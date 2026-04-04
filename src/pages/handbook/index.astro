@@ -1,0 +1,598 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('handbook');
+const sortedPosts = allPosts.sort((a, b) => a.data.order - b.data.order);
+
+const searchData = allPosts.map(p => ({
+  slug: p.id,
+  title: p.data.title,
+  description: p.data.description,
+  tags: p.data.tags || [],
+  phase: p.data.phase,
+  icon: p.data.icon,
+  phaseLabel: p.data.phaseLabel,
+  content: p.body
+}));
+
+const phases = [
+  {
+    id: 'preparation',
+    number: '01',
+    label: '戰略藍圖與落地籌備',
+    labelPt: 'Preparação Estratégica',
+    timeframe: '第 1~2 個月',
+    icon: '🗺️',
+    color: 'var(--color-platinum)',
+    glow: 'rgba(232,228,217,0.3)',
+    cause: '必須先看懂稅制地圖並獲得合法身份，才能真正落地開展業務。',
+    posts: sortedPosts.filter(p => p.data.phase === 'preparation'),
+  },
+  {
+    id: 'foundation',
+    number: '02',
+    label: '實體建立與資金血脈',
+    labelPt: 'Fundação & Capital',
+    timeframe: '第 2~4 個月',
+    icon: '🏛️',
+    color: 'var(--color-gold)',
+    glow: 'rgba(212,168,67,0.3)',
+    cause: '有了戰略後，建立法律實體並打通合法匯款管道，才有資格入駐電商平台。',
+    posts: sortedPosts.filter(p => p.data.phase === 'foundation'),
+  },
+  {
+    id: 'operations',
+    number: '03',
+    label: '供應鏈與數位營運',
+    labelPt: 'Operações & Supply Chain',
+    timeframe: '第 4~5 個月',
+    icon: '⚙️',
+    color: 'var(--color-neon-yellow)',
+    glow: 'rgba(229,255,0,0.3)',
+    cause: '店鋪與資金準備妥當，打通貨物進口及物流管道，由 IT 系統接管日常交易。',
+    posts: sortedPosts.filter(p => p.data.phase === 'operations'),
+  },
+  {
+    id: 'harvest',
+    number: '04',
+    label: '財務合規與利潤收割',
+    labelPt: 'Compliance & Colheita',
+    timeframe: '第 6 個月以後',
+    icon: '💰',
+    color: 'var(--color-neon-green)',
+    glow: 'rgba(0,255,135,0.3)',
+    cause: '穩定銷售後應付稅務稽核，年底執行盈餘最大化並合法匯回母國。',
+    posts: sortedPosts.filter(p => p.data.phase === 'harvest'),
+  },
+];
+
+const heroSlides = [
+  { title: '破譯巴西複雜稅制', sub: '從 5 稅並存到 IVA Dual 雙軌制，看懂稅務地圖', icon: '⚖️', slug: '01-tax-system' },
+  { title: '稅改 2026-2033 過渡期', sub: 'IVA Dual 雙軌制 — 把握視窗期建立先行者優勢', icon: '🗺️', slug: '01-1-tax-timeline' },
+  { title: '注資路徑 SCE-IED (RDE-IED)', sub: '中央銀行申報 → CNPJ → 開戶 → 匯款，一步不能錯', icon: '🏦', slug: '05-bacen-capital' },
+  { title: '電商平台入駐實戰', sub: 'Mercado Livre、Amazon、Shopee、TikTok Shop 完整指南', icon: '🛒', slug: '06-ecommerce-platforms' },
+  { title: '3PL 倉庫選擇策略', sub: '從 SC 州 TTD 稅務優惠到尾程時效的完整評分矩陣', icon: '🏭', slug: '08-3pl-warehouse' },
+];
+---
+
+<Layout title="跨境電商出海、落地巴西實戰手冊" description="從稅制理解到利潤匯出，最完整的跨境電商巴西落地實戰指南">
+
+  <!-- ★ HERO ──────────────────────────────────────────── -->
+  <section class="hero-section" style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-5) var(--space-3) var(--space-4);text-align:center;">
+    <canvas id="hero-canvas" class="canvas-bg"></canvas>
+
+    <div class="hero-content">
+      <div class="hero-badge">🇧🇷 BRASIL MARKET ENTRY MASTERGUIDE</div>
+      <h1 class="hero-title">
+        跨境電商出海<br/>
+        <span class="text-gradient-hope">落地巴西</span> 實戰手冊
+      </h1>
+      <p class="hero-subtitle">
+        從破譯複雜稅制、閃電成立公司，到打通 3PL 物流、完稅匯利回母國——<br/>一份具備因果敘事邏輯的 3D 立體英雄之旅地圖。
+      </p>
+      <div class="hero-actions">
+        <a href="#timeline" class="btn-gold-primary">開始英雄之旅 →</a>
+        <a href="https://braziltax.netlify.app/#contact" class="btn-gold-outline">免費諮詢專家</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ★ HERO CAROUSEL ─────────────────────────────────── -->
+  <section class="section-compact">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="carousel-title">📸 關鍵議題快覽</h2>
+        <div class="flex-center gap-1">
+          <button id="carousel-prev" class="carousel-btn" onclick="scrollCarousel(-1)">‹</button>
+          <button id="carousel-next" class="carousel-btn" onclick="scrollCarousel(1)">›</button>
+        </div>
+      </div>
+
+      <div id="hero-carousel" class="carousel-track">
+        {heroSlides.map((slide) => (
+          <div class="carousel-slide carousel-slide-fixed">
+            <a href={`/handbook/${slide.slug}`} class="link-none">
+              <div class="card img-placeholder img-placeholder-md flex-col p-3" title={`[圖片佔位] ${slide.title}`}>
+                <span class="carousel-icon">{slide.icon}</span>
+                <div class="text-center">
+                  <div style="font-weight:700;color:var(--color-text);margin-bottom:0.25rem;">{slide.title}</div>
+                  <div class="carousel-subtitle">{slide.sub}</div>
+                </div>
+                <div class="carousel-upload-hint">📷 上傳圖片</div>
+              </div>
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ★ SEARCH ────────────────────────────────────────── -->
+  <section class="section-compact">
+    <div class="container-xs">
+      <div class="relative">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="handbook-search"
+          class="search-box search-input"
+          placeholder="搜尋手冊內容（如：RADAR、Lucro Real、CNPJ...）"
+        />
+      </div>
+      <div id="search-results" class="mt-2" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- ★ TIMELINE ──────────────────────────────────────── -->
+  <section id="timeline" style="padding:var(--space-4) var(--space-3) var(--space-6);">
+    <div class="container-narrow">
+      <h2 class="section-title">英雄之旅時間軸</h2>
+      <p class="section-sub">每個關鍵節點都具備明確的前後因果關係</p>
+
+      <div class="timeline-wrapper flex-col gap-3" style="padding:var(--space-4) 0;">
+
+        {phases.map((phase, phaseIdx) => (
+          <div class="timeline-item" id={`phase-${phase.id}`} data-phase={phase.id} style={`--phase-color:${phase.color};--phase-glow:${phase.glow};`}>
+
+            <!-- Phase Header -->
+            <div class={`phase-header ${phaseIdx % 2 !== 0 ? 'phase-header-reverse' : ''}`}>
+              <div class="phase-icon" style={`background:${phase.glow};border:2px solid ${phase.color};box-shadow:0 0 24px ${phase.glow};`}>
+                {phase.icon}
+              </div>
+              <div style={phaseIdx % 2 !== 0 ? 'text-align:right;' : ''}>
+                <div class="phase-meta" style={`color:${phase.color};`}>
+                  PHASE {phase.number} · {phase.timeframe}
+                </div>
+                <h3 class="phase-title" style={`color:${phase.color};`}>{phase.label}</h3>
+                <p class="phase-desc">{phase.cause}</p>
+                <div class="phase-label-pt" style={`color:${phase.color};`}>{phase.labelPt}</div>
+              </div>
+            </div>
+
+            <!-- Phase Posts Grid - Bento Layout -->
+            {phase.posts.length > 0 ? (
+              <div class="bento-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));">
+                {phase.posts.map((post, postIdx) => (
+                  <a href={`/handbook/${post.id}`} style="text-decoration:none;" class={postIdx === 0 ? 'bento-featured' : ''}>
+                    <article class={`tilt-card card ${postIdx === 0 ? 'bento-featured' : ''} relative overflow-hidden cursor-pointer`} style="padding:var(--space-3);">
+                      <div class="tilt-inner">
+                      <div class="img-placeholder img-placeholder-sm rounded mb-2" title="[圖片佔位] 點擊上傳封面圖">
+                        <span class="z-1 relative">{post.data.icon} 封面圖片</span>
+                      </div>
+                      <div class="phase-label-inline" style={`color:${phase.color};`}>
+                        {post.data.phaseLabel}
+                      </div>
+                      <h4 class="article-title">{post.data.title}</h4>
+                      <p class="article-desc">{post.data.description}</p>
+                      {post.data.tags && post.data.tags.length > 0 && (
+                        <div class="flex-wrap mt-2" style="gap:0.4rem;">
+                          {post.data.tags.slice(0,3).map(tag => (
+                            <span class="tag">{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                      <div class="card-accent" style={`background:linear-gradient(90deg,${phase.color},transparent);`}></div>
+                      </div>
+                      <div class="tilt-glow"></div>
+                      <div class="tilt-shine"></div>
+                    </article>
+                  </a>
+                ))}
+                <div class="more-chapters-card" onclick={`openLightbox('${phase.id}')`}>
+                  <div class="more-chapters-icon" style={`color:${phase.color};`}>+</div>
+                  <div class="more-chapters-text">即將推出更多章節</div>
+                  <div class="more-chapters-sub">點擊預覽目錄</div>
+                </div>
+              </div>
+            ) : (
+              <div class="timeline-grid-fallback">
+                {[1,2,3].map(n => (
+                  <div class="card card-placeholder-empty">
+                    <div class="img-placeholder img-placeholder-sm rounded mb-2"></div>
+                    <div class="img-placeholder rounded mb-1" style="height:1rem;width:60%;"></div>
+                    <div class="img-placeholder rounded" style="height:0.8rem;width:80%;"></div>
+                    <div class="empty-chapter mt-2 text-center">章節即將發布</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ★ LIGHTBOX ──────────────────────────────────────── -->
+  <div id="lightbox" class="lightbox-overlay" onclick="if(event.target===this)closeLightbox()">
+    <div class="lightbox-content" style="min-width:320px;max-width:600px;width:90vw;">
+      <div class="section-header">
+        <h3 id="lb-title" style="margin:0;color:var(--color-gold);">章節目錄</h3>
+        <button class="lightbox-close" onclick="closeLightbox()">×</button>
+      </div>
+      <div id="lb-content"></div>
+    </div>
+  </div>
+
+  <!-- ★ CTA ───────────────────────────────────────────── -->
+  <section class="cta-section">
+    <h2 class="mb-2" style="font-size:clamp(1.5rem,4vw,2rem);">準備好開始您的巴西出海之旅了嗎？</h2>
+    <p class="mb-4" style="color:var(--color-muted);">我們的專業團隊將為您量身定制最優化的市場進入策略。</p>
+    <a href="https://braziltax.netlify.app/#contact" class="btn-gold-primary" style="font-size:1rem;padding:0.8rem 2rem;">預約免費策略諮詢 →</a>
+  </section>
+
+</Layout>
+
+<!-- ★ SCRIPTS ───────────────────────────────────────────── -->
+<script define:vars={{ searchData }}>
+  window.searchData = searchData;
+</script>
+<script>
+(function initParticles() {
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let W = canvas.offsetWidth, H = canvas.offsetHeight;
+  canvas.width = W; canvas.height = H;
+
+  const gradientColors = [
+    { r: 232, g: 228, b: 217 },
+    { r: 212, g: 168, b: 67 },
+    { r: 229, g: 255, b: 0 },
+    { r: 0, g: 255, b: 135 },
+    { r: 125, g: 211, b: 252 },
+  ];
+
+  const isMobile = W < 768;
+  const maxParticles = isMobile ? 35 : 60;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const speed = prefersReducedMotion ? 0.3 : 1;
+
+  interface Particle {
+    x: number; y: number; baseVx: number; vy: number;
+    size: number; opacity: number; colorIndex: number;
+    swaySpeed: number; swayAmount: number; phase: number;
+    isLarge: boolean; pulsePhase: number;
+  }
+
+  const particles: Particle[] = [];
+
+  function createParticle(): Particle {
+    const colorIndex = Math.floor(Math.random() * gradientColors.length);
+    const isLarge = Math.random() < 0.15;
+    return {
+      x: Math.random() * W,
+      y: -10 - Math.random() * H * 0.5,
+      baseVx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() * 0.4 + 0.2) * speed,
+      size: isLarge ? Math.random() * 3 + 2 : Math.random() * 1.5 + 0.5,
+      opacity: isLarge ? Math.random() * 0.3 + 0.15 : Math.random() * 0.4 + 0.1,
+      colorIndex,
+      swaySpeed: Math.random() * 0.02 + 0.005,
+      swayAmount: Math.random() * 0.5 + 0.2,
+      phase: Math.random() * Math.PI * 2,
+      isLarge,
+      pulsePhase: Math.random() * Math.PI * 2,
+    };
+  }
+
+  for (let i = 0; i < maxParticles; i++) {
+    const p = createParticle();
+    p.y = Math.random() * H;
+    particles.push(p);
+  }
+
+  let time = 0;
+
+  function draw() {
+    ctx!.clearRect(0, 0, W, H);
+    time += 0.016;
+
+    while (particles.length < maxParticles) {
+      particles.push(createParticle());
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      const c = gradientColors[p.colorIndex];
+
+      p.x += p.baseVx + Math.sin(time * p.swaySpeed * 60 + p.phase) * p.swayAmount * 0.1;
+      p.y += p.vy;
+
+      let currentOpacity = p.opacity;
+      if (p.isLarge) {
+        currentOpacity = p.opacity * (0.7 + 0.3 * Math.sin(time * 2 + p.pulsePhase));
+      }
+
+      ctx!.beginPath();
+      ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx!.fillStyle = `rgba(${c.r},${c.g},${c.b},${currentOpacity})`;
+      ctx!.fill();
+
+      if (p.isLarge) {
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(${c.r},${c.g},${c.b},${currentOpacity * 0.15})`;
+        ctx!.fill();
+      }
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const vDist = Math.abs(p.y - p2.y);
+        const hDist = Math.abs(p.x - p2.x);
+        if (vDist < 80 && hDist < 60) {
+          const avgR = (c.r + gradientColors[p2.colorIndex].r) / 2;
+          const avgG = (c.g + gradientColors[p2.colorIndex].g) / 2;
+          const avgB = (c.b + gradientColors[p2.colorIndex].b) / 2;
+          const alpha = 0.06 * (1 - vDist / 80) * (1 - hDist / 60);
+          ctx!.beginPath();
+          ctx!.moveTo(p.x, p.y);
+          ctx!.lineTo(p2.x, p2.y);
+          ctx!.strokeStyle = `rgba(${avgR},${avgG},${avgB},${alpha})`;
+          ctx!.lineWidth = 0.5;
+          ctx!.stroke();
+        }
+      }
+
+      if (p.y > H + 20) {
+        particles.splice(i, 1);
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  window.addEventListener('resize', () => {
+    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    canvas.width = W; canvas.height = H;
+  });
+})();
+
+// ── 3D Tilt Effect ─────────────────────────────────────────
+(function initTilt() {
+  const cards = document.querySelectorAll('.tilt-card');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -8;
+      const rotateY = ((x - centerX) / centerX) * 8;
+      const inner = card.querySelector('.tilt-inner') as HTMLElement;
+      if (inner) {
+        inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      }
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+      const shineX = `${(x / rect.width) * 200 - 100}%`;
+      card.style.setProperty('--shine-x', shineX);
+    });
+    card.addEventListener('mouseleave', () => {
+      const inner = card.querySelector('.tilt-inner') as HTMLElement;
+      if (inner) {
+        inner.style.transform = 'rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+      }
+    });
+  });
+})();
+
+(function initTimeline() {
+  const nodes = document.querySelectorAll('.timeline-item');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        (e.target as HTMLElement).classList.add('in-view');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  nodes.forEach(n => obs.observe(n));
+})();
+
+function scrollCarousel(dir: number) {
+  const c = document.getElementById('hero-carousel');
+  if (c) c.scrollBy({ left: dir * 340, behavior: 'smooth' });
+}
+(window as any).scrollCarousel = scrollCarousel;
+
+const phaseDetails: Record<string, { title: string; items: string[] }> = {
+  preparation: {
+    title: '🗺️ 第一階段：戰略藍圖與落地籌備',
+    items: [
+      '1.0 巴西稅改全景地圖 — 2026-2033 過渡期攻略',
+      '1.1 破譯巴西複雜稅制 — Lucro Real vs Presumido',
+      '1.2 合法當地居留：投資簽證 vs 高管簽證',
+      '1.3 尋找在地領路人 — Pleno Poder 的牽制藝術',
+    ]
+  },
+  foundation: {
+    title: '🏛️ 第二階段：實體建立與資金血脈',
+    items: [
+      '2.1 外資企業閃電成立 — CNPJ & Pre-acordo 倉庫策略',
+      '2.2 中央銀行申報先行 — RDE-IED 合規匯款',
+      '2.3 入駐電商平台 — Meli / Amazon / TikTok Shop 2026',
+    ]
+  },
+  operations: {
+    title: '⚙️ 第三階段：供應鏈與數位營運',
+    items: [
+      '3.1 RADAR 申請與產品進口資質 (INMETRO / ANATEL / ANVISA / MAPA)',
+      '3.2 3PL 倉庫選擇策略 — SC 州 TTD 稅務優惠評估矩陣',
+      '3.2.1 3PL 合約談判 — 稅務條款與賠償責任檢查清單',
+      '3.3 ERP & 支付整合 — Pix / Split Payment',
+      '3.3.1 Split Payment 現金流生存指南',
+      '3.4 本地化售後服務 — CDC 消費者保護法',
+    ]
+  },
+  harvest: {
+    title: '💰 第四階段：財務合規與利潤收割',
+    items: [
+      '4.1 日常稅務合規 — NF-e、SPED、Malha Fiscal',
+      '4.2 合規抵稅策略 — JCP 自有資本利息與 Royalties',
+      '4.3 利潤匯出母國 — Remessa de Lucros 完整操作',
+    ]
+  }
+};
+
+function openLightbox(phaseId: string) {
+  const lb = document.getElementById('lightbox');
+  const lbTitle = document.getElementById('lb-title');
+  const lbContent = document.getElementById('lb-content');
+  const data = phaseDetails[phaseId];
+  if (!lb || !lbTitle || !lbContent || !data) return;
+
+  lbTitle.textContent = data.title;
+  lbContent.innerHTML = `
+    <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:0.75rem;">
+      ${data.items.map(item => `
+        <li style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.1);border-radius:0.5rem;">
+          <span style="color:var(--color-gold);margin-top:0.1rem;">▸</span>
+          <span style="color:#d1d5db;font-size:0.9rem;">${item}</span>
+        </li>
+      `).join('')}
+    </ul>
+    <p style="color:#6b7280;font-size:0.8rem;margin-top:1.5rem;text-align:center;">更多章節持續更新中...</p>
+  `;
+  lb.classList.add('active');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox')?.classList.remove('active');
+}
+(window as any).openLightbox = openLightbox;
+(window as any).closeLightbox = closeLightbox;
+
+(function initSearch() {
+  const input = document.getElementById('handbook-search') as HTMLInputElement;
+  const resultsEl = document.getElementById('search-results');
+  if (!input || !resultsEl) return;
+
+  let fuse: any = null;
+  let searchIndex: any[] = (window as any).searchData || [];
+
+  // Initialize Fuse.js with the injected data
+  import('https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js').then(mod => {
+    const Fuse = mod.default || (mod as any).Fuse;
+    fuse = new Fuse(searchIndex, {
+      keys: [
+        { name: 'title', weight: 0.5 },
+        { name: 'description', weight: 0.3 },
+        { name: 'tags', weight: 0.15 },
+        { name: 'content', weight: 0.1 },
+        { name: 'phaseLabel', weight: 0.05 },
+      ],
+      threshold: 0.35,
+      ignoreLocation: true,
+      includeScore: true,
+      includeMatches: true,
+    });
+  }).catch(() => {
+    // Fallback: use simple search if CDN fails
+    fuse = null;
+  });
+
+  let searchTimeout: any;
+
+  // Highlight helper for UX
+  const highlight = (text: string, term: string) => {
+    if (!term || !text) return text;
+    try {
+      const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedTerm})`, 'gi');
+      return String(text).replace(regex, '<mark class="search-highlight" style="background:rgba(229,255,0,0.15);color:var(--color-neon-yellow);border-radius:0.2rem;padding:0 0.1rem;">$1</mark>');
+    } catch {
+      return text;
+    }
+  };
+
+  input.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      const q = input.value.trim();
+      if (!q) { resultsEl.style.display = 'none'; return; }
+
+      let results: any[] = [];
+
+      if (fuse) {
+        // Use Fuse.js fuzzy search
+        const fuseResults = fuse.search(q);
+        results = fuseResults.map((r: any) => ({
+          slug: r.item.slug,
+          title: r.item.title,
+          description: r.item.description,
+          icon: r.item.icon,
+          phase: r.item.phase,
+          score: r.score,
+        }));
+      } else {
+        // Fallback: simple text search
+        const lowerQ = q.toLowerCase();
+        results = searchIndex
+          .filter(item =>
+            item.title.toLowerCase().includes(lowerQ) ||
+            item.description.toLowerCase().includes(lowerQ) ||
+            (item.tags || []).some((t: string) => t.toLowerCase().includes(lowerQ)) ||
+            (item.content && item.content.toLowerCase().includes(lowerQ))
+          )
+          .map(item => ({
+            slug: item.slug,
+            title: item.title,
+            description: item.description,
+            icon: item.icon,
+            phase: item.phase,
+            score: 0,
+          }));
+      }
+
+      resultsEl.style.display = 'block';
+      if (results.length === 0) {
+        resultsEl.innerHTML = `
+          <div style="color:var(--color-muted);font-size:0.9rem;text-align:center;padding:1.5rem 0;background:rgba(212,168,67,0.02);border-radius:0.5rem;border:1px dashed rgba(212,168,67,0.15);">
+            <div style="font-size:1.5rem;margin-bottom:0.5rem;">😅</div>
+            未找到相關內容... <br/>
+            <span style="font-size:0.85rem;color:#6b7280;margin-top:0.8rem;display:inline-block;">
+              推薦搜尋：<span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='RADAR';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">RADAR</span>、
+              <span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='CNPJ';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">CNPJ</span>、
+              <span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='3PL';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">3PL</span>
+            </span>
+          </div>`;
+      } else {
+        resultsEl.innerHTML = `
+          <div style="color:var(--color-muted);font-size:0.8rem;margin-bottom:0.5rem;">找到 ${results.length} 個相關章節：</div>
+          ${results.map((r: any) => `
+            <a href="/handbook/${r.slug}" style="display:block;padding:0.75rem;border-radius:0.5rem;color:var(--color-text);font-size:0.9rem;margin-bottom:0.25rem;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.1);text-decoration:none;transition:all 0.2s;">
+              <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.25rem;">${r.icon || '📄'} ${highlight(r.title, q)}</div>
+              <div style="font-size:0.8rem;color:var(--color-muted);line-height:1.4;">${highlight(r.description, q)}</div>
+            </a>
+          `).join('')}
+        `;
+      }
+    }, 250);
+  });
+})();
+</script>

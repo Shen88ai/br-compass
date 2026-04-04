@@ -1,0 +1,133 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { glossaryData, categoryLabels } from '../../data/glossary';
+
+const sortedGlossary = [...glossaryData].sort((a, b) => a.term.localeCompare(b.term));
+---
+
+<Layout title="巴西專有名詞詞典" description="保姆級巴西稅務、證件、機構、支付、物流、法律專有名詞解釋，為完全不懂葡語的新僑設計">
+
+  <div class="glossary-page">
+    <div class="glossary-hero">
+      <h1>📚 巴西專有名詞詞典</h1>
+      <p>為完全不懂葡語、不熟悉巴西文化的新僑設計的保姆級詞典<br/>每個詞條包含發音指南、中文類比、詳細說明與實戰提醒</p>
+    </div>
+
+    <div class="glossary-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="glossary-search" placeholder="搜尋詞條（如：CNPJ、Lucro Real、Split Payment...）" />
+    </div>
+
+    <div class="glossary-categories" id="glossary-categories">
+      <button class="glossary-cat-btn active" data-category="all" onclick="filterCategory('all')">
+        📋 全部 ({glossaryData.length})
+      </button>
+      {Object.entries(categoryLabels).map(([key, cat]) => {
+        const count = glossaryData.filter(g => g.category === key).length;
+        return (
+          <button class="glossary-cat-btn" data-category={key} onclick={`filterCategory('${key}')`}>
+            {cat.icon} {cat.label} ({count})
+          </button>
+        );
+      })}
+    </div>
+
+    <div class="glossary-grid" id="glossary-grid">
+      {sortedGlossary.map((entry) => {
+        const cat = categoryLabels[entry.category];
+        return (
+          <div class="glossary-entry" data-term={entry.term} data-category={entry.category} onclick="toggleGlossaryEntry(this)">
+            <div class="glossary-entry-header">
+              <span class="glossary-entry-term">{entry.term}</span>
+              <span class="glossary-entry-pronunciation">{entry.pronunciation}</span>
+            </div>
+            <span class="glossary-entry-category" style={`background:${cat.color}20;color:${cat.color};`}>
+              {cat.icon} {cat.label}
+            </span>
+            <div class="glossary-entry-analogy">{entry.analogy}</div>
+            <div class="glossary-entry-oneliner">{entry.oneLiner}</div>
+            <div class="glossary-entry-fullname">{entry.fullPortuguese}</div>
+            <div class="glossary-entry-details">
+              <p class="glossary-entry-detail-text">{entry.fullExplanation}</p>
+              <div class="glossary-entry-tips">
+                <h5>💡 實戰提醒</h5>
+                <ul>
+                  {entry.practicalTips.map(tip => <li>{tip}</li>)}
+                </ul>
+              </div>
+              <div class="glossary-entry-mistakes">
+                <h5>⚠️ 常見錯誤</h5>
+                <ul>
+                  {entry.commonMistakes.map(mistake => <li>{mistake}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="glossary-no-results" id="glossary-no-results" style="display:none;">
+      <div style="font-size:2rem;margin-bottom:0.5rem;">🔍</div>
+      <div>未找到相關詞條</div>
+    </div>
+
+    <div style="text-align:center;margin-top:var(--space-4);">
+      <a href="/handbook" style="color:var(--color-gold);text-decoration:none;font-size:0.9rem;">
+        ← 返回手冊首頁
+      </a>
+    </div>
+  </div>
+
+</Layout>
+
+<script>
+(function initGlossaryPage() {
+  const searchInput = document.getElementById('glossary-search') as HTMLInputElement;
+  const grid = document.getElementById('glossary-grid');
+  const noResults = document.getElementById('glossary-no-results');
+  let currentCategory = 'all';
+
+  (window as any).filterCategory = function(cat: string) {
+    currentCategory = cat;
+    document.querySelectorAll('.glossary-cat-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-category') === cat);
+    });
+    applyFilters();
+  };
+
+  function applyFilters() {
+    const query = searchInput.value.toLowerCase().trim();
+    const entries = grid!.querySelectorAll('.glossary-entry');
+    let visibleCount = 0;
+
+    entries.forEach(entry => {
+      const term = entry.getAttribute('data-term')?.toLowerCase() || '';
+      const cat = entry.getAttribute('data-category') || '';
+      const text = entry.textContent?.toLowerCase() || '';
+
+      const matchCategory = currentCategory === 'all' || cat === currentCategory;
+      const matchSearch = !query || term.includes(query) || text.includes(query);
+
+      if (matchCategory && matchSearch) {
+        (entry as HTMLElement).style.display = '';
+        visibleCount++;
+      } else {
+        (entry as HTMLElement).style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  (window as any).toggleGlossaryEntry = function(el: HTMLElement) {
+    el.classList.toggle('expanded');
+  };
+
+  searchInput?.addEventListener('input', () => {
+    applyFilters();
+  });
+})();
+</script>

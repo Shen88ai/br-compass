@@ -1,0 +1,425 @@
+{
+  "nodes": [
+    {
+      "id": "a1b2c3d4e5f67890",
+      "type": "group",
+      "x": -50,
+      "y": -50,
+      "width": 1800,
+      "height": 1200,
+      "label": "混合方案：軍師羅盤 × 英雄之旅地圖",
+      "color": "6"
+    },
+    {
+      "id": "compass0000000001",
+      "type": "text",
+      "x": 600,
+      "y": 30,
+      "width": 500,
+      "height": 80,
+      "text": "# 🧭 階段一：互動羅盤（首頁入口）\n*巨型 SVG 羅盤，4 方位發光，品牌色漸變*",
+      "color": "3"
+    },
+    {
+      "id": "north0000000001",
+      "type": "text",
+      "x": 700,
+      "y": 130,
+      "width": 300,
+      "height": 100,
+      "text": "## 🔵 北：偵察兵\n**Preparation**\n還在觀望、想了解巴西\n8 關卡 | ⭐⭐\n鉑金色 #E8E4D9",
+      "color": "5"
+    },
+    {
+      "id": "east000000000001",
+      "type": "text",
+      "x": 1050,
+      "y": 280,
+      "width": 300,
+      "height": 100,
+      "text": "## 🟡 東：奠基者\n**Foundation**\n已決定進入、建實體\n4 關卡 | ⭐⭐⭐\n金色 #D4A843",
+      "color": "3"
+    },
+    {
+      "id": "south0000000001",
+      "type": "text",
+      "x": 700,
+      "y": 430,
+      "width": 300,
+      "height": 100,
+      "text": "## 🟢 南：領航員\n**Operations**\n已註冊、打通供應鏈\n8 關卡 | ⭐⭐⭐⭐\n霓虹綠 #00FF87",
+      "color": "4"
+    },
+    {
+      "id": "west000000000001",
+      "type": "text",
+      "x": 350,
+      "y": 280,
+      "width": 300,
+      "height": 100,
+      "text": "## 🟣 西：收割者\n**Harvest**\n在運營、合規與利潤\n5 關卡 | ⭐⭐⭐⭐⭐\n霓虹黃 #E5FF00",
+      "color": "2"
+    },
+    {
+      "id": "advisor000000001",
+      "type": "text",
+      "x": 600,
+      "y": 570,
+      "width": 500,
+      "height": 80,
+      "text": "# 🎭 階段二：軍師診斷\n*點擊羅盤方位後，軍師現身，3 問診斷*",
+      "color": "5"
+    },
+    {
+      "id": "q1000000000001",
+      "type": "text",
+      "x": 100,
+      "y": 680,
+      "width": 400,
+      "height": 160,
+      "text": "## ❓ Q1：你的身份？\n\n🧑‍💼 **個人投資者**\n→ 走簽證路線\n\n🏢 **企業派出**\n→ 走企業路線\n\n🌐 **跨境賣家**\n→ 純電商路線",
+      "color": "1"
+    },
+    {
+      "id": "q2000000000001",
+      "type": "text",
+      "x": 550,
+      "y": 680,
+      "width": 400,
+      "height": 160,
+      "text": "## ❓ Q2：你的終極目標？\n\n💰 **利潤匯回**\n→ 賺巴西錢，匯回母國\n\n🏠 **移民定居**\n→ 拿身份，在巴西生活\n\n📦 **規模擴張**\n→ 巴西作拉美樞紐\n\n🎯 **快速試水**\n→ 最小成本測試",
+      "color": "2"
+    },
+    {
+      "id": "q3000000000001",
+      "type": "text",
+      "x": 1000,
+      "y": 680,
+      "width": 400,
+      "height": 160,
+      "text": "## ❓ Q3：目前進度？\n\n🔵 **零基礎**\n→ 還在了解階段\n\n🟡 **準備中**\n→ 已決定，正在籌備\n\n🟢 **已落地**\n→ 公司/簽證已搞定\n\n🟣 **運營中**\n→ 已有銷售，需優化",
+      "color": "4"
+    },
+    {
+      "id": "reveal000000001",
+      "type": "text",
+      "x": 600,
+      "y": 870,
+      "width": 500,
+      "height": 80,
+      "text": "# 📜 階段三：戰略卷軸揭示\n*軍師思考動畫 → 展開個人化閱讀清單*",
+      "color": "3"
+    },
+    {
+      "id": "pathA000000001",
+      "type": "text",
+      "x": 50,
+      "y": 970,
+      "width": 260,
+      "height": 180,
+      "text": "## 🛡️ 路徑 A：移民征途\n**17 關 | 約 8 小時**\n\n適合：個人投資者 + 零基礎 + 移民\n\n全 19 篇文章\n從入境清單 → 利潤匯出\n\n⭐⭐⭐⭐⭐ 最完整",
+      "color": "1"
+    },
+    {
+      "id": "pathB000000001",
+      "type": "text",
+      "x": 330,
+      "y": 970,
+      "width": 260,
+      "height": 180,
+      "text": "## 🚀 路徑 B：閃電出海\n**5 關 | 約 2.5 小時**\n\n適合：跨境賣家 + 零基礎 + 試水\n\n稅制 → 平台 → RADAR\n→ 3PL → ERP\n\n⭐⭐ 精簡版",
+      "color": "2"
+    },
+    {
+      "id": "pathC000000001",
+      "type": "text",
+      "x": 610,
+      "y": 970,
+      "width": 260,
+      "height": 180,
+      "text": "## 🏗️ 路徑 C：企業遠征\n**14 關 | 約 6 小時**\n\n適合：企業派出 + 準備中 + 擴張\n\n入境 → 稅制 → 高管簽證\n→ 公司 → 全運營 → 合規\n\n⭐⭐⭐⭐ 完整版",
+      "color": "3"
+    },
+    {
+      "id": "pathD000000001",
+      "type": "text",
+      "x": 890,
+      "y": 970,
+      "width": 260,
+      "height": 180,
+      "text": "## ⚡ 路徑 D：落地加速\n**8 關 | 約 4 小時**\n\n適合：已落地 + 利潤匯回\n\n公司設立 → BACEN\n→ 平台 → RADAR → 3PL\n→ ERP → 合規 → 匯出\n\n⭐⭐⭐ 加速版",
+      "color": "4"
+    },
+    {
+      "id": "pathE000000001",
+      "type": "text",
+      "x": 1170,
+      "y": 970,
+      "width": 260,
+      "height": 180,
+      "text": "## 🔧 路徑 E：運營優化\n**5 關 | 約 2.5 小時**\n\n適合：運營中 + 利潤匯回\n\n售後 → 稅務合規\n→ 利潤匯出\n+ 必要營運複習\n\n⭐⭐⭐ 優化版",
+      "color": "5"
+    },
+    {
+      "id": "pathF000000001",
+      "type": "text",
+      "x": 1450,
+      "y": 970,
+      "width": 260,
+      "height": 180,
+      "text": "## 🎯 路徑 F：試水偵察\n**3 關 | 約 1.5 小時**\n\n適合：跨境賣家 + 零基礎 + 試水\n\n稅制 → 電商平台\n→ 3PL 倉庫\n\n⭐ 極簡版",
+      "color": "6"
+    },
+    {
+      "id": "map000000000001",
+      "type": "text",
+      "x": 600,
+      "y": 1170,
+      "width": 500,
+      "height": 80,
+      "text": "# 🗺️ 階段四：英雄之旅地圖展開\n*點擊「踏上征途」→ 進入第一篇文章*",
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge0000000001",
+      "fromNode": "compass0000000001",
+      "fromSide": "bottom",
+      "toNode": "north0000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "4 方位",
+      "color": "#E8E4D9"
+    },
+    {
+      "id": "edge0000000002",
+      "fromNode": "compass0000000001",
+      "fromSide": "bottom",
+      "toNode": "east000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#D4A843"
+    },
+    {
+      "id": "edge0000000003",
+      "fromNode": "compass0000000001",
+      "fromSide": "bottom",
+      "toNode": "south0000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#00FF87"
+    },
+    {
+      "id": "edge0000000004",
+      "fromNode": "compass0000000001",
+      "fromSide": "bottom",
+      "toNode": "west000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#E5FF00"
+    },
+    {
+      "id": "edge0000000005",
+      "fromNode": "north0000000001",
+      "fromSide": "bottom",
+      "toNode": "advisor000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "點擊後",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000006",
+      "fromNode": "east000000000001",
+      "fromSide": "bottom",
+      "toNode": "advisor000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000007",
+      "fromNode": "south0000000001",
+      "fromSide": "bottom",
+      "toNode": "advisor000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000008",
+      "fromNode": "west000000000001",
+      "fromSide": "bottom",
+      "toNode": "advisor000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000009",
+      "fromNode": "advisor000000001",
+      "fromSide": "bottom",
+      "toNode": "q1000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "Q1",
+      "color": "#E8E4D9"
+    },
+    {
+      "id": "edge0000000010",
+      "fromNode": "advisor000000001",
+      "fromSide": "bottom",
+      "toNode": "q2000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "Q2",
+      "color": "#D4A843"
+    },
+    {
+      "id": "edge0000000011",
+      "fromNode": "advisor000000001",
+      "fromSide": "bottom",
+      "toNode": "q3000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "Q3",
+      "color": "#00FF87"
+    },
+    {
+      "id": "edge0000000012",
+      "fromNode": "q1000000000001",
+      "fromSide": "bottom",
+      "toNode": "reveal000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000013",
+      "fromNode": "q2000000000001",
+      "fromSide": "bottom",
+      "toNode": "reveal000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000014",
+      "fromNode": "q3000000000001",
+      "fromSide": "bottom",
+      "toNode": "reveal000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000015",
+      "fromNode": "reveal000000001",
+      "fromSide": "bottom",
+      "toNode": "pathA000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#E8E4D9"
+    },
+    {
+      "id": "edge0000000016",
+      "fromNode": "reveal000000001",
+      "fromSide": "bottom",
+      "toNode": "pathB000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#D4A843"
+    },
+    {
+      "id": "edge0000000017",
+      "fromNode": "reveal000000001",
+      "fromSide": "bottom",
+      "toNode": "pathC000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#E5FF00"
+    },
+    {
+      "id": "edge0000000018",
+      "fromNode": "reveal000000001",
+      "fromSide": "bottom",
+      "toNode": "pathD000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#00FF87"
+    },
+    {
+      "id": "edge0000000019",
+      "fromNode": "reveal000000001",
+      "fromSide": "bottom",
+      "toNode": "pathE000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000020",
+      "fromNode": "reveal000000001",
+      "fromSide": "bottom",
+      "toNode": "pathF000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000021",
+      "fromNode": "pathA000000001",
+      "fromSide": "bottom",
+      "toNode": "map000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#E8E4D9"
+    },
+    {
+      "id": "edge0000000022",
+      "fromNode": "pathB000000001",
+      "fromSide": "bottom",
+      "toNode": "map000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#D4A843"
+    },
+    {
+      "id": "edge0000000023",
+      "fromNode": "pathC000000001",
+      "fromSide": "bottom",
+      "toNode": "map000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#E5FF00"
+    },
+    {
+      "id": "edge0000000024",
+      "fromNode": "pathD000000001",
+      "fromSide": "bottom",
+      "toNode": "map000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#00FF87"
+    },
+    {
+      "id": "edge0000000025",
+      "fromNode": "pathE000000001",
+      "fromSide": "bottom",
+      "toNode": "map000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    },
+    {
+      "id": "edge0000000026",
+      "fromNode": "pathF000000001",
+      "fromSide": "bottom",
+      "toNode": "map000000000001",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "color": "#7DD3FC"
+    }
+  ]
+}

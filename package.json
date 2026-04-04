@@ -1,0 +1,35 @@
+{
+  "name": "tidal-telescope",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/three": "^0.183.1",
+    "astro": "^6.1.2",
+    "fuse.js": "^7.1.0",
+    "gsap": "^3.14.2",
+    "rehype-external-links": "^3.0.0",
+    "remark-callouts": "^2.0.0",
+    "remark-wiki-link": "^2.0.1",
+    "tailwindcss": "^4.2.2",
+    "three": "^0.183.2"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "cheerio": "^1.2.0",
+    "jsdom": "^29.0.1",
+    "vitest": "^4.1.2"
+  }
+}

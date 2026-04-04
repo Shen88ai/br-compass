@@ -1,0 +1,44 @@
+---
+// JourneyMiniMap — 文章頁頂部小地圖組件
+// 顯示當前路徑、關卡進度和所有關卡狀態
+import { pathConfigs, pathInfo } from '../data/path-mapping';
+
+interface Props {
+  path: string;
+  currentSlug: string;
+}
+
+const { path, currentSlug } = Astro.props;
+const checkpoints = pathConfigs[path] || [];
+const info = pathInfo[path] || { name: '', checkpoints: 0, hours: 0 };
+const currentIndex = checkpoints.findIndex(c => c.slug === currentSlug);
+const currentCheckpoint = checkpoints[currentIndex];
+---
+
+{checkpoints.length > 0 && (
+<div class="journey-minimap" data-path={path} data-current={currentSlug}>
+  <div class="minimap-info">
+    <span class="minimap-path-name">{info.name}</span>
+    <span class="minimap-progress">關卡 {currentIndex + 1}/{checkpoints.length}</span>
+    <span class="minimap-current-title">{currentCheckpoint?.title || ''}</span>
+  </div>
+  <div class="minimap-track">
+    {checkpoints.map((cp, index) => {
+      const isCompleted = index < currentIndex;
+      const isCurrent = index === currentIndex;
+      const isAvailable = index === currentIndex + 1;
+      const isLocked = index > currentIndex + 1;
+      return (
+        <a
+          class={`minimap-node ${isCompleted ? 'completed' : isCurrent ? 'current' : isAvailable ? 'available' : 'locked'}`}
+          data-slug={cp.slug}
+          href={isCompleted || isAvailable ? `/handbook/${cp.slug}` : '#'}
+          aria-label={`關卡 ${index + 1}: ${cp.title}`}
+        >
+          {isCompleted ? '✓' : isCurrent ? '●' : isAvailable ? '○' : '·'}
+        </a>
+      );
+    })}
+  </div>
+</div>
+)}

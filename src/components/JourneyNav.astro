@@ -1,0 +1,125 @@
+---
+// JourneyNav — 文章頁底部導航組件
+// 顯示上一關/下一關、慶祝動畫、主要 CTA
+import { pathConfigs } from '../data/path-mapping';
+
+interface Props {
+  path: string;
+  currentSlug: string;
+}
+
+const { path, currentSlug } = Astro.props;
+const checkpoints = pathConfigs[path] || [];
+const currentIndex = checkpoints.findIndex(c => c.slug === currentSlug);
+const currentCheckpoint = checkpoints[currentIndex];
+const prevCheckpoint = checkpoints[currentIndex - 1];
+const nextCheckpoint = checkpoints[currentIndex + 1];
+const isLast = currentIndex === checkpoints.length - 1;
+const isFirst = currentIndex === 0;
+---
+
+{checkpoints.length > 0 && (
+<div class="journey-navigation" data-path={path} data-current={currentSlug} data-next={nextCheckpoint?.slug || ''} data-prev={prevCheckpoint?.slug || ''}>
+  <div class="nav-celebration" id="celebration">
+    <div class="celebration-badge">
+      <span class="badge-icon">✅</span>
+      <span class="badge-text">關卡 {currentIndex + 1}/{checkpoints.length} 已完成！</span>
+    </div>
+    <div class="celebration-stamp">
+      <span class="stamp-icon">🏅</span>
+      <span class="stamp-text">獲得金色印章：「{currentCheckpoint?.title || ''}」</span>
+    </div>
+  </div>
+
+  <div class="nav-chapters">
+    {!isFirst && prevCheckpoint ? (
+      <a href={`/handbook/${prevCheckpoint.slug}`} class="nav-chapter prev">
+        <span class="chapter-arrow">⬅️</span>
+        <div class="chapter-info">
+          <span class="chapter-label">上一關</span>
+          <span class="chapter-title">{prevCheckpoint.title}</span>
+          <span class="chapter-meta">⏱️ {prevCheckpoint.eta} | {'⭐'.repeat(prevCheckpoint.difficulty)}</span>
+        </div>
+      </a>
+    ) : null}
+    {!isLast && nextCheckpoint ? (
+      <a href={`/handbook/${nextCheckpoint.slug}`} class="nav-chapter next">
+        <div class="chapter-info">
+          <span class="chapter-label">下一關</span>
+          <span class="chapter-title">{nextCheckpoint.title}</span>
+          <span class="chapter-meta">⏱️ {nextCheckpoint.eta} | {'⭐'.repeat(nextCheckpoint.difficulty)}</span>
+        </div>
+        <span class="chapter-arrow">➡️</span>
+      </a>
+    ) : null}
+  </div>
+
+  {!isLast && nextCheckpoint ? (
+    <a href={`/handbook/${nextCheckpoint.slug}`} class="nav-cta">
+      <span class="cta-fire">🔥</span>
+      <span class="cta-text">繼續征途 → {nextCheckpoint.title}</span>
+    </a>
+  ) : (
+    <a href="/handbook" class="nav-cta">
+      <span class="cta-fire">🏆</span>
+      <span class="cta-text">🎉 恭喜！你已完成征途！</span>
+    </a>
+  )}
+
+  <div class="nav-actions">
+    <a href="/handbook" class="nav-action">
+      <span>🗺️</span>
+      <span>查看完整地圖</span>
+    </a>
+  </div>
+</div>
+)}
+
+---
+<script>
+(function initJourneyNav() {
+  const nav = document.querySelector('.journey-navigation');
+  if (!nav) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        nav.classList.add('visible');
+        markAsCompleted();
+        showCelebration();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(nav);
+
+  function markAsCompleted() {
+    const path = nav.dataset.path;
+    const current = nav.dataset.current;
+    if (!path || !current) return;
+
+    try {
+      const data = JSON.parse(localStorage.getItem('persona-journey') || '{}');
+      if (!data.path || data.path !== path) return;
+      if (!data.checkpoints) data.checkpoints = {};
+      if (data.checkpoints[current]?.status === 'completed') return;
+
+      data.checkpoints[current] = {
+        status: 'completed',
+        completedAt: new Date().toISOString()
+      };
+      data.lastVisited = new Date().toISOString();
+      localStorage.setItem('persona-journey', JSON.stringify(data));
+    } catch (e) {
+      // localStorage 不可用時忽略
+    }
+  }
+
+  function showCelebration() {
+    const celebration = document.getElementById('celebration');
+    if (!celebration || celebration.dataset.shown) return;
+    celebration.dataset.shown = 'true';
+    celebration.style.display = 'block';
+  }
+})();
+</script>

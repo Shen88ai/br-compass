@@ -1,0 +1,400 @@
+[
+  {
+    "slug": "01-0-pre-entry-checklist",
+    "title": "入境前合規準備清單：從 CPF 到文件認證的完整指南",
+    "description": "在踏上巴西土地之前，你必須完成哪些合規準備？CPF 線上申請、海牙認證、宣誓翻譯、gov.br 激活——一份按時間線排序的 5W2H 行動清單。",
+    "excerpt": "在踏上巴西土地之前，你必須完成哪些合規準備？CPF 線上申請、海牙認證、宣誓翻譯、gov.br 激活——一份按時間線排序的 5W2H 行動清單。",
+    "tags": [
+      "CPF",
+      "海牙認證",
+      "Apostila da Haia",
+      "宣誓翻譯",
+      "Tradução Juramentada",
+      "gov.br",
+      "無犯罪證明",
+      "入境準備",
+      "Procuração"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 1,
+    "icon": "📋",
+    "featured": 1
+  },
+  {
+    "slug": "01-tax-system",
+    "title": "破譯巴西複雜稅制：從稅務瘋人院到 IVA Dual",
+    "description": "深度解析巴西從 5 稅並存的舊制，到 2026-2033 IVA Dual 雙軌過渡期的完整稅務架構，並點出企業選擇 Lucro Real vs. Lucro Presumido 的關鍵時機與長遠影響。",
+    "excerpt": "深度解析巴西從 5 稅並存的舊制，到 2026-2033 IVA Dual 雙軌過渡期的完整稅務架構，並點出企業選擇 Lucro Real vs. Lucro Presumido 的關鍵時機與長遠影響。",
+    "tags": [
+      "稅制",
+      "IVA Dual",
+      "Lucro Real",
+      "IRPJ",
+      "CSLL",
+      "CBS",
+      "IBS"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 1,
+    "icon": "⚖️",
+    "featured": 1
+  },
+  {
+    "slug": "01-2-visa-golden",
+    "title": "黃金簽證：房產投資居留指南",
+    "description": "透過在巴西購買房產取得臨時居留權——區域門檻、資金來源要求、14天居住規則、4年轉永居完整路徑。",
+    "excerpt": "透過在巴西購買房產取得臨時居留權——區域門檻、資金來源要求、14天居住規則、4年轉永居完整路徑。",
+    "tags": [
+      "黃金簽證",
+      "房產投資",
+      "Visto Gold",
+      "CRNM",
+      "永居",
+      "Matrícula"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 3,
+    "icon": "🏠",
+    "featured": 1
+  },
+  {
+    "slug": "03-local-team",
+    "title": "尋找在地領路人：牽制與授權的博弈",
+    "description": "如何篩選可靠的巴西會計師與律師？如何安全地核發 Pleno Poder 全權授權書？附帶合約清單與風險管理框架，確保外資母廠不被反客為主。",
+    "excerpt": "如何篩選可靠的巴西會計師與律師？如何安全地核發 Pleno Poder 全權授權書？附帶合約清單與風險管理框架，確保外資母廠不被反客為主。",
+    "tags": [
+      "會計師",
+      "律師",
+      "Pleno Poder",
+      "授權書",
+      "Administrador",
+      "風險管理",
+      "合規"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 3,
+    "icon": "🤝",
+    "featured": false
+  },
+  {
+    "slug": "01-3-visa-digital-nomad",
+    "title": "數位遊民簽證：遠程工作者的巴西通行證",
+    "description": "VITEM XIV 數位遊民簽證完整指南——收入門檻、183天稅務居民規則、境內轉換流程、轉投資簽證路徑。",
+    "excerpt": "VITEM XIV 數位遊民簽證完整指南——收入門檻、183天稅務居民規則、境內轉換流程、轉投資簽證路徑。",
+    "tags": [
+      "數位遊民",
+      "VITEM XIV",
+      "稅務居民",
+      "183天",
+      "遠程工作",
+      "MigranteWeb"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 4,
+    "icon": "💻",
+    "featured": 1
+  },
+  {
+    "slug": "04-company-setup",
+    "title": "外資企業閃電成立：CNPJ、Pre-acordo 與 Pleno Poder 的授權博弈",
+    "description": "逐步拆解外資公司如何在巴西從零到一：Pre-acordo 借用倉庫地址策略、CNPJ 申請流程、Pleno Poder 全權授權書的法律風險管控，以及資本金額的精算邏輯。",
+    "excerpt": "逐步拆解外資公司如何在巴西從零到一：Pre-acordo 借用倉庫地址策略、CNPJ 申請流程、Pleno Poder 全權授權書的法律風險管控，以及資本金額的精算邏輯。",
+    "tags": [
+      "CNPJ",
+      "公司設立",
+      "Pleno Poder",
+      "SCE-IED",
+      "RDE-IED",
+      "外資",
+      "Pre-acordo",
+      "BACEN"
+    ],
+    "phase": "foundation",
+    "phaseLabel": "第二階段：實體建立",
+    "order": 4,
+    "icon": "🏛️",
+    "featured": false
+  },
+  {
+    "slug": "02-visa-strategy",
+    "title": "合法當地居留：簽證戰略與決策地圖",
+    "description": "5 種簽證路徑完整對比——法定董事 RN 11、投資簽證 RN 36、黃金簽證、數位遊民 VITEM XIV、高管簽證。互動決策地圖幫你找到最適合的路徑。",
+    "excerpt": "5 種簽證路徑完整對比——法定董事 RN 11、投資簽證 RN 36、黃金簽證、數位遊民 VITEM XIV、高管簽證。互動決策地圖幫你找到最適合的路徑。",
+    "tags": [
+      "簽證",
+      "RN 11",
+      "RN 36",
+      "黃金簽證",
+      "數位遊民",
+      "VITEM",
+      "稅務居民",
+      "永居",
+      "CPF",
+      "SCE-IED"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 5,
+    "icon": "🛂",
+    "featured": 1
+  },
+  {
+    "slug": "05-bacen-capital",
+    "title": "中央銀行申報與合規資本注入：SCE-IED (RDE-IED) 不可逾越的紅線",
+    "description": "為何匯款前必須先在 BACEN 的 SCE-IED (RDE-IED) 系統完成外資登記？2024 年 10 月 30 天規則取消後的定期申報新制。如何確保匯款水單與申報內容完全一致？精算註冊資本額與前半年的營運費用模型。",
+    "excerpt": "為何匯款前必須先在 BACEN 的 SCE-IED (RDE-IED) 系統完成外資登記？2024 年 10 月 30 天規則取消後的定期申報新制。如何確保匯款水單與申報內容完全一致？精算註冊資本額與前半年的營運費用模型。",
+    "tags": [
+      "BACEN",
+      "SCE-IED",
+      "RDE-IED",
+      "資本注入",
+      "外資登記",
+      "匯款",
+      "CNPJ",
+      "合規",
+      "gov.br",
+      "定期申報"
+    ],
+    "phase": "foundation",
+    "phaseLabel": "第二階段：實體建立",
+    "order": 5,
+    "icon": "🏦",
+    "featured": 1
+  },
+  {
+    "slug": "01-4-visa-executive",
+    "title": "高管簽證 VITEM V：跨國公司外派人員的巴西通行證",
+    "description": "VITEM V 高管/技術工作簽證完整指南——2026 年最低工資 R$1,621 的連鎖反應、學歷認證陷阱、Local-plus 安排風險、3~6 週最快審批路徑。",
+    "excerpt": "VITEM V 高管/技術工作簽證完整指南——2026 年最低工資 R$1,621 的連鎖反應、學歷認證陷阱、Local-plus 安排風險、3~6 週最快審批路徑。",
+    "tags": [
+      "VITEM V",
+      "高管簽證",
+      "技術服務簽證",
+      "最低工資",
+      "學歷認證",
+      "CLT",
+      "INSS",
+      "FGTS",
+      "Pró-labore"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 6,
+    "icon": "👔",
+    "featured": 1
+  },
+  {
+    "slug": "06-ecommerce-platforms",
+    "title": "入駐主流電商與社交電商平台實戰",
+    "description": "Mercado Livre、Amazon、Shopee、TikTok Shop 2026 巴西新策略——平台註冊要訣、稅務處理差異、演算法邏輯與合規注意事項。",
+    "excerpt": "Mercado Livre、Amazon、Shopee、TikTok Shop 2026 巴西新策略——平台註冊要訣、稅務處理差異、演算法邏輯與合規注意事項。",
+    "tags": [
+      "Mercado Livre",
+      "Amazon",
+      "Shopee",
+      "TikTok Shop",
+      "社交電商",
+      "平台註冊",
+      "演算法"
+    ],
+    "phase": "foundation",
+    "phaseLabel": "第二階段：實體建立",
+    "order": 6,
+    "icon": "🛒",
+    "featured": false
+  },
+  {
+    "slug": "07-radar-import",
+    "title": "RADAR 申請與產品進口資質：打開貿易敲門磚",
+    "description": "外資剛成立的新公司如何申請 Siscomex RADAR 進出口權？需要哪些財力資質？以及如何確保選定的產品符合 INMETRO、ANATEL、ANVISA、MAPA 等強制認證要求。",
+    "excerpt": "外資剛成立的新公司如何申請 Siscomex RADAR 進出口權？需要哪些財力資質？以及如何確保選定的產品符合 INMETRO、ANATEL、ANVISA、MAPA 等強制認證要求。",
+    "tags": [
+      "RADAR",
+      "Siscomex",
+      "INMETRO",
+      "ANATEL",
+      "ANVISA",
+      "MAPA",
+      "進口",
+      "清關"
+    ],
+    "phase": "operations",
+    "phaseLabel": "第三階段：供應鏈營運",
+    "order": 7,
+    "icon": "📦",
+    "featured": false
+  },
+  {
+    "slug": "08-3pl-warehouse",
+    "title": "串接當地 3PL 系統與倉儲選擇基準",
+    "description": "從進倉到尾程配送的 ICMS 稅務影響分析。如何選擇能提供最佳化稅務的倉庫？SC 州進口 ICMS 延緩抵稅優惠 (TTD) 實戰指南。",
+    "excerpt": "從進倉到尾程配送的 ICMS 稅務影響分析。如何選擇能提供最佳化稅務的倉庫？SC 州進口 ICMS 延緩抵稅優惠 (TTD) 實戰指南。",
+    "tags": [
+      "3PL",
+      "倉儲",
+      "ICMS",
+      "TTD",
+      "Santa Catarina",
+      "物流",
+      "稅務優化"
+    ],
+    "phase": "operations",
+    "phaseLabel": "第三階段：供應鏈營運",
+    "order": 8,
+    "icon": "🏭",
+    "featured": false
+  },
+  {
+    "slug": "09-erp-payment",
+    "title": "建立神經網絡：ERP 整合與在地支付系統",
+    "description": "如何整合 Pix、Boleto、Split Payment 分裂支付機制？選擇適合跨境電商的 ERP 系統，打造訂單到現金的自動化流程。",
+    "excerpt": "如何整合 Pix、Boleto、Split Payment 分裂支付機制？選擇適合跨境電商的 ERP 系統，打造訂單到現金的自動化流程。",
+    "tags": [
+      "ERP",
+      "Pix",
+      "Boleto",
+      "Split Payment",
+      "支付",
+      "Bling",
+      "Tiny",
+      "現金流"
+    ],
+    "phase": "operations",
+    "phaseLabel": "第三階段：供應鏈營運",
+    "order": 9,
+    "icon": "💳",
+    "featured": false
+  },
+  {
+    "slug": "10-after-sales-service",
+    "title": "本地化銷售與售後服務：巴西消費者法 (CDC) 實戰",
+    "description": "巴西消費者保護法 (CDC) 對電商賣家的強制要求、退換貨流程、逆向物流最佳實踐，以及如何避免消費者訴訟與 PROCON 罰款。",
+    "excerpt": "巴西消費者保護法 (CDC) 對電商賣家的強制要求、退換貨流程、逆向物流最佳實踐，以及如何避免消費者訴訟與 PROCON 罰款。",
+    "tags": [
+      "CDC",
+      "消費者法",
+      "退換貨",
+      "逆向物流",
+      "PROCON",
+      "售後服務",
+      "本地化"
+    ],
+    "phase": "operations",
+    "phaseLabel": "第三階段：供應鏈營運",
+    "order": 10,
+    "icon": "🔄",
+    "featured": false
+  },
+  {
+    "slug": "01-1-tax-timeline",
+    "title": "巴西稅改全景地圖：2026-2033 過渡期行動指南",
+    "description": "從 2026 年到 2033 年，巴西稅制經歷前所未有的劇烈變革。這份時間軸攻略幫助你根據自己的市場進入時間點，選擇最適合的稅制策略與合規路徑。",
+    "excerpt": "從 2026 年到 2033 年，巴西稅制經歷前所未有的劇烈變革。這份時間軸攻略幫助你根據自己的市場進入時間點，選擇最適合的稅制策略與合規路徑。",
+    "tags": [
+      "稅改",
+      "IVA Dual",
+      "CBS",
+      "IBS",
+      "時間軸",
+      "過渡期",
+      "2026",
+      "2033",
+      "稅制"
+    ],
+    "phase": "preparation",
+    "phaseLabel": "第一階段：戰略藍圖",
+    "order": 11,
+    "icon": "🗺️",
+    "featured": false
+  },
+  {
+    "slug": "11-tax-compliance",
+    "title": "日常稅務合規：SPED 系統、NF-e、報表與 Malha Fiscal 應對",
+    "description": "從 SPED 數位監管架構到日常 NF-e 開立、月度報表申報、以及稅務審查應對——跨境電商在巴西的完整合規操作手冊。",
+    "excerpt": "從 SPED 數位監管架構到日常 NF-e 開立、月度報表申報、以及稅務審查應對——跨境電商在巴西的完整合規操作手冊。",
+    "tags": [
+      "SPED",
+      "NF-e",
+      "Malha Fiscal",
+      "稅務合規",
+      "Compliance",
+      "電子發票",
+      "稅務審查",
+      "EFD",
+      "ECD",
+      "ECF"
+    ],
+    "phase": "harvest",
+    "phaseLabel": "第四階段：財務合規",
+    "order": 11,
+    "icon": "📋",
+    "featured": 1
+  },
+  {
+    "slug": "12-profit-remittance",
+    "title": "獲利落袋為安：合規抵稅與利潤匯出 (Remessa de Lucros)",
+    "description": "如何合法、低稅地將巴西子公司的盈餘匯回母公司？深度探討 JCP（自有資本利息）、特許權使用費、管理費等利潤轉移工具的合規操作與稅務優化。",
+    "excerpt": "如何合法、低稅地將巴西子公司的盈餘匯回母公司？深度探討 JCP（自有資本利息）、特許權使用費、管理費等利潤轉移工具的合規操作與稅務優化。",
+    "tags": [
+      "Remessa de Lucros",
+      "JCP",
+      "利潤匯出",
+      "特許權使用費",
+      "抵稅",
+      "IRRF",
+      "跨國稅務"
+    ],
+    "phase": "harvest",
+    "phaseLabel": "第四階段：財務合規",
+    "order": 12,
+    "icon": "💰",
+    "featured": 1
+  },
+  {
+    "slug": "08-1-3pl-contract",
+    "title": "3PL 合約談判：稅務條款與賠償責任的全方位檢查清單",
+    "description": "深度解析與巴西 3PL 物流商簽約時必須注意的法律細節，包括 Split Payment 系統對接、ANVISA/MAPA 資質責任、延遲發貨罰款條款等關鍵談判點。",
+    "excerpt": "深度解析與巴西 3PL 物流商簽約時必須注意的法律細節，包括 Split Payment 系統對接、ANVISA/MAPA 資質責任、延遲發貨罰款條款等關鍵談判點。",
+    "tags": [
+      "3PL",
+      "合約",
+      "法律",
+      "ANVISA",
+      "MAPA",
+      "AFE",
+      "LDR",
+      "物流",
+      "賠償"
+    ],
+    "phase": "operations",
+    "phaseLabel": "第三階段：供應鏈營運",
+    "order": 81,
+    "icon": "📋",
+    "featured": false
+  },
+  {
+    "slug": "09-1-split-payment",
+    "title": "Split Payment 現金流生存指南：稅款即時扣繳的 survival playbook",
+    "description": "深度解析 2026 年起的 Split Payment 分裂支付機制，理解「稅款瞬間被抽走」對現金流的衝擊，並提供週轉金規劃與 ERP 對接的實務建議。",
+    "excerpt": "深度解析 2026 年起的 Split Payment 分裂支付機制，理解「稅款瞬間被抽走」對現金流的衝擊，並提供週轉金規劃與 ERP 對接的實務建議。",
+    "tags": [
+      "Split Payment",
+      "現金流",
+      "CBS",
+      "IBS",
+      "週轉金",
+      "財務管理",
+      "Split Payment"
+    ],
+    "phase": "operations",
+    "phaseLabel": "第三階段：供應鏈營運",
+    "order": 91,
+    "icon": "💸",
+    "featured": false
+  }
+]

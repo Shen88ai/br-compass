@@ -1,0 +1,40 @@
+---
+// CompassView — 互動羅盤組件（首頁入口）
+// 4 方位發光羅盤，點擊後觸發診斷流程
+import { pathInfo } from '../data/path-mapping';
+
+const paths = Object.values(pathInfo);
+---
+
+<div class="compass-container" id="compass-view">
+  <div class="compass-ring">
+    <div class="compass-center">
+      <span class="compass-emoji">🧭</span>
+      <span class="compass-label">你的征途</span>
+    </div>
+    <a href="#diagnosis-form" class="compass-direction compass-north" data-direction="north" aria-label="偵察兵">
+      <span class="dir-icon">🔵</span>
+      <span class="dir-name">偵察兵</span>
+      <span class="dir-phase">Preparation</span>
+      <span class="dir-desc">還在觀望、想了解巴西</span>
+    </a>
+    <a href="#diagnosis-form" class="compass-direction compass-east" data-direction="east" aria-label="奠基者">
+      <span class="dir-icon">🟡</span>
+      <span class="dir-name">奠基者</span>
+      <span class="dir-phase">Foundation</span>
+      <span class="dir-desc">已決定進入、建實體</span>
+    </a>
+    <a href="#diagnosis-form" class="compass-direction compass-south" data-direction="south" aria-label="領航員">
+      <span class="dir-icon">🟢</span>
+      <span class="dir-name">領航員</span>
+      <span class="dir-phase">Operations</span>
+      <span class="dir-desc">已註冊、打通供應鏈</span>
+    </a>
+    <a href="#diagnosis-form" class="compass-direction compass-west" data-direction="west" aria-label="收割者">
+      <span class="dir-icon">🟣</span>
+      <span class="dir-name">收割者</span>
+      <span class="dir-phase">Harvest</span>
+      <span class="dir-desc">在運營、合規與利潤</span>
+    </a>
+  </div>
+</div>

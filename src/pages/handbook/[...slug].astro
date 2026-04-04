@@ -1,0 +1,1433 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { glossaryData, chapterTerms, categoryLabels } from '../../data/glossary';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('handbook');
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'handbook'>;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+const allPosts = (await getCollection('handbook')).sort((a, b) => a.data.order - b.data.order);
+const idx = allPosts.findIndex(p => p.id === post.id);
+const prev = idx > 0 ? allPosts[idx - 1] : null;
+const next = idx < allPosts.length - 1 ? allPosts[idx + 1] : null;
+
+const phaseColors: Record<string, string> = {
+  preparation: 'var(--color-platinum)',
+  foundation:  'var(--color-gold)',
+  operations:  'var(--color-neon-yellow)',
+  harvest:     'var(--color-neon-green)',
+};
+const phaseColor = phaseColors[post.data.phase] || 'var(--color-gold)';
+const phaseRgb: Record<string, string> = {
+  preparation: '232,228,217',
+  foundation:  '212,168,67',
+  operations:  '229,255,0',
+  harvest:     '0,255,135',
+};
+const rgb = phaseRgb[post.data.phase] || '212,168,67';
+
+// Get chapter-specific terms
+const chapterTermKeys = chapterTerms[post.id] || [];
+const chapterGlossaryEntries = glossaryData.filter(g => chapterTermKeys.includes(g.term));
+
+// Build glossary map for tooltip
+const glossaryMap: Record<string, typeof glossaryData[0]> = {};
+glossaryData.forEach(g => { glossaryMap[g.term] = g; });
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="progress-bar"></div>
+  </div>
+
+  <div class="article-layout">
+
+    <!-- ── Article Main ─────────────────────────────── -->
+    <article class="article-main">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a href="/">首頁</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="/handbook">出海實戰手冊</a>
+        <span class="breadcrumb-sep">›</span>
+        <span style={`color:${phaseColor};`}>{post.data.phaseLabel}</span>
+      </nav>
+
+      <!-- Phase badge -->
+      <div class="phase-badge" style={`background:rgba(${rgb},0.1);border:1px solid ${phaseColor}40;color:${phaseColor};`}>
+        {post.data.icon} {post.data.phaseLabel}
+      </div>
+
+      <!-- Title -->
+      <h1 class="article-title-main text-gradient-hope">{post.data.title}</h1>
+      <p class="article-subtitle">{post.data.description}</p>
+
+      <!-- Cover Placeholder -->
+      <div class="img-placeholder article-cover" title="[圖片佔位] 請上傳封面圖">
+        <span class="cover-icon">{post.data.icon}</span>
+        <span class="cover-hint">封面圖片 · 點擊上傳</span>
+      </div>
+
+      <!-- Tags -->
+      {post.data.tags && post.data.tags.length > 0 && (
+        <div class="article-tags">
+          {post.data.tags.map(tag => (
+            <span class="tag-item"># {tag}</span>
+          ))}
+        </div>
+      )}
+
+      <!-- ★ Chapter Vocabulary Preview (Phase 3) ────────────────── -->
+      {chapterGlossaryEntries.length > 0 && (
+        <div class="chapter-vocab-preview" id="chapter-vocab">
+          <div class="vocab-header">
+            <span class="vocab-icon">📖</span>
+            <div class="vocab-title-group">
+              <h3 class="vocab-title">本章必學詞彙</h3>
+              <span class="vocab-count">{chapterGlossaryEntries.length} 個專有名詞</span>
+            </div>
+            <button class="vocab-toggle-btn" onclick="toggleVocabPreview()">
+              <span class="vocab-toggle-text">展開詳細說明</span>
+              <span class="vocab-toggle-icon">▼</span>
+            </button>
+          </div>
+          <div class="vocab-content" id="vocab-content" style="display:none;">
+            {chapterGlossaryEntries.map((entry) => {
+              const cat = categoryLabels[entry.category];
+              return (
+                <div class="vocab-card" data-term={entry.term}>
+                  <div class="vocab-card-header">
+                    <div class="vocab-card-term">
+                      <span class="vocab-card-term-text">{entry.term}</span>
+                      <span class="vocab-card-pronunciation" title="發音">{entry.pronunciation}</span>
+                    </div>
+                    <span class="vocab-card-category" style={`background:${cat.color}20;color:${cat.color};`}>
+                      {cat.icon} {cat.label}
+                    </span>
+                  </div>
+                  <div class="vocab-card-body">
+                    <div class="vocab-card-analogy">{entry.analogy}</div>
+                    <div class="vocab-card-oneliner">{entry.oneLiner}</div>
+                    <div class="vocab-card-fullname" title="葡語全名">{entry.fullPortuguese}</div>
+                  </div>
+                  <div class="vocab-card-details" id={`vocab-detail-${entry.term}`} style="display:none;">
+                    <div class="vocab-detail-section">
+                      <h4 class="vocab-detail-title">📖 詳細說明</h4>
+                      <p class="vocab-detail-text">{entry.fullExplanation}</p>
+                    </div>
+                    <div class="vocab-detail-section">
+                      <h4 class="vocab-detail-title">💡 實戰提醒</h4>
+                      <ul class="vocab-detail-list">
+                        {entry.practicalTips.map(tip => (
+                          <li>{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div class="vocab-detail-section">
+                      <h4 class="vocab-detail-title">⚠️ 常見錯誤</h4>
+                      <ul class="vocab-detail-list vocab-error-list">
+                        {entry.commonMistakes.map(mistake => (
+                          <li>{mistake}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <button class="vocab-expand-btn" onclick={`toggleVocabDetail('${entry.term}')`}>
+                    展開詳細說明
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <div class="vocab-footer">
+            <a href="/handbook/glossary" class="vocab-glossary-link">
+              📚 前往完整巴西詞典 →
+            </a>
+          </div>
+        </div>
+      )}
+
+      <!-- Markdown Content -->
+      <div class="prose-custom">
+        <Content />
+      </div>
+
+      <!-- ── Persona Journey MiniMap ─────────────────── -->
+      <div class="journey-minimap persona-hidden" id="journey-minimap">
+        <div class="minimap-info">
+          <span class="minimap-path-name" id="minimap-path-name"></span>
+          <span class="minimap-progress" id="minimap-progress"></span>
+          <span class="minimap-current-title" id="minimap-current-title"></span>
+        </div>
+        <div class="minimap-track" id="minimap-track"></div>
+      </div>
+
+      <!-- ── Persona Journey Side Panel (右下角固定) ── -->
+      <div class="journey-side-panel persona-hidden" id="journey-side-panel">
+        <div class="side-panel-toggle" id="side-panel-toggle">🧭</div>
+        <div class="side-panel-content" id="side-panel-content">
+          <div class="side-panel-header">
+            <h4 class="side-panel-title" id="side-panel-title"></h4>
+            <span class="side-panel-progress" id="side-panel-progress"></span>
+          </div>
+          <div class="side-panel-track" id="side-panel-track"></div>
+          <a href="/" class="side-panel-home-btn">🏠 返回首頁重選角色</a>
+        </div>
+      </div>
+
+      <!-- ── Prev / Next ─────────────────────────────── -->
+      <div class="article-nav">
+        {prev ? (
+          <a href={`/handbook/${prev.id}`} class="card nav-prev">
+            <div class="nav-prev-label">← 上一章</div>
+            <div class="nav-prev-title">{prev.data.icon} {prev.data.title}</div>
+          </a>
+        ) : <div />}
+        {next ? (
+          <a href={`/handbook/${next.id}`} class="card nav-next" style="text-align:right;">
+            <div class="nav-next-label">下一章 →</div>
+            <div class="nav-next-title">{next.data.icon} {next.data.title}</div>
+          </a>
+        ) : <div />}
+      </div>
+
+      <!-- ── Persona Journey Nav ─────────────────────── -->
+      <div class="journey-navigation persona-hidden" id="journey-navigation">
+        <div class="nav-celebration" id="celebration">
+          <div class="celebration-badge">
+            <span class="badge-icon">✅</span>
+            <span class="badge-text" id="nav-celebration-text"></span>
+          </div>
+          <div class="celebration-stamp">
+            <span class="stamp-icon">🏅</span>
+            <span class="stamp-text" id="nav-stamp-text"></span>
+          </div>
+        </div>
+        <div class="nav-chapters" id="nav-chapters"></div>
+        <div id="nav-cta-container"></div>
+        <div class="nav-actions">
+          <a href="/handbook" class="nav-action">
+            <span>🗺️</span>
+            <span>查看完整地圖</span>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ── Sidebar TOC ───────────────────────────────── -->
+    <aside class="article-sidebar">
+      <div class="card toc-card">
+        <div class="toc-title">📑 本章目錄</div>
+        {headings.length > 0 ? (
+          <nav>
+            {(() => {
+              const tocColors = [
+                'var(--color-platinum)',
+                'var(--color-gold)',
+                'var(--color-neon-yellow)',
+                'var(--color-neon-green)',
+                'var(--color-sky-blue)',
+              ];
+              let colorIdx = 0;
+              return headings.map((h) => {
+                const hasNumber = /[一二三四五六七八九十]/.test(h.text);
+                const tocColor = hasNumber ? tocColors[colorIdx++ % tocColors.length] : 'var(--color-text-muted)';
+                return (
+                  <a
+                    href={`#${h.slug}`}
+                    class="toc-link"
+                    style={`padding-left:${(h.depth - 2) * 0.75}rem;margin-left:${(h.depth - 2) * 0.75}rem;color:${tocColor};`}
+                  >
+                    {h.text}
+                  </a>
+                );
+              });
+            })()}
+          </nav>
+        ) : (
+          <p style="font-size:0.8rem;color:var(--color-muted);">無章節標題</p>
+        )}
+
+        <!-- Back to timeline -->
+        <div class="toc-back">
+          <a href="/handbook" class="toc-back-link">
+            ← 返回時間軸
+          </a>
+        </div>
+      </div>
+
+      <!-- CTA sidebar -->
+      <div class="card sidebar-cta">
+        <div class="cta-icon">💬</div>
+        <div class="cta-title">需要專業協助？</div>
+        <p class="cta-desc">我們的巴西稅務專家可為您提供一對一解答。</p>
+        <a href="https://braziltax.netlify.app/#contact" class="btn-gold-outline cta-btn-sm">免費預約諮詢</a>
+      </div>
+    </aside>
+  </div>
+</Layout>
+
+<!-- Inject glossary data for client-side scripts -->
+<script define:vars={{ glossaryMap }}>
+  window.__GLOSSARY_MAP__ = glossaryMap;
+</script>
+
+<style is:global>
+.prose-custom {
+  color: var(--color-text);
+  line-height: 1.8;
+  font-size: 1rem;
+}
+.prose-custom h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+  margin: 2.5rem 0 1rem;
+}
+.prose-custom h3 {
+  font-size: 1.15rem;
+  color: var(--color-text);
+  margin: 2rem 0 0.75rem;
+}
+.prose-custom h4 {
+  font-size: 1rem;
+  color: var(--color-gold-light);
+  margin: 1.5rem 0 0.5rem;
+}
+.prose-custom p { margin: 0 0 1rem; }
+.prose-custom ul, .prose-custom ol {
+  padding-left: 1.5rem;
+  margin: 0 0 1rem;
+}
+.prose-custom li { margin-bottom: 0.4rem; }
+.prose-custom strong { color: var(--color-gold); }
+.prose-custom em { color: var(--color-muted); }
+.prose-custom code {
+  background: rgba(var(--color-gold-rgb),0.1);
+  border: 1px solid rgba(var(--color-gold-rgb),0.2);
+  border-radius: 0.25rem;
+  padding: 0.1em 0.4em;
+  font-size: 0.85em;
+  color: var(--color-gold);
+}
+.prose-custom pre {
+  background: var(--color-bg-800);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+.prose-custom blockquote {
+  border-left: 3px solid var(--color-gold);
+  background: rgba(var(--color-gold-rgb),0.05);
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 1.5rem 0;
+  color: var(--color-muted);
+}
+.prose-custom table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+.prose-custom th {
+  background: rgba(var(--color-gold-rgb),0.1);
+  color: var(--color-gold);
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+.prose-custom td {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+.prose-custom tr:hover td { background: rgba(var(--color-gold-rgb),0.03); }
+
+.callout-decision, .callout-warning, .callout-tip { margin: 1.5rem 0; }
+</style>
+
+<script>
+// Color the numbered headings in article content
+(function initHeadingColors() {
+  const prose = document.querySelector('.prose-custom');
+  if (!prose) return;
+  
+  const headingColors = [
+    'var(--color-platinum)',
+    'var(--color-gold)',
+    'var(--color-neon-yellow)',
+    'var(--color-neon-green)',
+    'var(--color-sky-blue)',
+  ];
+  let colorIdx = 0;
+  
+  const h2s = prose.querySelectorAll('h2');
+  h2s.forEach((h2) => {
+    const hasNumber = /[一二三四五六七八九十]/.test(h2.textContent || '');
+    if (hasNumber) {
+      h2.style.color = headingColors[colorIdx++ % headingColors.length];
+    }
+  });
+})();
+</script>
+
+<script>
+// ── Reading Progress Bar ──────────────────────────────────
+(function initProgressBar() {
+  const bar = document.getElementById('progress-bar');
+  if (!bar) return;
+
+  const onScroll = () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = `${Math.min(progress, 100)}%`;
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+// ── Tax Regime Quiz ────────────────────────────────────────
+(function initTaxQuiz() {
+  const quizEl = document.querySelector('[data-quiz="tax-regime"]');
+  if (!quizEl) return;
+
+  const questions = [
+    {
+      q: '你的公司預計年營收規模是多少？',
+      options: [
+        { text: '低於 R$4,800 萬（Simples Nacional 資格）', score: 0 },
+        { text: 'R$4,800 萬 ~ R$7,800 萬（Lucro Presumido 資格）', score: 1 },
+        { text: '超過 R$7,800 萬（必須 Lucro Real）', score: 2 },
+      ]
+    },
+    {
+      q: '你的進口貨物是否需要大量稅金抵扣？',
+      options: [
+        { text: '是，進口金額佔營收 30% 以上', score: 2 },
+        { text: '部分需要，進口金額 10%~30%', score: 1 },
+        { text: '幾乎不需要進口', score: 0 },
+      ]
+    },
+    {
+      q: '你的企業預計在初期（1~2 年）是否會有虧損？',
+      options: [
+        { text: '是，預計先期虧損較大', score: 2 },
+        { text: '不確定', score: 1 },
+        { text: '否，預計立即盈利', score: 0 },
+      ]
+    },
+    {
+      q: '你的會計團隊是否具備 Lucro Real 記帳能力？',
+      options: [
+        { text: '是，已有專業會計師', score: 0 },
+        { text: '需要尋找', score: 1 },
+        { text: '否，希望簡化記帳', score: -1 },
+      ]
+    },
+    {
+      q: '你是否計劃在未來 3 年內引入外部投資？',
+      options: [
+        { text: '是，需要財務透明度', score: 2 },
+        { text: '可能', score: 1 },
+        { text: '否，自營為主', score: 0 },
+      ]
+    },
+  ];
+
+  const results = {
+    real: {
+      title: '🎯 推薦方案：Lucro Real（實際利潤制）',
+      desc: '根據你的回答，Lucro Real 是最適合你的稅制。它能讓你抵扣進口稅金、結轉虧損，並提供更高的財務透明度——非常適合跨境電商。建議立即與會計師確認開戶與首次申報時間。',
+    },
+    presumido: {
+      title: '🎯 推薦方案：Lucro Presumido（推定利潤制）',
+      desc: '根據你的回答，Lucro Presumido 可能適合你。它記帳簡單、合規成本低。但請注意：進口稅金無法抵扣，如果你的進口量增加，建議重新評估是否切換至 Lucro Real。',
+    },
+    unclear: {
+      title: '📋 建議：預約專業稅務諮詢',
+      desc: '根據你的回答，目前難以給出明確建議。建議預約我們的巴西稅務專家進行一對一評估，綜合考量你的營收預測、進口規模和長期規劃。',
+    },
+  };
+
+  let currentQ = 0;
+  let totalScore = 0;
+
+  const questionEl = quizEl.querySelector('#quiz-question')!;
+  const optionsEl = quizEl.querySelector('#quiz-options')!;
+  const progressEl = quizEl.querySelector('#quiz-progress')!;
+  const resultEl = quizEl.querySelector('#quiz-result')!;
+  const resultTitle = quizEl.querySelector('#result-title')!;
+  const resultDesc = quizEl.querySelector('#result-desc')!;
+  const quizBody = quizEl.querySelector('#quiz-body')!;
+
+  function renderQuestion() {
+    const q = questions[currentQ];
+    questionEl.textContent = q.q;
+    progressEl.textContent = `問題 ${currentQ + 1} / ${questions.length}`;
+    optionsEl.innerHTML = '';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.textContent = opt.text;
+      btn.addEventListener('click', () => handleAnswer(opt.score));
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(score: number) {
+    totalScore += score;
+    currentQ++;
+    if (currentQ < questions.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    quizBody.style.display = 'none';
+    resultEl.style.display = 'block';
+    progressEl.textContent = '測驗完成';
+
+    let result;
+    if (totalScore >= 5) result = results.real;
+    else if (totalScore >= 2) result = results.presumido;
+    else result = results.unclear;
+
+    resultTitle.textContent = result.title;
+    resultDesc.textContent = result.desc;
+  }
+
+  (window as any).restartQuiz = function() {
+    currentQ = 0;
+    totalScore = 0;
+    quizBody.style.display = 'block';
+    resultEl.style.display = 'none';
+    renderQuestion();
+  };
+
+  renderQuestion();
+})();
+
+// ── Tax Compare Calculator ─────────────────────────────────
+(function initTaxCompare() {
+  const container = document.getElementById('tax-compare');
+  if (!container) return;
+
+  const parseBR = (val: string) => {
+    const cleaned = val.replace(/\./g, '').replace(/,/g, '.');
+    return parseFloat(cleaned) || 0;
+  };
+
+  const formatBR = (n: number) =>
+    n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  const filterInput = (val: string) => val.replace(/[^0-9.,]/g, '');
+
+  const fmt = (n: number) => 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+  const el = (id: string) => document.getElementById(id);
+
+  function calcReal() {
+    const revenue = parseBR((el('real-revenue') as HTMLInputElement).value);
+    const cost = parseBR((el('real-cost') as HTMLInputElement).value);
+    const importTax = parseBR((el('real-import-tax') as HTMLInputElement).value);
+    const profit = Math.max(revenue - cost, 0);
+    const irpjBase = profit * 0.15;
+    const irpjAdd = profit > 240000 ? (profit - 240000) * 0.1 : 0;
+    const csll = profit * 0.09;
+    const total = irpjBase + irpjAdd + csll - importTax;
+    const isRefund = total < 0;
+
+    (el('real-profit') as HTMLElement).textContent = fmt(profit);
+    (el('real-irpj') as HTMLElement).textContent = fmt(irpjBase);
+    (el('real-irpj-add') as HTMLElement).textContent = fmt(irpjAdd);
+    (el('real-csll') as HTMLElement).textContent = fmt(csll);
+    (el('real-credit') as HTMLElement).textContent = '-' + fmt(importTax);
+    const totalEl = el('real-total') as HTMLElement;
+    totalEl.textContent = (isRefund ? '退稅 ' : '') + fmt(Math.abs(total));
+    totalEl.style.color = isRefund ? '#34d399' : '';
+  }
+
+  function calcPresumido() {
+    const revenue = parseBR((el('pres-revenue') as HTMLInputElement).value);
+    const type = (el('pres-type') as HTMLSelectElement).value;
+    const rate = type === 'commerce' ? 0.08 : 0.32;
+    const base = revenue * rate;
+    const irpj = base * 0.15;
+    const irpjAdd = base > 240000 ? (base - 240000) * 0.1 : 0;
+    const csll = base * 0.09;
+    const total = irpj + irpjAdd + csll;
+
+    (el('pres-base') as HTMLElement).textContent = fmt(base);
+    (el('pres-irpj') as HTMLElement).textContent = fmt(irpj);
+    (el('pres-irpj-add') as HTMLElement).textContent = fmt(irpjAdd);
+    (el('pres-csll') as HTMLElement).textContent = fmt(csll);
+    (el('pres-total') as HTMLElement).textContent = fmt(total);
+  }
+
+  function update() {
+    calcReal();
+    calcPresumido();
+  }
+
+  // ── Revenue sync (FIXED: both sides recalculate on every change) ──
+  const realRevEl = el('real-revenue') as HTMLInputElement;
+  const presRevEl = el('pres-revenue') as HTMLInputElement;
+  let syncing = false;
+
+  realRevEl.addEventListener('input', () => {
+    if (syncing) return;
+    syncing = true;
+    presRevEl.value = realRevEl.value;
+    syncing = false;
+    update();
+  });
+
+  presRevEl.addEventListener('input', () => {
+    if (syncing) return;
+    syncing = true;
+    realRevEl.value = presRevEl.value;
+    syncing = false;
+    update();
+  });
+
+  // ── Other inputs trigger full recalc ──
+  container.querySelectorAll('input:not(#real-revenue):not(#pres-revenue), select').forEach(inputEl => {
+    inputEl.addEventListener('input', update);
+    inputEl.addEventListener('change', update);
+  });
+
+  // ── Input filtering: strip non-numeric chars on every keystroke ──
+  container.querySelectorAll('input[type="text"][inputmode="numeric"]').forEach(inputEl => {
+    inputEl.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      target.value = filterInput(target.value);
+    });
+  });
+
+  // ── Auto-format on blur, restore plain number on focus ──
+  container.querySelectorAll('input[type="text"][inputmode="numeric"]').forEach(inputEl => {
+    inputEl.addEventListener('blur', () => {
+      const num = parseBR(inputEl.value);
+      if (num > 0) inputEl.value = formatBR(num);
+    });
+    inputEl.addEventListener('focus', () => {
+      const num = parseBR(inputEl.value);
+      if (num > 0) inputEl.value = String(Math.round(num));
+    });
+  });
+
+  update();
+})();
+
+// ── Glossary Tooltip (Phase 4: Knowledge Card) ─────────────
+(function initGlossaryTooltip() {
+  const glossaryMap = (window as any).__GLOSSARY_MAP__ || {};
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'term-tooltip term-tooltip-expanded';
+  tooltip.innerHTML = `
+    <div class="tooltip-header">
+      <h5 class="term-tooltip-title"></h5>
+      <span class="tooltip-pronunciation"></span>
+    </div>
+    <div class="tooltip-body">
+      <div class="tooltip-analogy"></div>
+      <div class="tooltip-oneliner"></div>
+      <div class="tooltip-fullname"></div>
+      <div class="tooltip-fulltext"></div>
+      <div class="tooltip-tips" style="display:none;">
+        <h6>💡 實戰提醒</h6>
+        <ul></ul>
+      </div>
+      <div class="tooltip-mistakes" style="display:none;">
+        <h6>⚠️ 常見錯誤</h6>
+        <ul></ul>
+      </div>
+    </div>
+    <div class="tooltip-footer">
+      <button class="tooltip-expand-more" onclick="toggleTooltipMore()">展開詳細說明</button>
+      <a href="/handbook/glossary" class="tooltip-glossary-link">📚 完整詞典</a>
+    </div>
+  `;
+  document.body.appendChild(tooltip);
+
+  function showTooltip(term: string, x: number, y: number) {
+    const data = glossaryMap[term];
+    if (!data) return;
+
+    tooltip.querySelector('.term-tooltip-title')!.textContent = `${data.term} — ${data.chineseName}`;
+    tooltip.querySelector('.tooltip-pronunciation')!.textContent = `🔊 ${data.pronunciation}`;
+    tooltip.querySelector('.tooltip-analogy')!.textContent = data.analogy;
+    tooltip.querySelector('.tooltip-oneliner')!.textContent = data.oneLiner;
+    tooltip.querySelector('.tooltip-fullname')!.textContent = data.fullPortuguese;
+    tooltip.querySelector('.tooltip-fulltext')!.textContent = data.fullExplanation;
+
+    // Tips
+    const tipsEl = tooltip.querySelector('.tooltip-tips')!;
+    const tipsUl = tipsEl.querySelector('ul')!;
+    tipsUl.innerHTML = '';
+    if (data.practicalTips.length > 0) {
+      tipsEl.style.display = 'block';
+      data.practicalTips.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = t;
+        tipsUl.appendChild(li);
+      });
+    } else {
+      tipsEl.style.display = 'none';
+    }
+
+    // Mistakes
+    const mistakesEl = tooltip.querySelector('.tooltip-mistakes')!;
+    const mistakesUl = mistakesEl.querySelector('ul')!;
+    mistakesUl.innerHTML = '';
+    if (data.commonMistakes.length > 0) {
+      mistakesEl.style.display = 'block';
+      data.commonMistakes.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = m;
+        mistakesUl.appendChild(li);
+      });
+    } else {
+      mistakesEl.style.display = 'none';
+    }
+
+    // Reset expand state
+    tooltip.classList.remove('tooltip-show-more');
+
+    // Position
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let left = x + 16;
+    let top = y + 16;
+    if (left + 400 > vw) left = x - 400;
+    if (top + 500 > vh) top = y - 500;
+    if (left < 8) left = 8;
+    if (top < 8) top = 8;
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+    tooltip.classList.add('visible');
+  }
+
+  function hideTooltip() {
+    tooltip.classList.remove('visible');
+  }
+
+  (window as any).toggleTooltipMore = function() {
+    tooltip.classList.toggle('tooltip-show-more');
+    const btn = tooltip.querySelector('.tooltip-expand-more') as HTMLElement;
+    if (btn) {
+      btn.textContent = tooltip.classList.contains('tooltip-show-more') ? '收起詳細說明' : '展開詳細說明';
+    }
+  };
+
+  // Auto-link terms in article content
+  const articleContent = document.querySelector('.prose-custom');
+  if (articleContent) {
+    const walker = document.createTreeWalker(articleContent, NodeFilter.SHOW_TEXT, null);
+    const textNodes: Text[] = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode as Text);
+
+    const sortedTerms = Object.keys(glossaryMap).sort((a, b) => b.length - a.length);
+    textNodes.forEach(node => {
+      const parent = node.parentElement;
+      if (!parent || parent.closest('.term-trigger') || parent.closest('.chapter-vocab-preview') || parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') return;
+      let html = node.textContent || '';
+      sortedTerms.forEach(term => {
+        const regex = new RegExp(`\\b(${term})\\b`, 'g');
+        if (regex.test(html)) {
+          html = html.replace(regex, `<span class="term-trigger" data-term="$1">$1</span>`);
+        }
+      });
+      if (html !== node.textContent) {
+        const span = document.createElement('span');
+        span.innerHTML = html;
+        parent.replaceChild(span, node);
+      }
+    });
+
+    articleContent.addEventListener('mouseover', (e) => {
+      const trigger = (e.target as HTMLElement).closest('.term-trigger');
+      if (trigger) {
+        const term = trigger.getAttribute('data-term');
+        if (term) showTooltip(term, e.clientX, e.clientY);
+      }
+    });
+    articleContent.addEventListener('mouseout', (e) => {
+      const trigger = (e.target as HTMLElement).closest('.term-trigger');
+      if (trigger) hideTooltip();
+    });
+  }
+})();
+
+// ── Chapter Vocabulary Preview Toggle ──────────────────────
+(function initVocabPreview() {
+  (window as any).toggleVocabPreview = function() {
+    const content = document.getElementById('vocab-content');
+    const btnText = document.querySelector('.vocab-toggle-text');
+    const btnIcon = document.querySelector('.vocab-toggle-icon');
+    if (!content) return;
+    const isHidden = content.style.display === 'none';
+    content.style.display = isHidden ? 'block' : 'none';
+    if (btnText) btnText.textContent = isHidden ? '收起詞彙' : '展開詳細說明';
+    if (btnIcon) btnIcon.textContent = isHidden ? '▲' : '▼';
+  };
+
+  (window as any).toggleVocabDetail = function(term: string) {
+    const detail = document.getElementById(`vocab-detail-${term}`);
+    if (!detail) return;
+    const isHidden = detail.style.display === 'none';
+    detail.style.display = isHidden ? 'block' : 'none';
+  };
+})();
+
+// ── Timeline Calculator ────────────────────────────────────────
+(function initTimelineCalculator() {
+  const calcEl = document.getElementById('timeline-calc');
+  if (!calcEl) return;
+
+  (window as any).calculateTimeline = function() {
+    const entryYear = (document.getElementById('entry-year') as HTMLSelectElement).value;
+    const revenueScale = (document.getElementById('revenue-scale') as HTMLSelectElement).value;
+    const importRatio = (document.getElementById('import-ratio') as HTMLSelectElement).value;
+
+    const resultEl = document.getElementById('timeline-result');
+    const resultBody = document.getElementById('timeline-result-body');
+    if (!resultEl || !resultBody) return;
+
+    let title = '';
+    let body = '';
+
+    // 策略邏輯
+    const shouldUseReal = revenueScale === 'large' || (revenueScale === 'medium' && importRatio === 'high');
+    
+    if (entryYear === '2026') {
+      title = '🎯 2026 年進入：黃金窗口期';
+      body = `
+        <p><strong>⭐ 最佳策略：Lucro Real（實際利潤制）</strong></p>
+        <ul>
+          <li>2026 年 CBS/IBS 試行稅率僅 1%，是建立系統合規流程的最佳時機</li>
+          <li>選擇 Lucro Real 可享受進口稅金全额抵扣，應對 Split Payment 的現金流衝擊</li>
+          <li>在低稅率時建立 ERP 對接流程，2030 年後享受先行者紅利</li>
+        </ul>
+        <p><strong>⚡ 立即行動：</strong></p>
+        <ul>
+          <li>選擇支援 CBS/IBS 計算的 ERP（如 Bling、Tiny）</li>
+          <li>建立 Split Payment 扣繳的現金流機制（月銷售額 × 30% 預留金）</li>
+          <li>設計定價模型時預留 26.5% 税負空間（2033 年目標税率）</li>
+        </ul>
+      `;
+    } else if (entryYear === '2027') {
+      title = '🎯 2027 年進入：快速跟上';
+      body = `
+        <p><strong>⭐ 最佳策略：Lucro Real（實際利潤制）</strong></p>
+        <ul>
+          <li>PIS/COFINS 正式廢除，CBS 全面啟動，税率上升至約 12%</li>
+          <li>進項稅金抵扣變得更重要，Lucro Real 優勢明顯</li>
+          <li>確認 ERP 系統已移除 PIS/COFINS 計算模組</li>
+        </ul>
+        <p><strong>⚡ 立即行動：</strong></p>
+        <ul>
+          <li>更新所有發票模板，移除 PIS/COFINS 欄位</li>
+          <li>重新計算產品定價，預留約 20% 税負空間</li>
+          <li>建立 CBS/IBS 的計算邏輯與申報流程</li>
+        </ul>
+      `;
+    } else if (entryYear === '2028') {
+      title = '🎯 2028-2032 年進入：逐步切換期';
+      body = `
+        <p><strong>⭐ 最佳策略：${shouldUseReal ? 'Lucro Real（實際利潤制）' : '取決於當時具體稅率與營收規模'}</strong></p>
+        <ul>
+          <li>ICMS 與 ISS 逐步退出，IBS 税率從約 12% 升至 26.5%</li>
+          <li>過渡期結束時間各州可能不同，需關注所在州的具體時間表</li>
+          ${shouldUseReal ? '<li>高進口比例企業建議選擇 Lucro Real 以最大化進項抵扣' : ''}
+        </ul>
+        <p><strong>⚡ 立即行動：</strong></p>
+        <ul>
+          <li>每半年重新計算產品毛利，適應税率變化</li>
+          <li>持續監控 CBS/IBS 税率變化與各州過渡時間表</li>
+          <li>建立靈活的定價調整機制</li>
+        </ul>
+      `;
+    } else {
+      title = '🎯 2033 年後進入：新制完全體';
+      body = `
+        <p><strong>⭐ 最佳策略：Lucro Real（實際利潤制）</strong></p>
+        <ul>
+          <li>舊制五稅全部廢除，CBS + IBS 合計税率預計 26.5%（價外稅）</li>
+          <li>Split Payment 全面成熟，無「舊制」選項</li>
+          <li>Lucro Real 的進項抵扣對所有規模企業都有利</li>
+        </ul>
+        <p><strong>⚡ 立即行動：</strong></p>
+        <ul>
+          <li>直接採用新制邏輯，系統直接對標全球標準</li>
+          <li>產品定價預留 26.5% 税負空間</li>
+          <li>沒有舊制包袱，ERP 系統可直接對接 CBS/IBS</li>
+        </ul>
+      `;
+    }
+
+    resultBody.innerHTML = body;
+    document.getElementById('timeline-result-title')!.textContent = title;
+    resultEl.style.display = 'block';
+  };
+})();
+
+// ── 3PL Checklist ─────────────────────────────────────────────
+(function initChecklist() {
+  const checklistEl = document.getElementById('3pl-checklist');
+  if (!checklistEl) return;
+
+  const checkboxes = checklistEl.querySelectorAll<HTMLInputElement>('.checklist-checkbox');
+  const countEl = document.getElementById('checklist-count');
+  const resultEl = document.getElementById('checklist-result');
+  if (!countEl || !resultEl) return;
+
+  const total = checkboxes.length;
+  document.getElementById('checklist-total')!.textContent = String(total);
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const checked = checklistEl.querySelectorAll<HTMLInputElement>('.checklist-checkbox:checked').length;
+      countEl.textContent = String(checked);
+
+      const pct = Math.round((checked / total) * 100);
+      if (pct === 100) {
+        resultEl.textContent = '✅ 恭喜！所有檢查項目已完成，可以開始與 3PL 簽約！';
+        resultEl.style.color = 'var(--color-neon-green)';
+      } else if (pct >= 75) {
+        resultEl.textContent = '🟢 進度良好！再檢查一下剩餘項目即可';
+        resultEl.style.color = 'var(--color-gold)';
+      } else if (pct >= 50) {
+        resultEl.textContent = '🟡 已完成一半，繼續加油！';
+        resultEl.style.color = 'var(--color-gold-light)';
+      } else {
+        resultEl.textContent = '🔴 還有很多項目待檢查，請仔細審閱合約';
+        resultEl.style.color = 'var(--color-muted)';
+      }
+    });
+  });
+})();
+
+// ── Visa Decision Map ─────────────────────────────────────────────
+(function initVisaDecisionMap() {
+  const mapEl = document.getElementById('visa-decision-map');
+  if (!mapEl) return;
+
+  const visaDecisionTree = {
+    steps: [
+      {
+        question: '你的身份是什麼？',
+        options: [
+          { label: '👤 自然人投資者', desc: '以個人名義投資巴西', next: 'step_natural_long' },
+          { label: '🏢 法人母公司', desc: '境外已有公司，計畫設立巴西子公司', next: 'step_corporate' },
+        ]
+      },
+      {
+        id: 'step_natural_long',
+        question: '你計畫在巴西停留多久？',
+        options: [
+          { label: '🏠 長期居住', desc: '打算在巴西長期生活和工作', next: 'step_invest' },
+          { label: '✈️ 短期停留', desc: '偶爾去巴西，主要時間在其他國家', next: 'step_short' },
+          { label: '🌐 完全境外', desc: '不打算去巴西，完全遠程操作', next: 'result_no_visa' },
+        ]
+      },
+      {
+        id: 'step_invest',
+        question: '你的投資能力如何？',
+        options: [
+          { label: '💰 ≥ R$600,000', desc: '有充足資金投資', next: 'result_rn11' },
+          { label: '📊 ≥ R$500,000', desc: '有中等投資能力', next: 'result_rn36' },
+          { label: '🚀 ≥ R$150,000（科技/新創）', desc: '有孵化器背書的商業計畫', next: 'result_rn36_tech' },
+        ]
+      },
+      {
+        id: 'step_short',
+        question: '你的投資目的是什麼？',
+        options: [
+          { label: '🏠 房產投資', desc: '購買巴西房產取得居留', next: 'result_golden' },
+          { label: '💻 遠程工作', desc: '為境外公司遠程工作', next: 'result_nomad' },
+        ]
+      },
+      {
+        id: 'step_corporate',
+        question: '你是否需要外派人員到巴西？',
+        options: [
+          { label: '👔 是，外派高管', desc: '母公司指派人員到巴西子公司', next: 'result_vitem5' },
+          { label: '🤝 否，委任在地人士', desc: '找巴西本地人擔任管理員', next: 'result_local' },
+        ]
+      }
+    ],
+    results: {
+      result_rn11: {
+        badge: '⭐ 推薦',
+        title: '法定董事簽證（RN 11/2017）',
+        desc: '投資 R$600,000 即可取得即刻永久居留權。你將在公司章程中列名為管理員，擁有完整的法律簽署權。配偶及未成年子女可隨行申請家庭團聚簽證。',
+        path: '申請流程：CPF → 海牙認證文件 → 宣誓翻譯 → 設立公司（Contrato Social）→ SCE-IED (RDE-IED) 外資登記 → 向 CNIg 提交申請 → 領事館取簽 → 入境 90 天內 CRNM 採集 → 即刻永久居留'
+      },
+      result_rn36: {
+        badge: '投資簽證',
+        title: '投資簽證（RN 36/2018）',
+        desc: '投資 R$500,000 取得 2 年臨時居留，持有滿 4 年后可申請永久居留。審批速度通常比法定董事簽證快，適合不打算立即擔任管理員的投資者。',
+        path: '申請流程：CPF → 海牙認證 → 宣誓翻譯 → SCE-IED (RDE-IED) 登記 → 向 CNIg 提交申請 → 領事館取簽 → 入境 → CRNM 採集 → 4年後申請永居'
+      },
+      result_rn36_tech: {
+        badge: '科技優惠',
+        title: '科技投資簽證（RN 36 優惠門檻）',
+        desc: '僅需投資 R$150,000，但需經專業孵化器或加速器背書的商業計畫，並承諾 2 年內創造就業 10 個。適合科技創業者。',
+        path: '申請流程：CPF → 孵化器背書商業計畫 → SCE-IED (RDE-IED) 登記 → CNIg 審批 → 領事館取簽 → 入境 → CRNM → 4年後永居'
+      },
+      result_golden: {
+        badge: '被動投資',
+        title: '黃金簽證（房產投資）',
+        desc: '購買巴西房產（SP/RJ R$1,000,000，其他地區 R$700,000）取得 4 年臨時居留。每 2 年只需入境 14 天即可維持身份，4 年后可申請永久居留。',
+        path: '申請流程：CPF → 選房盡職調查 → 境外資金匯入 → 過戶登記（Matrícula）→ 聯邦警察申請 → CRNM 採集 → 每2年入境14天 → 4年後永居'
+      },
+      result_nomad: {
+        badge: '遠程工作',
+        title: '數位遊民簽證（VITEM XIV）',
+        desc: '月收入 ≥ USD 1,500 或銀行存款 ≥ USD 18,000 即可申請。可透過 MigranteWeb 在巴西境內直接轉換（10-15 天），無需投資、無需設立公司。',
+        path: '申請流程：護照 → 收入證明 → 健康保險（葡語）→ 無犯罪證明 → MigranteWeb 提交（境內）或領事館申請（境外）→ 批准 → CRNM'
+      },
+      result_vitem5: {
+        badge: '最快審批',
+        title: '高管簽證（VITEM V）',
+        desc: '跨國公司外派人員最快路徑，審批通常只需 3~6 週。無需投資門檻，但薪資需符合 2026 年最低薪資倍數要求（技術 ≥ R$3,242，高管 ≥ R$9,726）。',
+        path: '申請流程：巴西子公司 CNPJ → 勞動合約 → 學歷海牙認證 + 宣誓翻譯 → 司法部審核 → 領事館取簽 → 入境 → CRNM → 4年後永居'
+      },
+      result_local: {
+        badge: '⚠️ 高風險',
+        title: '委任在地管理員（無需簽證）',
+        desc: '委任巴西籍人士擔任公司管理員，你無需辦理簽證。但存在巨大的 Pleno Poder（全權授權書）風險——管理員在法律上可代表公司做任何事。',
+        path: '風險緩解：簽署《職責限制協議》→ 銀行雙簽制度 → 隨時撤銷權條款 → 季度獨立審計 → 備份管理員機制'
+      },
+      result_no_visa: {
+        badge: '無需簽證',
+        title: 'e-CPF + Procurador（完全境外操作）',
+        desc: '如果你完全不打算去巴西，可以申請 e-CPF（數位個人稅號）並委任一名巴西常駐代表（Procurador）代為處理所有法律事務。',
+        path: '操作方式：線上申請 e-CPF → 海牙認證委託書 → 宣誓翻譯 → 委任 Procurador → 透過代理人設立公司 → SCE-IED (RDE-IED) 登記'
+      }
+    }
+  };
+
+  const answers: { step: string; answer: string }[] = [];
+
+  function renderStep(step: typeof visaDecisionTree.steps[0]) {
+    const stepEl = document.getElementById('dm-step');
+    const questionEl = document.getElementById('dm-question');
+    const optionsEl = document.getElementById('dm-options');
+    const bodyEl = document.getElementById('dm-body');
+    const resultEl = document.getElementById('dm-result');
+
+    if (!stepEl || !questionEl || !optionsEl || !bodyEl || !resultEl) return;
+
+    resultEl.style.display = 'none';
+    bodyEl.style.display = 'block';
+
+    const stepNum = step.id ? answers.length + 1 : 1;
+    stepEl.textContent = `步驟 ${stepNum} / ${visaDecisionTree.steps.length}`;
+    questionEl.textContent = step.question;
+
+    optionsEl.innerHTML = '';
+    step.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'decision-map-option';
+      btn.innerHTML = `<strong>${opt.label}</strong><br><span style="font-size:0.8rem;color:var(--color-text-muted);">${opt.desc}</span>`;
+      btn.addEventListener('click', () => {
+        if (opt.next.startsWith('result_')) {
+          showResult(opt.next);
+        } else {
+          answers.push({ step: step.id || 'start', answer: opt.label });
+          const nextStep = visaDecisionTree.steps.find(s => s.id === opt.next);
+          if (nextStep) renderStep(nextStep);
+        }
+      });
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function showResult(resultId: string) {
+    const bodyEl = document.getElementById('dm-body');
+    const resultEl = document.getElementById('dm-result');
+    const badgeEl = document.getElementById('dm-badge');
+    const titleEl = document.getElementById('dm-result-title');
+    const descEl = document.getElementById('dm-result-desc');
+    const pathEl = document.getElementById('dm-result-path');
+    const stepEl = document.getElementById('dm-step');
+
+    if (!bodyEl || !resultEl || !badgeEl || !titleEl || !descEl || !pathEl || !stepEl) return;
+
+    const result = visaDecisionTree.results[resultId as keyof typeof visaDecisionTree.results];
+    if (!result) return;
+
+    bodyEl.style.display = 'none';
+    resultEl.style.display = 'block';
+    stepEl.textContent = '推薦結果';
+    badgeEl.textContent = result.badge;
+    titleEl.textContent = result.title;
+    descEl.textContent = result.desc;
+    pathEl.innerHTML = `<strong>📋 完整路徑：</strong><br>${result.path}`;
+  }
+
+  (window as any).restartVisaDecisionMap = function() {
+    answers.length = 0;
+    const firstStep = visaDecisionTree.steps[0];
+    if (firstStep) renderStep(firstStep);
+  };
+
+  const firstStep = visaDecisionTree.steps[0];
+  if (firstStep) renderStep(firstStep);
+})();
+
+// ── VITEM V Flow ─────────────────────────────────────────────
+(function initVitem5Flow() {
+  const flowEl = document.getElementById('vitem5-flow');
+  if (!flowEl) return;
+
+  const vitem5State: { position: string | null; edu: string | null; exp: string | null; tax: string | null } = { position: null, edu: null, exp: null, tax: null };
+
+  function show(id: string) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+  function hide(id: string) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+
+  flowEl.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('[data-action]');
+    if (!btn) return;
+
+    const action = btn.getAttribute('data-action');
+    const choice = btn.getAttribute('data-choice');
+
+    if (action === 'vitem5-position') {
+      vitem5State.position = choice;
+      show('vitem5-arrow-1');
+      show('vitem5-edu-step');
+    } else if (action === 'vitem5-edu') {
+      vitem5State.edu = choice;
+      if (choice === 'match') {
+        show('vitem5-arrow-3');
+        show('vitem5-docs');
+      } else {
+        show('vitem5-arrow-2');
+        show('vitem5-exp-step');
+      }
+    } else if (action === 'vitem5-exp') {
+      vitem5State.exp = choice;
+      if (choice === 'yes') {
+        show('vitem5-arrow-3');
+        show('vitem5-docs');
+      } else {
+        show('vitem5-arrow-3');
+        show('vitem5-fail');
+      }
+    } else if (action === 'vitem5-review') {
+      if (choice === 'pass') {
+        show('vitem5-arrow-6');
+        show('vitem5-visa');
+        setTimeout(() => {
+          show('vitem5-arrow-7');
+          show('vitem5-tax-step');
+        }, 500);
+      } else {
+        alert('請補充所需文件後重新提交申請。建議諮詢專業移民律師。');
+      }
+    } else if (action === 'vitem5-tax') {
+      vitem5State.tax = choice;
+      show('vitem5-arrow-8');
+      show('vitem5-tax-result');
+      const titleEl = document.getElementById('vitem5-tax-title');
+      const descEl = document.getElementById('vitem5-tax-desc');
+      if (titleEl && descEl) {
+        if (choice === 'yes') {
+          titleEl.textContent = '⚠️ 成為巴西稅務居民';
+          descEl.textContent = '全球所得需向巴西申報，最高邊際稅率 27.5%。建議諮詢跨國稅務顧問進行稅務規劃。';
+          titleEl.style.color = '#FF6B6B';
+        } else {
+          titleEl.textContent = '維持非稅務居民';
+          descEl.textContent = '僅巴西境內所得需申報。但需注意 730 天連續出境會導致居留權自動註銷。';
+          titleEl.style.color = 'var(--color-neon-green)';
+        }
+      }
+      setTimeout(() => {
+        show('vitem5-arrow-9');
+        show('vitem5-pr');
+      }, 500);
+    } else if (action === 'vitem5-restart') {
+      vitem5State.position = null;
+      vitem5State.edu = null;
+      vitem5State.exp = null;
+      vitem5State.tax = null;
+      const steps = ['vitem5-arrow-1','vitem5-edu-step','vitem5-arrow-2','vitem5-exp-step','vitem5-arrow-3','vitem5-docs','vitem5-arrow-4','vitem5-fail','vitem5-arrow-5','vitem5-review','vitem5-arrow-6','vitem5-visa','vitem5-arrow-7','vitem5-tax-step','vitem5-arrow-8','vitem5-tax-result','vitem5-arrow-9','vitem5-pr'];
+      steps.forEach(id => hide(id));
+      const taxTitle = document.getElementById('vitem5-tax-title');
+      const taxDesc = document.getElementById('vitem5-tax-desc');
+      if (taxTitle) taxTitle.textContent = '';
+      if (taxDesc) taxDesc.textContent = '';
+    }
+  });
+})();
+
+// ── Persona Journey System ─────────────────────────────────────
+(function initPersonaJourney() {
+  let journeyData: any = {};
+  try {
+    journeyData = JSON.parse(localStorage.getItem('persona-journey') || '{}');
+  } catch (e) { return; }
+  if (!journeyData.path) return;
+
+  const path = journeyData.path;
+  const currentSlug = window.location.pathname.split('/').pop() || '';
+
+  const articleIcons: Record<string, string> = {
+    '01-0-pre-entry-checklist': '📋', '01-tax-system': '⚖️', '01-1-tax-timeline': '🗺️',
+    '01-2-visa-golden': '🏠', '01-3-visa-digital-nomad': '💻', '01-4-visa-executive': '👔',
+    '02-visa-strategy': '🛂', '03-local-team': '🤝', '04-company-setup': '🏛️',
+    '05-bacen-capital': '🏦', '06-ecommerce-platforms': '🛒', '07-radar-import': '📦',
+    '08-3pl-warehouse': '🏭', '08-1-3pl-contract': '📋', '09-erp-payment': '💳',
+    '09-1-split-payment': '💸', '10-after-sales-service': '🔄', '11-tax-compliance': '📋',
+    '12-profit-remittance': '💰',
+  };
+
+  const pathConfigs: Record<string, Array<{ slug: string; title: string; eta: string; difficulty: number; strategy: string }>> = {
+    A: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1, strategy: '📋 先辦 CPF + 海牙認證，沒有這些你連銀行都開不了戶' },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 巴西是全球稅制最複雜的國家之一，先看懂地圖再出發' },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2, strategy: '🗺️ 2026-2033 是 IVA Dual 過渡期，現在進場有先行者優勢' },
+      { slug: '01-2-visa-golden', title: '黃金簽證', eta: '20min', difficulty: 1, strategy: '🏠 被動投資路徑：買房即可，每 2 年只需入境 14 天，4 年轉永居' },
+      { slug: '01-3-visa-digital-nomad', title: '數位遊民簽證', eta: '20min', difficulty: 1, strategy: '💻 最低成本試水溫：月收入 USD 1,500 即可，但 183 天觸發稅務居民' },
+      { slug: '01-4-visa-executive', title: '高管簽證 VITEM V', eta: '25min', difficulty: 2, strategy: '👔 需有母公司外派：最快審批，但學位必須與職位匹配' },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3, strategy: '🛂 5 種簽證完整對比，選錯路徑可能浪費 2 年以上時間' },
+      { slug: '03-local-team', title: '在地團隊組建', eta: '20min', difficulty: 2, strategy: '🤝 找對會計師和律師比選簽證更重要——他們決定你的合規底線' },
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3, strategy: '🏛️ CNPJ + Pre-acordo + Pleno Poder，三步到位' },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3, strategy: '🏦 SCE-IED 登記是合法匯款的唯一通道，漏掉這步資金進得來出不去' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 Mercado Livre 佔巴西 35% 市佔，但 Amazon 和 Shopee 也在快速成長' },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3, strategy: '📦 沒有 RADAR 你無法進口商品，這是供應鏈的敲門磚' },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2, strategy: '🏭 選 SC 州可省 12% ICMS，但尾程時效可能慢 2-3 天' },
+      { slug: '08-1-3pl-contract', title: '3PL 合約談判', eta: '30min', difficulty: 3, strategy: '📋 稅務條款和賠償責任是談判核心，標準合約對你極度不利' },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3, strategy: '💳 Pix 佔巴西電子支付 70%，不支持 Pix 等於放棄一半市場' },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3, strategy: '💸 稅款即時扣繳是 2026 新規，現金流規劃不當可能導致資金鏈斷裂' },
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2, strategy: '🔄 巴西消費者法 CDC 全球最嚴格，退貨率是一般市場的 3 倍' },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4, strategy: '📋 SPED + NF-e + Malha Fiscal，漏報一次罰款可能吃掉整月利潤' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 JCP 抵稅 + 特許權使用費，組合使用可將匯出稅率從 34% 降至 15%' },
+    ],
+    B: [
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 即使跨境銷售也要懂巴西稅制，Lucro Presumido 最適合初期試水' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 Mercado Livre 跨境賣家計劃是最低門檻入場方式' },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3, strategy: '📦 有了 RADAR 才能以公司名義進口，個人進口額度有限' },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2, strategy: '🏭 先用 SC 州 TTD 倉庫測試市場反應，確認銷量再擴大' },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3, strategy: '💳 訂單自動對帳是跨境賣家的命脈，手動處理出錯率太高' },
+    ],
+    C: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1, strategy: '📋 外派前先辦好 CPF + 海牙認證，避免到了巴西卡在文件' },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 企業必須用 Lucro Real，稅務規劃空間比想像中大' },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2, strategy: '🗺️ 過渡期內進場可以鎖定舊制優惠，時間窗口正在關閉' },
+      { slug: '01-4-visa-executive', title: '高管簽證 VITEM V', eta: '25min', difficulty: 2, strategy: '👔 你的專屬簽證：母公司外派 + 學位匹配 + 薪資門檻，三步搞定' },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3, strategy: '🛂 了解為什麼 VITEM V 是企業外派的最優解，以及其他路徑的劣勢' },
+      { slug: '03-local-team', title: '在地團隊組建', eta: '20min', difficulty: 2, strategy: '🤝 企業需要更強的在地團隊：會計師 + 律師 + 人力資源顧問' },
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3, strategy: '🏛️ 母公司全資子公司是最乾淨的架構，避免合夥糾紛' },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3, strategy: '🏦 母公司注資必須走 SCE-IED，這是未來利潤匯出的法律基礎' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 企業賣家可以拿到平台 VIP 通道，流量和佣金都有優勢' },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3, strategy: '📦 企業 RADAR 額度遠高於個人，可以支撐大規模進口' },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2, strategy: '🏭 企業建議用多倉策略：SC 州省稅 + SP 州提速' },
+      { slug: '08-1-3pl-contract', title: '3PL 合約談判', eta: '30min', difficulty: 3, strategy: '📋 企業合約要談獨家條款和年度返利，標準合約虧太多' },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3, strategy: '💳 企業需要 ERP 對接母公司系統，數據透明是合規基礎' },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3, strategy: '💸 2026 新規下企業現金流壓力最大，必須提前建模' },
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2, strategy: '🔄 企業退貨率控制在 15% 以內是健康線，超過需要檢討選品' },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4, strategy: '📋 企業合規是底線不是加分項，一次罰款可能影響母公司審計' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 母公司最關心的環節：JCP + 特許權使用費組合可合法降低 50% 匯出稅' },
+    ],
+    D: [
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3, strategy: '🏛️ 複習公司架構要點，確認你的 CNPJ 和 Pleno Poder 沒有遺漏' },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3, strategy: '🏦 如果還沒做 SCE-IED 登記，現在補做還來得及——這是匯出的前提' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 確認你的平台帳號是企業帳戶，個人帳戶無法合法匯出利潤' },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3, strategy: '📦 確認 RADAR 額度足夠支撐你的進口規模，不夠就申請升級' },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2, strategy: '🏭 如果倉庫不在 SC 州，評估搬遷的稅務收益是否大於搬遷成本' },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3, strategy: '💳 確保 ERP 能自動生成稅務報表，手動報表出錯率太高' },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4, strategy: '📋 合規是利潤匯出的前提，稅務局不會放行有欠稅的企業' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 你的終極目標：JCP 抵稅 + 特許權使用費，組合拳將稅率壓到最低' },
+    ],
+    E: [
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2, strategy: '🔄 優化退貨流程可以省下 5-10% 的營收，這是被忽視的利潤池' },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4, strategy: '📋 運營中最容易出問題的環節：SPED 漏報、NF-e 錯誤、Malha Fiscal 紅線' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 你已經在賺錢了，現在是時候讓錢合法回流——JCP + 特許權使用費' },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3, strategy: '💸 2026 新規下你的現金流模型可能已經過時，需要重新建模' },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 複習稅制地圖，確認你當初選擇的 Lucro Real/Presumido 仍然是最優解' },
+    ],
+    F: [
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 先看懂稅制再決定是否值得進入——巴西市場大但稅務成本也高' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 用 Mercado Livre 跨境計劃最低成本測試，不需要先註冊巴西公司' },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2, strategy: '🏭 先用 SC 州 TTD 倉庫小批量測試，確認銷量再考慮擴大投資' },
+    ],
+    G: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1, strategy: '📋 先辦 CPF + 海牙認證，數位遊民入境必備' },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 重點關注 183 天規則——停留超過 183 天你的全球所得都要向巴西申報' },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2, strategy: '🗺️ 2026 年起股息開始徵稅 10%，你的境外收入可能受影響' },
+      { slug: '01-3-visa-digital-nomad', title: '數位遊民簽證', eta: '20min', difficulty: 1, strategy: '💻 你的專屬簽證：月收入 USD 1,500 即可，1 年可續簽，但 183 天觸發稅務居民' },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3, strategy: '🛂 了解為什麼 VITEM XIV 是遠程工作者的最優解，以及轉其他簽證的路徑' },
+    ],
+  };
+
+  const pathInfo: Record<string, { name: string; checkpoints: number; hours: number }> = {
+    A: { name: '🛡️ 移民征途', checkpoints: 19, hours: 8 },
+    B: { name: '🚀 閃電出海', checkpoints: 5, hours: 2.5 },
+    C: { name: '🏗️ 企業遠征', checkpoints: 17, hours: 6 },
+    D: { name: '⚡ 落地加速', checkpoints: 8, hours: 4 },
+    E: { name: '🔧 運營優化', checkpoints: 5, hours: 2.5 },
+    F: { name: '🎯 試水偵察', checkpoints: 3, hours: 1.5 },
+    G: { name: '💻 數位遊民征途', checkpoints: 5, hours: 2 },
+  };
+
+  const checkpoints = pathConfigs[path] || [];
+  if (checkpoints.length === 0) return;
+
+  const currentIndex = checkpoints.findIndex(c => c.slug === currentSlug);
+  if (currentIndex === -1) return;
+
+  const info = pathInfo[path];
+  const currentCp = checkpoints[currentIndex];
+  const prevCp = checkpoints[currentIndex - 1];
+  const nextCp = checkpoints[currentIndex + 1];
+  const isLast = currentIndex === checkpoints.length - 1;
+  const isFirst = currentIndex === 0;
+
+  // Show side panel (bottom-right fixed)
+  const sidePanel = document.getElementById('journey-side-panel');
+  if (sidePanel) {
+    sidePanel.classList.remove('persona-hidden');
+    const titleEl = document.getElementById('side-panel-title');
+    if (titleEl) titleEl.textContent = info.name;
+    const progressEl = document.getElementById('side-panel-progress');
+    if (progressEl) progressEl.textContent = `${currentIndex + 1}/${checkpoints.length}`;
+
+    const track = document.getElementById('side-panel-track');
+    if (track) {
+      track.innerHTML = '';
+      checkpoints.forEach((cp, index) => {
+        const cpStatus = journeyData.checkpoints?.[cp.slug]?.status;
+        const isCompleted = index < currentIndex || cpStatus === 'completed';
+        const isCurrent = index === currentIndex;
+        const isAvailable = index === currentIndex + 1;
+        const wrapper = document.createElement('a');
+        wrapper.className = `side-row ${isCompleted ? 'completed' : isCurrent ? 'current' : isAvailable ? 'available' : 'locked'}`;
+        wrapper.href = (isCompleted || isAvailable) ? `/handbook/${cp.slug}` : '#';
+        const dot = document.createElement('span');
+        dot.className = `side-dot ${isCompleted ? 'completed' : isCurrent ? 'current' : isAvailable ? 'available' : 'locked'}`;
+        dot.textContent = isCompleted ? '✓' : isCurrent ? '●' : isAvailable ? '○' : '·';
+        const info = document.createElement('div');
+        info.className = 'side-info';
+        const label = document.createElement('span');
+        label.className = 'side-label';
+        label.textContent = `${index + 1}. ${cp.title}`;
+        const strategy = document.createElement('span');
+        strategy.className = 'side-strategy';
+        strategy.textContent = cp.strategy || '';
+        info.appendChild(label);
+        info.appendChild(strategy);
+        wrapper.appendChild(dot);
+        wrapper.appendChild(info);
+        track.appendChild(wrapper);
+      });
+    }
+
+    // Toggle panel
+    const toggle = document.getElementById('side-panel-toggle');
+    const content = document.getElementById('side-panel-content');
+    if (toggle && content) {
+      toggle.addEventListener('click', () => {
+        content.classList.toggle('panel-collapsed');
+      });
+    }
+  }
+
+  // Show journey nav
+  const nav = document.getElementById('journey-navigation');
+  if (nav) {
+    const celebrationText = document.getElementById('nav-celebration-text');
+    if (celebrationText) celebrationText.textContent = `關卡 ${currentIndex + 1}/${checkpoints.length} 已完成！`;
+    const stampText = document.getElementById('nav-stamp-text');
+    if (stampText) stampText.textContent = `獲得金色印章：「${currentCp?.title || ''}」`;
+
+    const chaptersContainer = document.getElementById('nav-chapters');
+    if (chaptersContainer) {
+      let html = '';
+      if (!isFirst && prevCp) {
+        html += `<a href="/handbook/${prevCp.slug}" class="nav-chapter prev">
+          <span class="chapter-arrow">⬅️</span>
+          <div class="chapter-info">
+            <span class="chapter-label">上一關</span>
+            <span class="chapter-title">${prevCp.title}</span>
+            <span class="chapter-meta">⏱️ ${prevCp.eta} | ${'⭐'.repeat(prevCp.difficulty)}</span>
+          </div>
+        </a>`;
+      }
+      if (!isLast && nextCp) {
+        html += `<a href="/handbook/${nextCp.slug}" class="nav-chapter next">
+          <div class="chapter-info">
+            <span class="chapter-label">下一關</span>
+            <span class="chapter-title">${nextCp.title}</span>
+            <span class="chapter-meta">⏱️ ${nextCp.eta} | ${'⭐'.repeat(nextCp.difficulty)}</span>
+          </div>
+          <span class="chapter-arrow">➡️</span>
+        </a>`;
+      }
+      chaptersContainer.innerHTML = html;
+    }
+
+    const ctaContainer = document.getElementById('nav-cta-container');
+    if (ctaContainer) {
+      if (!isLast && nextCp) {
+        ctaContainer.innerHTML = `<a href="/handbook/${nextCp.slug}" class="nav-cta"><span class="cta-fire">🔥</span><span class="cta-text">繼續征途 → ${nextCp.title}</span></a>`;
+      } else {
+        ctaContainer.innerHTML = `<a href="/handbook" class="nav-cta"><span class="cta-fire">🏆</span><span class="cta-text">🎉 恭喜！你已完成征途！</span></a>`;
+      }
+    }
+  }
+
+  // Mark as completed on scroll
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const navEl = document.getElementById('journey-navigation');
+        if (navEl) navEl.classList.add('visible');
+        try {
+          const data = JSON.parse(localStorage.getItem('persona-journey') || '{}');
+          if (!data.checkpoints) data.checkpoints = {};
+          if (!data.checkpoints[currentSlug]) {
+            data.checkpoints[currentSlug] = { status: 'completed', completedAt: new Date().toISOString() };
+            data.lastVisited = new Date().toISOString();
+            localStorage.setItem('persona-journey', JSON.stringify(data));
+          }
+        } catch (e) {}
+        const celebration = document.getElementById('celebration');
+        if (celebration && !celebration.dataset.shown) {
+          celebration.dataset.shown = 'true';
+          celebration.style.display = 'block';
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  if (nav) navObserver.observe(nav);
+})();
+</script>

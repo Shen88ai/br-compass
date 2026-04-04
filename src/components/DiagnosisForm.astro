@@ -1,0 +1,428 @@
+---
+// DiagnosisForm — 軍師診斷表單組件
+// 3 問診斷 → 揭示個人化戰略路徑
+import { pathConfigs, pathInfo, diagnosisMap } from '../data/path-mapping';
+
+const articleIcons: Record<string, string> = {
+  '01-0-pre-entry-checklist': '📋',
+  '01-tax-system': '⚖️',
+  '01-1-tax-timeline': '🗺️',
+  '01-2-visa-golden': '🏠',
+  '01-3-visa-digital-nomad': '💻',
+  '01-4-visa-executive': '👔',
+  '02-visa-strategy': '🛂',
+  '03-local-team': '🤝',
+  '04-company-setup': '🏛️',
+  '05-bacen-capital': '🏦',
+  '06-ecommerce-platforms': '🛒',
+  '07-radar-import': '📦',
+  '08-3pl-warehouse': '🏭',
+  '08-1-3pl-contract': '📋',
+  '09-erp-payment': '💳',
+  '09-1-split-payment': '💸',
+  '10-after-sales-service': '🔄',
+  '11-tax-compliance': '📋',
+  '12-profit-remittance': '💰',
+};
+---
+
+<div class="advisor-card" id="diagnosis-form">
+  <div class="advisor-dialogue">
+    <span class="advisor-avatar-icon">🎭</span>
+    <p class="advisor-speech">"歡迎，探險家。<br/>讓我為你量身打造戰略。"</p>
+  </div>
+
+  <form class="diagnosis-form" id="diagnosis-form-el">
+    <div class="question-step active" data-step="1">
+      <h3>Q1：你的身份是？</h3>
+      <div class="option-grid">
+        <label class="option-card">
+          <input type="radio" name="identity" value="individual" hidden>
+          <span class="option-icon">🧑‍💼</span>
+          <span class="option-title">個人投資者</span>
+          <span class="option-desc">以個人身份投資巴西</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="identity" value="corporate" hidden>
+          <span class="option-icon">🏢</span>
+          <span class="option-title">企業派出</span>
+          <span class="option-desc">代表公司開拓巴西市場</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="identity" value="crossborder" hidden>
+          <span class="option-icon">🌐</span>
+          <span class="option-title">跨境賣家</span>
+          <span class="option-desc">人在巴西境外，貨到巴西</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="identity" value="remoteworker" hidden>
+          <span class="option-icon">💻</span>
+          <span class="option-title">遠程工作者</span>
+          <span class="option-desc">收入來自巴西境外，想到巴西生活</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="question-step" data-step="2">
+      <h3>Q2：你的終極目標是？</h3>
+      <div class="option-grid">
+        <label class="option-card">
+          <input type="radio" name="goal" value="profit" hidden>
+          <span class="option-icon">💰</span>
+          <span class="option-title">利潤匯回</span>
+          <span class="option-desc">賺巴西的錢，匯回母國</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="goal" value="immigration" hidden>
+          <span class="option-icon">🏠</span>
+          <span class="option-title">移民定居</span>
+          <span class="option-desc">拿到身份，在巴西生活</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="goal" value="expansion" hidden>
+          <span class="option-icon">📦</span>
+          <span class="option-title">規模擴張</span>
+          <span class="option-desc">把巴西當作拉美樞紐</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="goal" value="testing" hidden>
+          <span class="option-icon">🎯</span>
+          <span class="option-title">快速試水</span>
+          <span class="option-desc">最小成本測試市場</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="question-step" data-step="3">
+      <h3>Q3：你目前的進度是？</h3>
+      <div class="option-grid">
+        <label class="option-card">
+          <input type="radio" name="progress" value="beginner" hidden>
+          <span class="option-icon">🔵</span>
+          <span class="option-title">零基礎</span>
+          <span class="option-desc">還在了解階段</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="progress" value="preparing" hidden>
+          <span class="option-icon">🟡</span>
+          <span class="option-title">準備中</span>
+          <span class="option-desc">已決定要做，正在籌備</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="progress" value="landed" hidden>
+          <span class="option-icon">🟢</span>
+          <span class="option-title">已落地</span>
+          <span class="option-desc">公司/簽證已搞定</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="progress" value="operating" hidden>
+          <span class="option-icon">🟣</span>
+          <span class="option-title">運營中</span>
+          <span class="option-desc">已有銷售，需要優化</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-navigation">
+      <button type="button" class="btn-prev" id="btn-prev" hidden>← 上一步</button>
+      <button type="button" class="btn-next" id="btn-next" disabled>下一步 →</button>
+    </div>
+  </form>
+
+  <div class="result-reveal" id="result-reveal" style="display:none;">
+    <div class="result-scroll">
+      <div class="scroll-seal">📜</div>
+      <h3 id="result-path-name"></h3>
+      <p class="result-summary" id="result-summary"></p>
+      <div class="result-checklist" id="result-checklist"></div>
+      <div class="result-actions">
+        <a href="#" class="btn-start-journey" id="btn-start-journey">🔥 踏上征途</a>
+        <button type="button" class="btn-back-adjust" id="btn-back-adjust">← 調整選項</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function initDiagnosisForm() {
+  const form = document.getElementById('diagnosis-form-el');
+  if (!form) return;
+
+  const pathConfigs = {
+    A: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1 },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2 },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2 },
+      { slug: '01-2-visa-golden', title: '黃金簽證', eta: '20min', difficulty: 1 },
+      { slug: '01-3-visa-digital-nomad', title: '數位遊民簽證', eta: '20min', difficulty: 1 },
+      { slug: '01-4-visa-executive', title: '高管簽證 VITEM V', eta: '25min', difficulty: 2 },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3 },
+      { slug: '03-local-team', title: '在地團隊組建', eta: '20min', difficulty: 2 },
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3 },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3 },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2 },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3 },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2 },
+      { slug: '08-1-3pl-contract', title: '3PL 合約談判', eta: '30min', difficulty: 3 },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3 },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3 },
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2 },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4 },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5 },
+    ],
+    B: [
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2 },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2 },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3 },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2 },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3 },
+    ],
+    C: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1 },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2 },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2 },
+      { slug: '01-4-visa-executive', title: '高管簽證 VITEM V', eta: '25min', difficulty: 2 },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3 },
+      { slug: '03-local-team', title: '在地團隊組建', eta: '20min', difficulty: 2 },
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3 },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3 },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2 },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3 },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2 },
+      { slug: '08-1-3pl-contract', title: '3PL 合約談判', eta: '30min', difficulty: 3 },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3 },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3 },
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2 },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4 },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5 },
+    ],
+    D: [
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3 },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3 },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2 },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3 },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2 },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3 },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4 },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5 },
+    ],
+    E: [
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2 },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4 },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5 },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3 },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2 },
+    ],
+    F: [
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2 },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2 },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2 },
+    ],
+    G: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1 },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2 },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2 },
+      { slug: '01-3-visa-digital-nomad', title: '數位遊民簽證', eta: '20min', difficulty: 1 },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3 },
+    ],
+  };
+
+  const pathInfo = {
+    A: { name: '🛡️ 移民征途', checkpoints: 19, hours: 8 },
+    B: { name: '🚀 閃電出海', checkpoints: 5, hours: 2.5 },
+    C: { name: '🏗️ 企業遠征', checkpoints: 17, hours: 6 },
+    D: { name: '⚡ 落地加速', checkpoints: 8, hours: 4 },
+    E: { name: '🔧 運營優化', checkpoints: 5, hours: 2.5 },
+    F: { name: '🎯 試水偵察', checkpoints: 3, hours: 1.5 },
+    G: { name: '💻 數位遊民征途', checkpoints: 5, hours: 2 },
+  };
+
+  const diagnosisMap: Record<string, string> = {
+    'individual-immigration-beginner': 'A', 'individual-immigration-preparing': 'A',
+    'individual-immigration-landed': 'D', 'individual-immigration-operating': 'E',
+    'individual-profit-beginner': 'A', 'individual-profit-preparing': 'A',
+    'individual-profit-landed': 'D', 'individual-profit-operating': 'E',
+    'individual-expansion-beginner': 'A', 'individual-expansion-preparing': 'C',
+    'individual-expansion-landed': 'D', 'individual-expansion-operating': 'E',
+    'individual-testing-beginner': 'F', 'individual-testing-preparing': 'F',
+    'individual-testing-landed': 'B', 'individual-testing-operating': 'E',
+    'corporate-immigration-beginner': 'C', 'corporate-immigration-preparing': 'C',
+    'corporate-immigration-landed': 'D', 'corporate-immigration-operating': 'E',
+    'corporate-profit-beginner': 'C', 'corporate-profit-preparing': 'C',
+    'corporate-profit-landed': 'D', 'corporate-profit-operating': 'E',
+    'corporate-expansion-beginner': 'C', 'corporate-expansion-preparing': 'C',
+    'corporate-expansion-landed': 'D', 'corporate-expansion-operating': 'E',
+    'corporate-testing-beginner': 'F', 'corporate-testing-preparing': 'B',
+    'corporate-testing-landed': 'D', 'corporate-testing-operating': 'E',
+    'crossborder-immigration-beginner': 'A', 'crossborder-immigration-preparing': 'A',
+    'crossborder-immigration-landed': 'D', 'crossborder-immigration-operating': 'E',
+    'crossborder-profit-beginner': 'C', 'crossborder-profit-preparing': 'C',
+    'crossborder-profit-landed': 'D', 'crossborder-profit-operating': 'E',
+    'crossborder-expansion-beginner': 'C', 'crossborder-expansion-preparing': 'C',
+    'crossborder-expansion-landed': 'D', 'crossborder-expansion-operating': 'E',
+    'crossborder-testing-beginner': 'F', 'crossborder-testing-preparing': 'F',
+    'crossborder-testing-landed': 'B', 'crossborder-testing-operating': 'E',
+    'remoteworker-immigration-beginner': 'G', 'remoteworker-immigration-preparing': 'G',
+    'remoteworker-immigration-landed': 'D', 'remoteworker-immigration-operating': 'E',
+    'remoteworker-profit-beginner': 'G', 'remoteworker-profit-preparing': 'G',
+    'remoteworker-profit-landed': 'D', 'remoteworker-profit-operating': 'E',
+    'remoteworker-expansion-beginner': 'G', 'remoteworker-expansion-preparing': 'G',
+    'remoteworker-expansion-landed': 'D', 'remoteworker-expansion-operating': 'E',
+    'remoteworker-testing-beginner': 'G', 'remoteworker-testing-preparing': 'G',
+    'remoteworker-testing-landed': 'D', 'remoteworker-testing-operating': 'E',
+  };
+
+  const articleIcons: Record<string, string> = {
+    '01-0-pre-entry-checklist': '📋', '01-tax-system': '⚖️', '01-1-tax-timeline': '🗺️',
+    '01-2-visa-golden': '🏠', '01-3-visa-digital-nomad': '💻', '01-4-visa-executive': '👔',
+    '02-visa-strategy': '🛂', '03-local-team': '🤝', '04-company-setup': '🏛️',
+    '05-bacen-capital': '🏦', '06-ecommerce-platforms': '🛒', '07-radar-import': '📦',
+    '08-3pl-warehouse': '🏭', '08-1-3pl-contract': '📋', '09-erp-payment': '💳',
+    '09-1-split-payment': '💸', '10-after-sales-service': '🔄', '11-tax-compliance': '📋',
+    '12-profit-remittance': '💰',
+  };
+
+  let currentStep = 1;
+  const totalSteps = 3;
+  const answers: Record<string, string> = {};
+
+  const btnNext = document.getElementById('btn-next') as HTMLButtonElement;
+  const btnPrev = document.getElementById('btn-prev') as HTMLButtonElement;
+
+  btnNext?.addEventListener('click', () => {
+    const currentQuestion = form.querySelector(`.question-step[data-step="${currentStep}"]`);
+    const selected = currentQuestion?.querySelector('input[type="radio"]:checked') as HTMLInputElement;
+    if (!selected) return;
+
+    const key = currentStep === 1 ? 'identity' : currentStep === 2 ? 'goal' : 'progress';
+    answers[key] = selected.value;
+
+    // 遠程工作者：Q1 完成後直接揭示戰略，跳過 Q2/Q3
+    if (currentStep === 1 && answers.identity === 'remoteworker') {
+      showResult();
+      return;
+    }
+
+    if (currentStep < totalSteps) {
+      currentStep++;
+      updateForm();
+    } else {
+      showResult();
+    }
+  });
+
+  btnPrev?.addEventListener('click', () => {
+    if (currentStep > 1) {
+      currentStep--;
+      updateForm();
+    }
+  });
+
+  form.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const radio = card.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) radio.checked = true;
+      if (btnNext) btnNext.disabled = false;
+    });
+  });
+
+  function updateForm() {
+    form.querySelectorAll('.question-step').forEach(step => {
+      const el = step as HTMLElement;
+      el.classList.toggle('active', parseInt(el.dataset.step || '0') === currentStep);
+    });
+
+    if (btnPrev) btnPrev.hidden = currentStep === 1;
+    if (btnNext) btnNext.textContent = currentStep === totalSteps ? '揭示戰略 📜' : '下一步 →';
+
+    const currentQuestion = form.querySelector(`.question-step[data-step="${currentStep}"]`);
+    const selected = currentQuestion?.querySelector('input[type="radio"]:checked');
+    if (btnNext) btnNext.disabled = !selected;
+  }
+
+  function showResult() {
+    const key = `${answers.identity}-${answers.goal}-${answers.progress}`;
+    let path = diagnosisMap[key] || 'A';
+
+    // 遠程工作者 → 數位遊民路徑 G
+    if (answers.identity === 'remoteworker') {
+      path = 'G';
+    }
+    const info = pathInfo[path as keyof typeof pathInfo];
+    const config = pathConfigs[path as keyof typeof pathConfigs] || [];
+
+    try {
+      const journeyData = {
+        path,
+        diagnosis: answers,
+        checkpoints: {},
+        startedAt: new Date().toISOString(),
+        lastVisited: new Date().toISOString()
+      };
+      localStorage.setItem('persona-journey', JSON.stringify(journeyData));
+    } catch (e) {
+      // localStorage not available
+    }
+
+    const formEl = document.getElementById('diagnosis-form-el');
+    if (formEl) formEl.style.display = 'none';
+
+    const dialogue = document.querySelector('.advisor-dialogue .advisor-speech') as HTMLElement;
+    if (dialogue) {
+      dialogue.innerHTML = `"你的征途是【${info.name}】，共 ${info.checkpoints} 關。"`;
+    }
+
+    const reveal = document.getElementById('result-reveal');
+    if (reveal) {
+      reveal.style.display = 'block';
+      const nameEl = document.getElementById('result-path-name');
+      if (nameEl) nameEl.textContent = info.name;
+      const summaryEl = document.getElementById('result-summary');
+      if (summaryEl) summaryEl.innerHTML = `共 <strong>${info.checkpoints}</strong> 關，預估 <strong>${info.hours}</strong> 小時`;
+
+      const checklistEl = document.getElementById('result-checklist');
+      if (checklistEl) {
+        checklistEl.innerHTML = config.map((article: { slug: string; title: string; eta: string }, i: number) =>
+          `<div class="checklist-item">
+            <span class="item-number">${i + 1}</span>
+            <span class="item-icon">${articleIcons[article.slug] || '📄'}</span>
+            <span class="item-title">${article.title}</span>
+            <span class="item-eta">${article.eta}</span>
+          </div>`
+        ).join('');
+      }
+
+      const startBtn = document.getElementById('btn-start-journey') as HTMLAnchorElement;
+      if (startBtn && config.length > 0) {
+        startBtn.href = `/handbook/${config[0].slug}`;
+      }
+
+      // "調整選項" button: go back to Q3 with current answers preserved
+      const backBtn = document.getElementById('btn-back-adjust');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          const formEl = document.getElementById('diagnosis-form-el');
+          const revealEl = document.getElementById('result-reveal');
+          if (formEl) formEl.style.display = 'block';
+          if (revealEl) revealEl.style.display = 'none';
+          // Restore to Q3 so user can adjust
+          currentStep = totalSteps;
+          // Restore radio selections
+          const identityRadio = form.querySelector(`input[name="identity"][value="${answers.identity}"]`) as HTMLInputElement;
+          const goalRadio = form.querySelector(`input[name="goal"][value="${answers.goal}"]`) as HTMLInputElement;
+          const progressRadio = form.querySelector(`input[name="progress"][value="${answers.progress}"]`) as HTMLInputElement;
+          if (identityRadio) identityRadio.checked = true;
+          if (goalRadio) goalRadio.checked = true;
+          if (progressRadio) progressRadio.checked = true;
+          updateForm();
+          // Reset dialogue
+          const dialogue = document.querySelector('.advisor-dialogue .advisor-speech') as HTMLElement;
+          if (dialogue) {
+            dialogue.innerHTML = '"歡迎，探險家。<br/>讓我為你量身打造戰略。"';
+          }
+        });
+      }
+    }
+  }
+})();
+</script>
