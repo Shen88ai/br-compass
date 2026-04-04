@@ -1,0 +1,113 @@
+---
+// src/components/FateWheel/DiagnosisOverlay.astro
+import { questions } from '../../lib/fate-wheel/config';
+---
+
+<div class="diagnosis-overlay" id="diagnosis-overlay">
+  <div class="advisor-dialogue">
+    <span class="advisor-avatar-icon">🎭</span>
+    <p class="advisor-speech">"歡迎，探險家。<br/>讓我為你量身打造戰略。"</p>
+  </div>
+
+  <form class="diagnosis-form" id="diagnosis-form-el">
+    {questions.map((q, idx) => (
+      <div class={`question-step ${idx === 0 ? 'active' : ''}`} data-step={q.id}>
+        <h3>{q.title}</h3>
+        <div class="option-grid">
+          {q.options.map(opt => (
+            <label class="option-card">
+              <input type="radio" name={`q${q.id}`} value={opt.value} hidden>
+              <span class="option-icon">{opt.icon}</span>
+              <span class="option-title">{opt.title}</span>
+              <span class="option-desc">{opt.desc}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <div class="form-navigation">
+      <button type="button" class="btn-prev" id="btn-prev" hidden>← 上一步</button>
+      <button type="button" class="btn-next" id="btn-next" disabled>下一步 →</button>
+    </div>
+  </form>
+
+  <div class="result-reveal" id="result-reveal" style="display:none;">
+    <div class="scroll-seal">📜</div>
+    <h3 id="result-path-name"></h3>
+    <p class="result-summary" id="result-summary"></p>
+    <div class="result-actions">
+      <a href="#" class="btn-start-journey" id="btn-start-journey">🔥 踏上征途</a>
+      <button type="button" class="btn-back-adjust" id="btn-back-adjust">← 調整選項</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { stateManager } from '../../lib/fate-wheel/state-manager';
+  import { pathInfo } from '../../data/path-mapping';
+
+  const form = document.getElementById('diagnosis-form-el');
+  const btnNext = document.getElementById('btn-next') as HTMLButtonElement;
+  const btnPrev = document.getElementById('btn-prev') as HTMLButtonElement;
+  let currentStep = 1;
+
+  form?.addEventListener('click', (e) => {
+    const card = (e.target as HTMLElement).closest('.option-card');
+    if (card) {
+      const radio = card.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) radio.checked = true;
+      if (btnNext) btnNext.disabled = false;
+    }
+  });
+
+  btnNext?.addEventListener('click', () => {
+    const activeStep = form?.querySelector('.question-step.active') as HTMLElement;
+    if (!activeStep) return;
+    const step = parseInt(activeStep.dataset.step || '1');
+    const selected = activeStep.querySelector('input[type="radio"]:checked') as HTMLInputElement;
+    if (!selected) return;
+
+    stateManager.answerQuestion(step, selected.value);
+
+    activeStep.classList.remove('active');
+    const nextStep = form?.querySelector(`.question-step[data-step="${step + 1}"]`) as HTMLElement;
+    if (nextStep) {
+      nextStep.classList.add('active');
+      currentStep = step + 1;
+    }
+  });
+
+  btnPrev?.addEventListener('click', () => {
+    if (currentStep > 1) {
+      const activeStep = form?.querySelector('.question-step.active') as HTMLElement;
+      activeStep?.classList.remove('active');
+      const prevStep = form?.querySelector(`.question-step[data-step="${currentStep - 1}"]`) as HTMLElement;
+      if (prevStep) prevStep.classList.add('active');
+      currentStep--;
+    }
+  });
+
+  window.addEventListener('fate-wheel:direction-selected', () => {
+    const overlay = document.getElementById('diagnosis-overlay');
+    if (overlay) overlay.classList.add('active');
+  });
+
+  window.addEventListener('fate-wheel:diagnosis-complete', (e: Event) => {
+    const detail = (e as CustomEvent).detail as { path: string };
+    const info = pathInfo[detail.path as keyof typeof pathInfo];
+    const reveal = document.getElementById('result-reveal');
+    const nameEl = document.getElementById('result-path-name');
+    const summaryEl = document.getElementById('result-summary');
+    const formEl = document.getElementById('diagnosis-form-el');
+    const startBtn = document.getElementById('btn-start-journey') as HTMLAnchorElement;
+
+    if (reveal) reveal.style.display = 'block';
+    if (nameEl) nameEl.textContent = info.name;
+    if (summaryEl) summaryEl.textContent = `共 ${info.checkpoints} 關，預估 ${info.hours} 小時`;
+    if (formEl) formEl.style.display = 'none';
+    if (startBtn && info.checkpoints > 0) {
+      startBtn.href = '/handbook';
+    }
+  });
+</script>

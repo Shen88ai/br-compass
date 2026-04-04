@@ -1,0 +1,59 @@
+---
+// src/components/FateWheel/FateWheelScene.astro
+---
+
+<div class="fate-wheel-canvas-container" id="fate-wheel-container">
+  <canvas id="fate-wheel-canvas"></canvas>
+</div>
+
+<div class="fate-wheel-loader" id="fate-wheel-loader">
+  <div class="loader-ring"></div>
+  <p class="loader-text">命運之輪運轉中...</p>
+</div>
+
+<script>
+  import { initFateWheel, disposeFateWheel } from '../../lib/fate-wheel/scene-manager';
+
+  let canvas: HTMLCanvasElement | null = null;
+
+  function init() {
+    canvas = document.getElementById('fate-wheel-canvas') as HTMLCanvasElement;
+    const loader = document.getElementById('fate-wheel-loader');
+    if (!canvas) return;
+
+    initFateWheel(canvas)
+      .then(() => {
+        if (loader) loader.classList.add('hidden');
+      })
+      .catch((err) => {
+        console.warn('Fate Wheel 3D init failed, falling back to CSS:', err);
+        if (loader) loader.classList.add('hidden');
+        showFallback();
+      });
+  }
+
+  function showFallback() {
+    const container = document.getElementById('fate-wheel-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="fate-wheel-fallback">
+          <div class="ring ring-inner">
+            <div class="compass-core breathing">🧭</div>
+          </div>
+          <div class="ring ring-middle"></div>
+          <div class="ring ring-outer"></div>
+        </div>
+      `;
+    }
+  }
+
+  // Initialize when component is in viewport
+  if (typeof window !== 'undefined') {
+    init();
+
+    // Cleanup on page navigation
+    window.addEventListener('beforeunload', () => {
+      disposeFateWheel();
+    });
+  }
+</script>

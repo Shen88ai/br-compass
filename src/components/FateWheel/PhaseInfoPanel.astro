@@ -1,0 +1,46 @@
+---
+// src/components/FateWheel/PhaseInfoPanel.astro
+---
+
+<div class="phase-info-panel" id="phase-info-panel">
+  <div class="phase-icon" id="panel-icon"></div>
+  <h3 id="panel-title"></h3>
+  <p id="panel-desc"></p>
+  <div class="phase-stats">
+    <span id="panel-articles"></span>
+    <span id="panel-time"></span>
+  </div>
+  <a href="#" class="btn-enter" id="panel-link">進入 →</a>
+</div>
+
+<script>
+  import { phases } from '../../lib/fate-wheel/config';
+
+  const panel = document.getElementById('phase-info-panel');
+  const iconEl = document.getElementById('panel-icon');
+  const titleEl = document.getElementById('panel-title');
+  const descEl = document.getElementById('panel-desc');
+  const articlesEl = document.getElementById('panel-articles');
+  const timeEl = document.getElementById('panel-time');
+  const linkEl = document.getElementById('panel-link');
+
+  window.addEventListener('fate-wheel:planet-hover', (e: Event) => {
+    const detail = (e as CustomEvent).detail as { planet: number | null };
+    if (detail.planet === null) {
+      panel?.classList.remove('visible');
+      return;
+    }
+
+    const phase = phases[detail.planet - 1];
+    if (!phase) return;
+
+    if (iconEl) iconEl.textContent = phase.icon;
+    if (titleEl) titleEl.textContent = `階段${phase.id} · ${phase.name}`;
+    if (descEl) descEl.textContent = phase.desc;
+    if (articlesEl) articlesEl.textContent = `${phase.articleCount} 篇指南`;
+    if (timeEl) timeEl.textContent = phase.timeRange;
+    if (linkEl) linkEl.href = `/handbook#phase-${phase.slug}`;
+
+    panel?.classList.add('visible');
+  });
+</script>

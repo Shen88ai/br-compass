@@ -12,10 +12,10 @@ describe('方案二：視覺層級重構 — 根首頁', () => {
       expect(page).toMatch(/text-gradient-hope/);
     });
 
-    it('Hero 區域應使用 advisor-section class', () => {
+    it('Hero 區域應使用 fate-wheel-overlay class', () => {
       const pagePath = join(srcDir, 'pages', 'index.astro');
       const page = readFileSync(pagePath, 'utf-8');
-      expect(page).toMatch(/class=["'][^"']*advisor-section/);
+      expect(page).toMatch(/class=["'][^"']*fate-wheel-overlay/);
     });
 
     it('Phase Cards 應使用 bento-grid 佈局', () => {

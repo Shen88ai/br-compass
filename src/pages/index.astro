@@ -1,248 +1,145 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import CompassView from '../components/CompassView.astro';
-import DiagnosisForm from '../components/DiagnosisForm.astro';
+import FateWheelScene from '../components/FateWheel/FateWheelScene.astro';
+import DiagnosisOverlay from '../components/FateWheel/DiagnosisOverlay.astro';
+import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
 ---
 
 <Layout title="跨境電商巴西出海實戰手冊" description="從戰略藍圖到利潤收割，最完整的巴西落地指南">
-  <!-- Advisor Section: Hero + Compass + Diagnosis -->
-  <section class="advisor-section">
-    <canvas id="hero-canvas" class="canvas-bg hero-canvas-dim"></canvas>
+  <!-- 3D Fate Wheel Scene (fixed, always centered) -->
+  <FateWheelScene />
 
-    <div class="advisor-content">
-      <h1 class="advisor-title animate-on-scroll">
+  <!-- HTML Overlay Content (scrolls over 3D) -->
+  <div class="fate-wheel-overlay">
+    <!-- Hero Section -->
+    <section class="hero-section-fullscreen">
+      <h1 class="hero-title-fate">
         跨境電商出海<span class="text-gradient-hope">巴西</span><br/>實戰手冊
       </h1>
-      <p class="advisor-subtitle animate-on-scroll delay-100">
+      <p class="hero-subtitle-fate">
         從稅制破譯、公司設立、供應鏈打通到利潤匯出<br/>
         19 篇深度指南，涵蓋外資落地巴西的每一個關鍵節點
       </p>
-
-      <CompassView />
-      <DiagnosisForm />
-
-      <div class="hero-actions animate-on-scroll delay-300" style="margin-top:var(--space-3);">
+      <div class="hero-actions-fate animate-on-scroll delay-300">
         <a href="/handbook" class="btn-red btn-md magnetic-btn">📖 瀏覽完整手冊</a>
         <a href="https://braziltax.netlify.app/#contact" class="btn-gold-outline btn-md magnetic-btn">💬 免費咨詢</a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Phase Overview -->
-  <section class="section-pad section-bg-alt">
-    <div class="container">
-      <h2 class="section-title">四大實戰<span class="text-gradient-hope">階段</span></h2>
-      <p class="section-sub">從籌備到收割，每一步都有詳細指南</p>
+    <!-- Diagnosis Overlay (appears after compass interaction) -->
+    <DiagnosisOverlay />
 
-      <div class="bento-grid grid-auto-fit">
-        <!-- Phase 1 - Featured -->
-        <a href="/handbook#phase-preparation" class="bento-featured link-none">
-          <div class="bento-card phase-card card-full-height" data-phase="1">
-            <div class="phase-icon-sm">🚩</div>
-            <div class="phase-label-platinum">階段一 · 第 1~2 個月</div>
-            <h3 class="phase-card-title">戰略藍圖與落地籌備</h3>
-            <p class="phase-card-desc">破譯巴西稅制、簽證策略、在地團隊組建與授權防護</p>
-            <div class="phase-card-link" style="color:var(--color-platinum);">8 篇指南 →</div>
-          </div>
-        </a>
+    <!-- Phase Info Panel (appears on planet hover) -->
+    <PhaseInfoPanel />
 
-        <!-- Phase 2 -->
-        <a href="/handbook#phase-foundation" class="link-none">
-          <div class="bento-card phase-card card-full-height" data-phase="2">
-            <div class="phase-icon-sm">🏛️</div>
-            <div class="phase-label-blue">階段二 · 第 2~4 個月</div>
-            <h3 class="phase-card-title">實體建立與資金血脈</h3>
-            <p class="phase-card-desc">CNPJ 申請、Pre-acordo 策略、BACEN 資金申報、平台入駐</p>
-            <div class="phase-card-link" style="color:var(--color-gold-light);">3 篇指南 →</div>
-          </div>
-        </a>
+    <!-- Phase Overview Cards (scrollable section) -->
+    <section class="section-pad section-bg-alt">
+      <div class="container">
+        <h2 class="section-title">四大實戰<span class="text-gradient-hope">階段</span></h2>
+        <p class="section-sub">從籌備到收割，每一步都有詳細指南</p>
 
-        <!-- Phase 3 -->
-        <a href="/handbook#phase-operations" class="link-none">
-          <div class="bento-card phase-card card-full-height" data-phase="3">
-            <div class="phase-icon-sm">📦</div>
-            <div class="phase-label-green">階段三 · 第 4~5 個月</div>
-            <h3 class="phase-card-title">供應鏈與數位營運</h3>
-            <p class="phase-card-desc">RADAR 申請、3PL 倉儲、ERP 整合、支付系統、售後服務</p>
-            <div class="phase-card-link" style="color:var(--color-neon-yellow);">6 篇指南 →</div>
-          </div>
-        </a>
+        <div class="bento-grid grid-auto-fit">
+          <!-- Phase 1 - Featured -->
+          <a href="/handbook#phase-preparation" class="bento-featured link-none">
+            <div class="bento-card phase-card card-full-height" data-phase="1">
+              <div class="phase-icon-sm">🚩</div>
+              <div class="phase-label-platinum">階段一 · 第 1~2 個月</div>
+              <h3 class="phase-card-title">戰略藍圖與落地籌備</h3>
+              <p class="phase-card-desc">破譯巴西稅制、簽證策略、在地團隊組建與授權防護</p>
+              <div class="phase-card-link" style="color:var(--color-platinum);">8 篇指南 →</div>
+            </div>
+          </a>
 
-        <!-- Phase 4 -->
-        <a href="/handbook#phase-harvest" class="link-none">
-          <div class="bento-card phase-card card-full-height" data-phase="4">
-            <div class="phase-icon-sm">💰</div>
-            <div class="phase-label-purple">階段四 · 第 6 個月+</div>
-            <h3 class="phase-card-title">財務合規與利潤收割</h3>
-            <p class="phase-card-desc">日常稅務合規、NF-e、SPED 申報、JCP 抵稅、利潤匯出</p>
-            <div class="phase-card-link" style="color:var(--color-neon-green);">3 篇指南 →</div>
-          </div>
-        </a>
+          <!-- Phase 2 -->
+          <a href="/handbook#phase-foundation" class="link-none">
+            <div class="bento-card phase-card card-full-height" data-phase="2">
+              <div class="phase-icon-sm">🏛️</div>
+              <div class="phase-label-blue">階段二 · 第 2~4 個月</div>
+              <h3 class="phase-card-title">實體建立與資金血脈</h3>
+              <p class="phase-card-desc">CNPJ 申請、Pre-acordo 策略、BACEN 資金申報、平台入駐</p>
+              <div class="phase-card-link" style="color:var(--color-gold-light);">3 篇指南 →</div>
+            </div>
+          </a>
+
+          <!-- Phase 3 -->
+          <a href="/handbook#phase-operations" class="link-none">
+            <div class="bento-card phase-card card-full-height" data-phase="3">
+              <div class="phase-icon-sm">📦</div>
+              <div class="phase-label-green">階段三 · 第 4~5 個月</div>
+              <h3 class="phase-card-title">供應鏈與數位營運</h3>
+              <p class="phase-card-desc">RADAR 申請、3PL 倉儲、ERP 整合、支付系統、售後服務</p>
+              <div class="phase-card-link" style="color:var(--color-neon-yellow);">6 篇指南 →</div>
+            </div>
+          </a>
+
+          <!-- Phase 4 -->
+          <a href="/handbook#phase-harvest" class="link-none">
+            <div class="bento-card phase-card card-full-height" data-phase="4">
+              <div class="phase-icon-sm">💰</div>
+              <div class="phase-label-purple">階段四 · 第 6 個月+</div>
+              <h3 class="phase-card-title">財務合規與利潤收割</h3>
+              <p class="phase-card-desc">日常稅務合規、NF-e、SPED 申報、JCP 抵稅、利潤匯出</p>
+              <div class="phase-card-link" style="color:var(--color-neon-green);">3 篇指南 →</div>
+            </div>
+          </a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="container-xs">
-      <h2 class="heading-xl mb-2">準備好進入<span class="text-gradient-hope">巴西市場</span>了嗎？</h2>
-      <p class="text-lg mb-4" style="color:var(--color-muted);line-height:1.6;">
-        從手冊開始，或直接聯繫我們的巴西稅務專家團隊<br/>
-        獲取一對一的落地策略諮詢
-      </p>
-      <div class="hero-actions">
-        <a href="/handbook" class="btn-red btn-md magnetic-btn">📖 閱讀手冊</a>
-        <a href="https://braziltax.netlify.app/#contact" class="btn-outline btn-md magnetic-btn">聯繫專家</a>
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container-xs">
+        <h2 class="heading-xl mb-2">準備好進入<span class="text-gradient-hope">巴西市場</span>了嗎？</h2>
+        <p class="text-lg mb-4" style="color:var(--color-muted);line-height:1.6;">
+          從手冊開始，或直接聯繫我們的巴西稅務專家團隊<br/>
+          獲取一對一的落地策略諮詢
+        </p>
+        <div class="hero-actions">
+          <a href="/handbook" class="btn-red btn-md magnetic-btn">📖 閱讀手冊</a>
+          <a href="https://braziltax.netlify.app/#contact" class="btn-outline btn-md magnetic-btn">聯繫專家</a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </Layout>
 
-<script>
-  const canvas = document.getElementById('hero-canvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    const gradientColors = [
-      { r: 232, g: 228, b: 217 },  // 白鉑
-      { r: 212, g: 168, b: 67 },   // 金色
-      { r: 229, g: 255, b: 0 },    // 螢光黃
-      { r: 0, g: 255, b: 135 },    // 螢光綠
-      { r: 125, g: 211, b: 252 },  // 淺藍
-    ];
-
-    // 檢測設備性能
-    const isMobile = window.innerWidth < 768;
-    const maxParticles = isMobile ? 35 : 60;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const speedMultiplier = prefersReducedMotion ? 0.3 : 1;
-
-    let particles = [];
-    let mouseX = -1000, mouseY = -1000;
-
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 64;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    canvas.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-    canvas.addEventListener('mouseleave', () => {
-      mouseX = -1000;
-      mouseY = -1000;
-    });
-
-    // 光雨粒子：從頂部生成，向下飄落 + 左右微擺
-    function createParticle() {
-      const colorIndex = Math.floor(Math.random() * gradientColors.length);
-      const c = gradientColors[colorIndex];
-      const isLarge = Math.random() < 0.15; // 15% 大光斑
-      return {
-        x: Math.random() * canvas.width,
-        y: -10 - Math.random() * canvas.height * 0.5,
-        baseVx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() * 0.4 + 0.2) * speedMultiplier,
-        size: isLarge ? Math.random() * 3 + 2 : Math.random() * 1.5 + 0.5,
-        opacity: isLarge ? Math.random() * 0.3 + 0.15 : Math.random() * 0.4 + 0.1,
-        colorIndex,
-        swaySpeed: Math.random() * 0.02 + 0.005,
-        swayAmount: Math.random() * 0.5 + 0.2,
-        phase: Math.random() * Math.PI * 2,
-        isLarge,
-        pulsePhase: Math.random() * Math.PI * 2,
-      };
-    }
-
-    for (let i = 0; i < maxParticles; i++) {
-      const p = createParticle();
-      p.y = Math.random() * canvas.height; // 初始分散
-      particles.push(p);
-    }
-
-    let time = 0;
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      time += 0.016;
-
-      // 補充粒子
-      while (particles.length < maxParticles) {
-        particles.push(createParticle());
-      }
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        const c = gradientColors[p.colorIndex];
-
-        // 運動：向下 + 左右微擺
-        p.x += p.baseVx + Math.sin(time * p.swaySpeed * 60 + p.phase) * p.swayAmount * 0.1;
-        p.y += p.vy;
-
-        // 鼠標互動：附近粒子被輕微推開
-        const dx = p.x - mouseX;
-        const dy = p.y - mouseY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120 && dist > 0) {
-          const force = (1 - dist / 120) * 0.8;
-          p.x += (dx / dist) * force;
-          p.y += (dy / dist) * force * 0.5;
-        }
-
-        // 脈動效果（大光斑）
-        let currentOpacity = p.opacity;
-        if (p.isLarge) {
-          currentOpacity = p.opacity * (0.7 + 0.3 * Math.sin(time * 2 + p.pulsePhase));
-        }
-
-        // 繪製粒子
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${currentOpacity})`;
-        ctx.fill();
-
-        // 大光斑加外圈光暈
-        if (p.isLarge) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${currentOpacity * 0.15})`;
-          ctx.fill();
-        }
-
-        // 垂直連線：與附近同色粒子連接（形成光線柱效果）
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const vDist = Math.abs(p.y - p2.y);
-          const hDist = Math.abs(p.x - p2.x);
-          if (vDist < 80 && hDist < 60) {
-            const avgR = (c.r + gradientColors[p2.colorIndex].r) / 2;
-            const avgG = (c.g + gradientColors[p2.colorIndex].g) / 2;
-            const avgB = (c.b + gradientColors[p2.colorIndex].b) / 2;
-            const alpha = 0.06 * (1 - vDist / 80) * (1 - hDist / 60);
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(${avgR}, ${avgG}, ${avgB}, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-
-        // 移除超出底部的粒子
-        if (p.y > canvas.height + 20) {
-          particles.splice(i, 1);
-        }
-      }
-
-      requestAnimationFrame(animate);
-    }
-    animate();
-  }
-</script>
-
 <style>
+  .hero-section-fullscreen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-5) var(--space-3);
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-title-fate {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: var(--space-3);
+    text-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+  }
+
+  .hero-subtitle-fate {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--color-muted);
+    max-width: 650px;
+    margin: 0 auto var(--space-4);
+    line-height: 1.7;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .hero-actions-fate {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   section a:hover .card {
     border-color: rgba(var(--color-gold-rgb, 212, 168, 67), 0.5);
     box-shadow: 0 12px 40px rgba(var(--color-gold-rgb, 212, 168, 67), 0.15);
