@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       deployments: write
+      pages: write
 
     steps:
       - name: Checkout
@@ -34,4 +35,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: ./dist/server
           command: deploy
