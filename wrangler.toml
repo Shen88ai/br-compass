@@ -1,12 +1,4 @@
-# Cloudflare Workers Configuration for br-compass
-# Using Workers with Assets for Static Site
-
+# Cloudflare Pages Configuration
 name = "br-compass"
 compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
-
-# Workers Assets configuration
-main = "./dist/_worker.js"
-
-[assets]
-directory = "./dist"
+pages_build_output_dir = "dist"
