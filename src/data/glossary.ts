@@ -2270,6 +2270,50 @@ export const glossaryData: GlossaryEntry[] = [
     ],
     relatedTerms: ['Apostila da Haia', 'Junta Comercial'],
   },
+  {
+    term: 'DAS',
+    category: 'tax',
+    pronunciation: '迪-阿-埃塞 (dee-ah-eh-see)',
+    fullPortuguese: 'Documento de Arrecadação do Simples Nacional',
+    chineseName: '統一簡易繳款單',
+    analogy: '🇹🇼 類似台灣的綜合所得稅繳款單，但合併了所有稅種',
+    oneLiner: 'Simples Nacional 企業的單一繳款文件，合併了聯邦、州、市各級稅收。',
+    fullExplanation: 'DAS 是巴西稅局為 Simples Nacional 企業設計的單一繳款文件。它將 IRPJ、CSLL、PIS、COFINS、ICMS、ISS 等所有稅種合併成一張繳款單，大大簡化了小微企業的稅務行政負擔。企業每月根據營業額查詢 DAS 金額並按時繳納即可。',
+    practicalTips: [
+      '每月 20 日前繳納',
+      '可透過 SIMEI 系統自動計算',
+      '逾期繳納會產生利息和罰款',
+      '連續三次欠繳可能被取消 Simples 資格',
+    ],
+    commonMistakes: [
+      '以為 DAS 包含了所有稅（實際上 ICMS/ISS 需另外計算）',
+      '忘記繳納導致產生滯納金',
+      '混淆 DAS 和 GPS（社保繳款單）',
+    ],
+    relatedTerms: ['Simples Nacional', 'SIMEI', 'IRPJ', 'CSLL'],
+  },
+  {
+    term: 'Valor Aduaneiro',
+    category: 'tax',
+    pronunciation: '瓦洛-阿杜阿奈-鲁 (vah-loh-ah-doo-ah-neh-ee-roo)',
+    fullPortuguese: 'Valor Aduaneiro (VA)',
+    chineseName: '海關完稅價格',
+    analogy: '🇹🇼 類似台灣的 CIF 價格，是計算進口稅的基準',
+    oneLiner: '海關用來計算進口稅的價格基準，通常等於商品價值 + 保險費 + 運費。',
+    fullExplanation: 'Valor Aduaneiro (VA) 是海關用於計算進口關稅的價格基準。根據 WTO 估價協定，原則上 VA = 交易價格（發票金額）。但海關有權懷疑發票價格的真實性，特別是當發票價格明顯低於市場價格時。此時海關可採用「參考價格」估價，導致進口商需要補繳稅款。',
+    practicalTips: [
+      '申報時確保發票價格真實反映交易價格',
+      '保存完整採購憑證以備查驗',
+      '低報可能導致海關重新估價',
+      '合理避稅應通過 HS CODE 分類，而非低報價格',
+    ],
+    commonMistakes: [
+      '以為低報發票可以節省稅款（實際風險極高）',
+      '忽略保險費和運費計入 VA',
+      '不了解海關參考價格機制',
+    ],
+    relatedTerms: ['II', 'IPI', 'PIS', 'COFINS', 'ICMS', 'SISCOMEX'],
+  },
 ];
 
 // ── Category Labels ──────────────────────────────────────
@@ -2300,4 +2344,5 @@ export const chapterTerms: Record<string, string[]> = {
   '10-after-sales-service': ['CDC', 'PROCON', '3PL', 'NF-e', 'Direito de Arrependimento', 'Logistica Reversa', 'LGPD', 'SAC', 'PNRS', 'CONAMA', 'Garantia Legal'],
   '11-tax-compliance': ['SPED', 'NF-e', 'Malha Fiscal', 'ECD', 'ECF', 'RFB', 'NCM', 'CFOP', 'EFD', 'SEFAZ', 'Intimacao', 'Retificacao', 'ICMS-ST', 'DCTF', 'SINIEF'],
   '12-profit-remittance': ['JCP', 'BACEN', 'RDE-IED', 'IRPJ', 'CSLL', 'CNPJ', 'IRRF', 'CIDE', 'INPI', 'Remessa de Lucros', 'TJLP', 'Fechamento de Cambio'],
+  '12-tax-calculator': ['DAS', 'Valor Aduaneiro', 'II', 'IPI', 'PIS', 'COFINS', 'ICMS', 'Simples Nacional', 'Lucro Real', 'Lucro Presumido', 'IRPJ', 'CSLL', 'Adicional IRPJ'],
 };

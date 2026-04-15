@@ -7,6 +7,9 @@ order: 5
 icon: "🛂"
 tags: ["簽證", "RN 11", "RN 36", "黃金簽證", "數位遊民", "VITEM", "稅務居民", "永居", "CPF", "SCE-IED"]
 featured: true
+
+images:
+  cover: 02-visa-strategy-cover.png
 ---
 
 > **因果連接**：你的簽證類型決定了你在巴西的法律身份——是投資者、管理者、還是遠程工作者。這不僅影響你能否親赴巴西簽署文件，更直接決定你是否成為巴西稅務居民，進而影響全球資產的稅務申報義務。
@@ -386,3 +389,43 @@ featured: true
 - [ ] 我是否了解 SCE-IED (RDE-IED) 外資登記的 30 天期限？
 
 完成簽證決策後，你的法律身份將明確——下一步是了解黃金簽證和數位遊民簽證的詳細指南，或直接進入入境前準備清單！
+
+## ## 流程圖 
+
+Mermaid Flowchart — How Logic
+
+  
+
+```mermaid
+
+flowchart TD
+
+    A[你的巴西簽證決策] --> B{主要目的?}
+    
+    B -->|投資房產| C[黃金簽證]
+    C --> C1["R$700K-1M | 4年永居"]
+    
+    B -->|遠端工作| D[數位遊民]
+    D --> D1["USD 1,500/月 | 183天"]
+    
+    B -->|公司外派| E[VITEM V]
+    E --> E1["2x-6x 最低工資"]
+    
+    B -->|商業投資| F[投資簽證]
+    F --> F1["R$500K+ | 6個月"]
+    
+    B -->|本地運營| G[本地管理]
+    G --> G1["公司設立 | 靈活"]
+    
+    C1 & D1 & E1 & F1 & G1 --> H{最適合你?}
+    H --> I[✅ 選擇路徑]
+    
+    style A fill:#B5A8A3
+    style C fill:#C4A87A
+    style D fill:#A5C4D4
+    style E fill:#A5A5C4
+    style F fill:#C4A5A5
+    style G fill:#A5C4B5
+    style I fill:#8FA4C4
+
+```

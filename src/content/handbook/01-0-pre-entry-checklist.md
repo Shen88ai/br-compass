@@ -1,12 +1,23 @@
 ---
-title: "入境前合規準備清單：從 CPF 到文件認證的完整指南"
-description: "在踏上巴西土地之前，你必須完成哪些合規準備？CPF 線上申請、海牙認證、宣誓翻譯、gov.br 激活——一份按時間線排序的 5W2H 行動清單。"
-phase: "preparation"
-phaseLabel: "第一階段：戰略藍圖"
+title: 入境前合規準備清單：從 CPF 到文件認證的完整指南
+description: 在踏上巴西土地之前，你必須完成哪些合規準備？CPF 線上申請、海牙認證、宣誓翻譯、gov.br 激活——一份按時間線排序的 5W2H 行動清單。
+phase: preparation
+phaseLabel: 第一階段：戰略藍圖
 order: 1
-icon: "📋"
-tags: ["CPF", "海牙認證", "Apostila da Haia", "宣誓翻譯", "Tradução Juramentada", "gov.br", "無犯罪證明", "入境準備", "Procuração"]
+icon: 📋
+tags:
+  - CPF
+  - 海牙認證
+  - Apostila da Haia
+  - 宣誓翻譯
+  - Tradução Juramentada
+  - gov.br
+  - 無犯罪證明
+  - 入境準備
+  - Procuração
 featured: true
+images:
+  cover: 01-0-pre-entry-checklist-cover.png
 ---
 
 > **因果連接**：如果你不先辦好 CPF 和海牙認證就飛到巴西——你將面臨「人在巴西、文件還在原籍國認證中」的尷尬局面，簽證申請直接延後 2~4 個月。巴西官僚體系不接受「到了再說」——文件不全 = 簽證被退 = 數月 wasted。
@@ -184,3 +195,38 @@ featured: true
 - [ ] 我是否了解 730 天連續出境會導致居留權自動註銷？
 
 完成入境前準備後，你的法律基礎已經建立——下一步是理解巴西稅制並選擇最適合你的簽證路徑！
+
+## 流程圖
+
+
+```mermaid
+
+graph TD
+
+    A[🔑 W1-W2: 申請 CPF] --> B[📜 W2-W8: 海牙認證]
+
+    B --> C{文件順序正確?}
+
+    C -->|是| D[✈️ W6-W9: 寄往巴西]
+
+    C -->|否| E[❌ 整組文件作廢]
+
+    D --> F[📝 W6-W9: 宣誓翻譯]
+
+    F --> G[🏛️ W8-W12: 指定巴西代表]
+
+    G --> H[💳 W8-W12: 激活 gov.br]
+
+    H --> I[📋 W14-W22: 提交簽證申請]
+
+    I --> J{gov.br 銀級/金級?}
+
+    J -->|是| K[✅ 進入審核流程]
+
+    J -->|否| L[⚠️ 系統阻斷]
+
+    K --> M[🎉 W26-W30: 領取 CRNM]
+
+    L --> H
+
+```

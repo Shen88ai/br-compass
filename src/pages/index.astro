@@ -3,43 +3,180 @@ import Layout from '../layouts/Layout.astro';
 import FateWheelScene from '../components/FateWheel/FateWheelScene.astro';
 import DiagnosisOverlay from '../components/FateWheel/DiagnosisOverlay.astro';
 import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
+import { getCollection } from 'astro:content';
+
+const handbookEntries = await getCollection('handbook');
+const insightCount = handbookEntries.filter(e => e.data.phase === 'insights').length;
+const mediaCount = handbookEntries.filter(e => e.data.phase === 'media').length;
+const coreCount = handbookEntries.filter(e => e.data.phase !== 'insights' && e.data.phase !== 'media').length;
 ---
 
-<Layout title="跨境電商巴西出海實戰手冊" description="從戰略藍圖到利潤收割，最完整的巴西落地指南">
+<Layout title="黃金雨林 | 跨境電商巴西出海一站式門戶" description="從稅務計算到公司設立，最完整的巴西落地解決方案">
   <!-- 3D Fate Wheel Scene (fixed, always centered) -->
   <FateWheelScene />
 
   <!-- HTML Overlay Content (scrolls over 3D) -->
   <div class="fate-wheel-overlay">
-    <!-- Hero Section -->
+
+    <!-- ═══════════ HERO SECTION ═══════════ -->
     <section class="hero-section-fullscreen">
-      <h1 class="hero-title-fate">
-        跨境電商出海<span class="text-gradient-hope">巴西</span><br/>實戰手冊
+      <div class="hero-badge animate-on-scroll">黃金雨林 GOLDEN RAINFOREST</div>
+      <h1 class="hero-title-fate animate-on-scroll delay-100">
+        3分鐘算出你的<span class="text-gradient-hope">巴西稅負</span>
       </h1>
-      <p class="hero-subtitle-fate">
-        從稅制破譯、公司設立、供應鏈打通到利潤匯出<br/>
-        19 篇深度指南，涵蓋外資落地巴西的每一個關鍵節點
+      <p class="hero-subtitle-fate animate-on-scroll delay-200">
+        不了解巴西稅制，你可能多付 30% 稅款<br/>
+        {coreCount} 篇實戰手冊 + {insightCount} 篇市場洞察 + {mediaCount} 個視頻 + 免費稅務計算器
       </p>
       <div class="hero-actions-fate animate-on-scroll delay-300">
-        <a href="/handbook" class="btn-red btn-md magnetic-btn">📖 瀏覽完整手冊</a>
-        <a href="https://braziltax.netlify.app/#contact" class="btn-gold-outline btn-md magnetic-btn">💬 免費咨詢</a>
+        <a href="/tools" class="btn-red btn-lg magnetic-btn">🧮 免費計算稅負</a>
+        <a href="/handbook" class="btn-gold-outline btn-lg magnetic-btn">📖 瀏覽實戰手冊</a>
       </div>
     </section>
 
-    <!-- Diagnosis Overlay (appears after compass interaction) -->
-    <DiagnosisOverlay />
+    <!-- ═══════════ TRUST INDICATORS ═══════════ -->
+    <section class="trust-section">
+      <div class="container">
+        <div class="trust-grid">
+          <div class="trust-item animate-on-scroll delay-100">
+            <div class="trust-number text-gradient-hope">{coreCount}+</div>
+            <div class="trust-label">實戰指南</div>
+          </div>
+          <div class="trust-item animate-on-scroll delay-200">
+            <div class="trust-number text-gradient-hope">{insightCount}+</div>
+            <div class="trust-label">市場洞察</div>
+          </div>
+          <div class="trust-item animate-on-scroll delay-300">
+            <div class="trust-number text-gradient-hope">4</div>
+            <div class="trust-label">實戰階段</div>
+          </div>
+          <div class="trust-item animate-on-scroll delay-400">
+            <div class="trust-number text-gradient-hope">0</div>
+            <div class="trust-label">元起步（免費工具）</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- Phase Info Panel (appears on planet hover) -->
-    <PhaseInfoPanel />
+    <!-- ═══════════ PAIN POINTS ═══════════ -->
+    <section class="section-pad">
+      <div class="container">
+        <h2 class="section-title">進軍巴西，你是否遇到<span class="text-gradient-hope">這些問題</span>？</h2>
+        <p class="section-sub">我們懂你的痛，因為我們走過同樣的路</p>
 
-    <!-- Phase Overview Cards (scrollable section) -->
+        <div class="pain-grid">
+          <div class="pain-card animate-on-scroll delay-100">
+            <div class="pain-icon">😰</div>
+            <h3 class="pain-title">稅制太複雜</h3>
+            <p class="pain-desc">PIS、COFINS、IPI、ICMS、ISS⋯⋯五種稅疊加，綜合稅率高達 60%，根本算不清成本</p>
+          </div>
+          <div class="pain-card animate-on-scroll delay-200">
+            <div class="pain-icon">🤷</div>
+            <h3 class="pain-title">流程不熟悉</h3>
+            <p class="pain-desc">RADAR 怎麼申請？CNPJ 要多久？BACEN 申報怎麼做？每一步都是未知數</p>
+          </div>
+          <div class="pain-card animate-on-scroll delay-300">
+            <div class="pain-icon">😤</div>
+            <h3 class="pain-title">語言不通</h3>
+            <p class="pain-desc">所有文件都是葡萄牙語，找不到可靠的中文翻譯，溝通成本極高</p>
+          </div>
+          <div class="pain-card animate-on-scroll delay-400">
+            <div class="pain-icon">💸</div>
+            <h3 class="pain-title">利潤匯不出</h3>
+            <p class="pain-desc">賺了錢卻不知道怎麼合法匯回中國，外匯管制和稅務合規成為最大障礙</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SERVICE LADDER ═══════════ -->
     <section class="section-pad section-bg-alt">
       <div class="container">
-        <h2 class="section-title">四大實戰<span class="text-gradient-hope">階段</span></h2>
+        <h2 class="section-title">從免費到專業，<span class="text-gradient-hope">每一步都有我們</span></h2>
+        <p class="section-sub">零風險起步，按需升級</p>
+
+        <div class="ladder-grid">
+          <!-- Step 1: Free Tools -->
+          <div class="ladder-card animate-on-scroll delay-100">
+            <div class="ladder-step">第一步</div>
+            <div class="ladder-icon">🧮</div>
+            <h3 class="ladder-title">免費工具</h3>
+            <p class="ladder-desc">進口稅計算器、稅制對比、合規檢查清單</p>
+            <ul class="ladder-features">
+              <li>✅ 無需註冊，即開即用</li>
+              <li>✅ 3 分鐘得出稅負估算</li>
+              <li>✅ 了解巴西稅制全貌</li>
+            </ul>
+            <a href="/tools" class="ladder-btn btn-gold-outline btn-md">立即使用</a>
+          </div>
+
+          <!-- Step 2: Handbook -->
+          <div class="ladder-card animate-on-scroll delay-200">
+            <div class="ladder-step">第二步</div>
+            <div class="ladder-icon">📖</div>
+            <h3 class="ladder-title">實戰手冊</h3>
+            <p class="ladder-desc">{handbookEntries.length} 篇深度指南，覆蓋落地全流程</p>
+            <ul class="ladder-features">
+              <li>✅ 稅制破譯、公司設立</li>
+              <li>✅ 供應鏈、支付系統</li>
+              <li>✅ 利潤匯出、稅務合規</li>
+            </ul>
+            <a href="/handbook" class="ladder-btn btn-gold-outline btn-md">免費閱讀</a>
+          </div>
+
+          <!-- Step 3: Media -->
+          <div class="ladder-card animate-on-scroll delay-300">
+            <div class="ladder-step">第三步</div>
+            <div class="ladder-icon">🎬</div>
+            <h3 class="ladder-title">媒體中心</h3>
+            <p class="ladder-desc">YouTube 解說、小紅書短視頻、AI 生成內容</p>
+            <ul class="ladder-features">
+              <li>✅ 稅改視頻解說</li>
+              <li>✅ 社交媒體短視頻</li>
+              <li>✅ AI 生成視覺內容</li>
+            </ul>
+            <a href="/handbook#phase-media" class="ladder-btn btn-gold-outline btn-md">觀看視頻</a>
+          </div>
+
+          <!-- Step 4: Insights -->
+          <div class="ladder-card animate-on-scroll delay-400">
+            <div class="ladder-step">第四步</div>
+            <div class="ladder-icon">📊</div>
+            <h3 class="ladder-title">市場洞察</h3>
+            <p class="ladder-desc">{insightCount} 篇市場分析，掌握最新趨勢</p>
+            <ul class="ladder-features">
+              <li>✅ 宏觀經濟解讀</li>
+              <li>✅ 產業趨勢分析</li>
+              <li>✅ 政策變化追蹤</li>
+            </ul>
+            <a href="/handbook#phase-insights" class="ladder-btn btn-gold-outline btn-md">查看洞察</a>
+          </div>
+
+          <!-- Step 4: Consulting -->
+          <div class="ladder-card ladder-highlight animate-on-scroll delay-400">
+            <div class="ladder-badge">⭐ 推薦</div>
+            <div class="ladder-step">第四步</div>
+            <div class="ladder-icon">💬</div>
+            <h3 class="ladder-title">一對一諮詢</h3>
+            <p class="ladder-desc">專業團隊為您量身定制落地方案</p>
+            <ul class="ladder-features">
+              <li>✅ 稅務規劃與優化</li>
+              <li>✅ 公司設立全程代辦</li>
+              <li>✅ 持續合規支持</li>
+            </ul>
+            <a href="https://braziltax.netlify.app/#contact" class="ladder-btn btn-gold-primary btn-md">預約免費諮詢</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ PHASE OVERVIEW ═══════════ -->
+    <section class="section-pad">
+      <div class="container">
+        <h2 class="section-title">五大實戰<span class="text-gradient-hope">階段</span></h2>
         <p class="section-sub">從籌備到收割，每一步都有詳細指南</p>
 
         <div class="bento-grid grid-auto-fit">
-          <!-- Phase 1 - Featured -->
           <a href="/handbook#phase-preparation" class="bento-featured link-none">
             <div class="bento-card phase-card card-full-height" data-phase="1">
               <div class="phase-icon-sm">🚩</div>
@@ -50,7 +187,6 @@ import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
             </div>
           </a>
 
-          <!-- Phase 2 -->
           <a href="/handbook#phase-foundation" class="link-none">
             <div class="bento-card phase-card card-full-height" data-phase="2">
               <div class="phase-icon-sm">🏛️</div>
@@ -61,7 +197,6 @@ import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
             </div>
           </a>
 
-          <!-- Phase 3 -->
           <a href="/handbook#phase-operations" class="link-none">
             <div class="bento-card phase-card card-full-height" data-phase="3">
               <div class="phase-icon-sm">📦</div>
@@ -72,7 +207,6 @@ import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
             </div>
           </a>
 
-          <!-- Phase 4 -->
           <a href="/handbook#phase-harvest" class="link-none">
             <div class="bento-card phase-card card-full-height" data-phase="4">
               <div class="phase-icon-sm">💰</div>
@@ -82,21 +216,45 @@ import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
               <div class="phase-card-link" style="color:var(--color-neon-green);">3 篇指南 →</div>
             </div>
           </a>
+
+          <a href="/handbook#phase-insights" class="bento-featured link-none">
+            <div class="bento-card phase-card card-full-height" data-phase="5">
+              <div class="phase-icon-sm">📊</div>
+              <div class="phase-label-platinum">階段五 · 持續更新</div>
+              <h3 class="phase-card-title">市場洞察</h3>
+              <p class="phase-card-desc">宏觀經濟解讀、產業趨勢分析、政策變化追蹤</p>
+              <div class="phase-card-link" style="color:var(--color-sky-blue);">{insightCount} 篇洞察 →</div>
+            </div>
+          </a>
+
+          <a href="/handbook#phase-media" class="bento-featured link-none">
+            <div class="bento-card phase-card card-full-height" data-phase="6">
+              <div class="phase-icon-sm">🎬</div>
+              <div class="phase-label-platinum">階段六 · 持續更新</div>
+              <h3 class="phase-card-title">媒體中心</h3>
+              <p class="phase-card-desc">YouTube 解說、小紅書短視頻、AI 生成內容</p>
+              <div class="phase-card-link" style="color:var(--color-neon-yellow);">{mediaCount} 個視頻 →</div>
+            </div>
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- CTA Section -->
+    <!-- Diagnosis Overlay -->
+    <DiagnosisOverlay />
+    <PhaseInfoPanel />
+
+    <!-- ═══════════ CTA SECTION ═══════════ -->
     <section class="cta-section">
       <div class="container-xs">
         <h2 class="heading-xl mb-2">準備好進入<span class="text-gradient-hope">巴西市場</span>了嗎？</h2>
         <p class="text-lg mb-4" style="color:var(--color-muted);line-height:1.6;">
-          從手冊開始，或直接聯繫我們的巴西稅務專家團隊<br/>
+          從免費工具開始，或直接聯繫我們的巴西稅務專家團隊<br/>
           獲取一對一的落地策略諮詢
         </p>
         <div class="hero-actions">
-          <a href="/handbook" class="btn-red btn-md magnetic-btn">📖 閱讀手冊</a>
-          <a href="https://braziltax.netlify.app/#contact" class="btn-outline btn-md magnetic-btn">聯繫專家</a>
+          <a href="/tools" class="btn-red btn-md magnetic-btn">🧮 免費計算稅負</a>
+          <a href="https://braziltax.netlify.app/#contact" class="btn-outline btn-md magnetic-btn">💬 聯繫專家</a>
         </div>
       </div>
     </section>
@@ -104,40 +262,236 @@ import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
 </Layout>
 
 <style>
+  .fate-wheel-overlay {
+    position: relative;
+    z-index: 10;
+  }
+
   .hero-section-fullscreen {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     text-align: center;
-    padding: var(--space-5) var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-5);
     position: relative;
     z-index: 10;
   }
 
+  .hero-badge {
+    display: inline-block;
+    background: rgba(var(--color-gold-rgb), 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: 2rem;
+    padding: 0.3rem 1rem;
+    font-size: var(--text-xs);
+    color: var(--color-gold);
+    margin-bottom: var(--space-3);
+    letter-spacing: 0.15em;
+    font-weight: 600;
+  }
+
   .hero-title-fate {
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-size: clamp(1.8rem, 5vw, 3.5rem);
     font-weight: 800;
     line-height: 1.15;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
     text-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
   }
 
   .hero-subtitle-fate {
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-size: clamp(0.9rem, 1.5vw, 1.15rem);
     color: var(--color-muted);
     max-width: 650px;
-    margin: 0 auto var(--space-4);
-    line-height: 1.7;
+    margin: 0 auto var(--space-3);
+    line-height: 1.6;
     text-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
   }
 
   .hero-actions-fate {
     display: flex;
-    gap: var(--space-3);
+    gap: var(--space-2);
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  /* ── Trust Indicators ───────────────────── */
+  .trust-section {
+    padding: var(--space-4) var(--space-3);
+    background: rgba(var(--color-gold-rgb), 0.02);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .trust-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .trust-item {
+    padding: var(--space-3);
+  }
+
+  .trust-number {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .trust-label {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+  }
+
+  /* ── Pain Points ────────────────────────── */
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .pain-card {
+    background: var(--color-bg-800);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    text-align: center;
+    transition: var(--transition);
+  }
+
+  .pain-card:hover {
+    border-color: rgba(var(--color-gold-rgb), 0.3);
+    transform: translateY(-4px);
+    box-shadow: var(--glow-gold);
+  }
+
+  .pain-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .pain-title {
+    font-size: var(--text-h3);
+    margin: 0 0 var(--space-1);
+    color: var(--color-text);
+  }
+
+  .pain-desc {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── Service Ladder ─────────────────────── */
+  .ladder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .ladder-card {
+    background: var(--color-bg-800);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ladder-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-hope);
+    opacity: 0.5;
+  }
+
+  .ladder-card:hover {
+    border-color: rgba(var(--color-gold-rgb), 0.3);
+    transform: translateY(-6px);
+    box-shadow: var(--glow-gold);
+  }
+
+  .ladder-highlight {
+    border-color: rgba(var(--color-gold-rgb), 0.3);
+    background: linear-gradient(135deg, var(--color-bg-800), rgba(var(--color-gold-rgb), 0.05));
+  }
+
+  .ladder-highlight::before {
+    opacity: 1;
+    height: 4px;
+  }
+
+  .ladder-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--color-gold);
+    color: var(--color-bg-900);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    border-radius: 1rem;
+  }
+
+  .ladder-step {
+    font-size: var(--text-xs);
+    color: var(--color-gold);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-1);
+  }
+
+  .ladder-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .ladder-title {
+    font-size: var(--text-h3);
+    margin: 0 0 var(--space-1);
+    color: var(--color-text);
+  }
+
+  .ladder-desc {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin: 0 0 var(--space-3);
+  }
+
+  .ladder-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+    text-align: left;
+  }
+
+  .ladder-features li {
+    font-size: var(--text-small);
+    color: var(--color-text);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(var(--color-gold-rgb), 0.06);
+  }
+
+  .ladder-btn {
+    display: inline-block;
   }
 
   section a:hover .card {

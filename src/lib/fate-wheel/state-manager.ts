@@ -2,6 +2,14 @@ import type { FateWheelState, FateWheelStateData } from './types';
 
 const STORAGE_KEY = 'persona-journey';
 
+const DEBUG = true;
+
+function log(event: string, data?: unknown): void {
+  if (DEBUG && typeof console !== 'undefined') {
+    console.log(`[FateWheel] ${event}`, data || '');
+  }
+}
+
 const diagnosisMap: Record<string, string> = {
   'individual-immigration-beginner': 'A', 'individual-immigration-preparing': 'A',
   'individual-immigration-landed': 'D', 'individual-immigration-operating': 'E',
@@ -48,6 +56,7 @@ class FateWheelStateManager {
   getData(): FateWheelStateData { return { ...this.data }; }
 
   selectDirection(direction: string): void {
+    log('selectDirection', { direction });
     this.data.selectedDirection = direction;
     this.data.state = 'compass-selected';
     this.emit('state-change', { state: this.data.state });
@@ -55,11 +64,13 @@ class FateWheelStateManager {
   }
 
   answerQuestion(questionNum: number, answer: string): void {
+    log('answerQuestion', { questionNum, answer });
     const key = questionNum === 1 ? 'identity' : questionNum === 2 ? 'goal' : 'progress';
     this.data.answers[key] = answer;
     this.data.currentQuestion = Math.min(questionNum + 1, 3);
 
     if (questionNum === 1 && answer === 'remoteworker') {
+      log('remoteworker shortcut - completing immediately');
       this.completeDiagnosis();
       return;
     }
@@ -68,28 +79,35 @@ class FateWheelStateManager {
       this.data.state = 'answering';
       this.emit('question-answered', { question: questionNum, answer });
     } else {
+      log('all questions answered - completing diagnosis');
       this.completeDiagnosis();
     }
   }
 
   private completeDiagnosis(): void {
+    log('completeDiagnosis called');
     const { identity, goal, progress } = this.data.answers;
     const key = `${identity}-${goal}-${progress}`;
+    log('diagnosis key', { key, identity, goal, progress });
     this.data.determinedPath = diagnosisMap[key] || 'A';
     if (this.data.answers.identity === 'remoteworker') this.data.determinedPath = 'G';
     this.data.state = 'diagnosis-complete';
+    log('determined path', { path: this.data.determinedPath });
     this.saveToStorage();
     this.emit('diagnosis-complete', { path: this.data.determinedPath });
     this.emit('state-change', { state: this.data.state });
+    log('diagnosis-complete event emitted');
   }
 
   setHoveredPlanet(planet: number | null): void {
+    log('setHoveredPlanet', { planet });
     this.data.hoveredPlanet = planet;
     this.data.state = planet !== null ? 'planet-hover' : 'diagnosis-complete';
     this.emit('planet-hover', { planet: this.data.hoveredPlanet });
   }
 
   navigateToPlanet(planet: number): void {
+    log('navigateToPlanet', { planet });
     this.data.state = 'navigating';
     this.emit('planet-click', { planet });
   }
@@ -118,6 +136,7 @@ class FateWheelStateManager {
 
   private emit(event: string, detail: Record<string, unknown>): void {
     if (typeof window !== 'undefined') {
+      log(`emit: fate-wheel:${event}`, detail);
       window.dispatchEvent(new CustomEvent(`fate-wheel:${event}`, { detail }));
     }
   }

@@ -6,6 +6,9 @@ phaseLabel: "第二階段：實體建立"
 order: 6
 icon: "🛒"
 tags: ["Mercado Livre", "Amazon", "Shopee", "TikTok Shop", "社交電商", "平台註冊", "演算法"]
+
+images:
+  cover: 06-ecommerce-platforms-cover.jpeg
 ---
 
 > **因果連接**：你有了合法公司、銀行帳戶和合規資金，但貨物必須有銷售渠道才能變現。選擇正確的平台組合，決定了你的品牌曝光度、利潤率和合規風險。
@@ -175,3 +178,52 @@ TikTok 的推薦演算法核心指標：
 - [ ] TikTok Shop 的短視頻內容是否已規劃？
 
 完成平台入駐後，你的銷售渠道已經打通——下一步是打通供應鏈，讓貨物順利進口並送入倉庫！
+
+
+## 3. Mermaid 流程圖
+
+
+```mermaid
+
+flowchart LR
+    direction TB
+    
+    A[🛒 進入巴西電商] --> B{選擇平台}
+    
+    subgraph "🟡 Mercado Livre"
+    B --> C
+    C --> C1[市占 35%]
+    C --> C2[佣金 11-19%]
+    C --> C3[Full物流]
+    end
+    
+    subgraph "🔵 Amazon"
+    B --> D
+    D --> D1[市占 15%]
+    D --> D2[佣金 8-15%]
+    D --> D3[FBA物流]
+    end
+    
+    subgraph "🟠 Shopee"
+    B --> E
+    E --> E1[市占 12%]
+    E --> E2[佣金 5-10%]
+    E --> E3[跨境友好]
+    end
+    
+    subgraph "⚫ TikTok"
+    B --> F
+    F --> F1[市占 8%]
+    F --> F2[佣金 2-5%]
+    F --> F3[直播帶貨]
+    end
+    
+    C1 & D1 & E1 & F1 --> G[📊 評估] --> H[🎯 選擇]
+    
+    style C fill:#E0C4B0
+    style D fill:#B8A9C9
+    style E fill:#A8C4B0
+    style F fill:#B8A9C9
+    style H fill:#E0C4B0
+
+```

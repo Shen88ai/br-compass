@@ -6,6 +6,9 @@ phaseLabel: "第二階段：實體建立"
 order: 4
 icon: "🏛️"
 tags: ["CNPJ", "公司設立", "Pleno Poder", "SCE-IED", "RDE-IED", "外資", "Pre-acordo", "BACEN"]
+
+images:
+  cover: 04-company-setup-cover.png
 ---
 
 > **因果連接**：公司地址決定了所屬州，而所在州的稅率將影響未來每一筆跨州訂單。因此，在申請 CNPJ 之前，必須先與目標倉庫完成預約，確保登記地址與未來物流策略完美對齊。
@@ -107,3 +110,30 @@ tags: ["CNPJ", "公司設立", "Pleno Poder", "SCE-IED", "RDE-IED", "外資", "P
 - [ ] 管理員《職責限制協議》是否已由律師草擬並由各方簽署？
 
 完成所有確認後，恭喜你——你的公司即將有了法律生命，下一步是打通資金血脈並入駐電商平台！
+
+
+## 3. Mermaid 流程圖
+
+
+```mermaid
+
+flowchart TD
+
+    A[📄 原始文件] --> B[🏭 第1站: Pre-acordo]
+    B -->|稅務協議| C[🏭 第2站: CNPJ申請]
+    C -->|稅號生成| D[🏭 第3站: Junta Comercial]
+    D -->|商業登記| E[🏭 第4站: Pleno Poder]
+    E -->|全權授權| F[🏭 第5站: 最終審批]
+    F -->|蓋章認證| G[📜 公司成立證書]
+    
+    style A fill:#D4C5A9
+    style G fill:#7BA7BC
+    style B fill:#D4A5A5
+
+    style D fill:#D4C5A9
+
+    style E fill:#D4A5A5
+
+    style F fill:#7BA7BC
+
+```

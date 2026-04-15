@@ -7,6 +7,9 @@ order: 4
 icon: "💻"
 tags: ["數位遊民", "VITEM XIV", "稅務居民", "183天", "遠程工作", "MigranteWeb"]
 featured: true
+
+images:
+  cover: 01-3-visa-digital-nomad-cover.png
 ---
 
 > **因果連接**：如果你已在遠程工作，數位遊民簽證是成本最低的「試水溫」方式——先合法入境體驗巴西，再決定是否長期投資。但 183 天規則可能讓你意外成為巴西稅務居民。
@@ -157,3 +160,50 @@ featured: true
 - [ ] 我是否考慮過從數位遊民轉換為投資簽證的長期路徑？
 
 完成確認後，你的數位遊民路徑已清晰——下一步是了解所有簽證類型的完整決策地圖！
+
+
+## 流程圖
+
+```mermaid
+
+flowchart TD
+
+    A[數位遊民簽證申請] --> B{收入證明}
+
+    B -->|USD 1,500/月| C[符合資格]
+
+    B -->|USD 18,000 存款| C
+
+    C --> D[提交申請]
+
+    D --> E{選擇通道}
+
+    E -->|標準| F[常規審批]
+
+    E -->|MigranteWeb| G[快速通道 ⚡]
+
+    F & G --> H[獲得簽證]
+
+    H --> I[入境巴西]
+
+    I --> J{停留天數}
+
+    J -->|<183天| K[非稅務居民 ✅]
+
+    J -->|≥183天| L[⚠️ 稅務居民觸發]
+
+    L --> M[全球收入需申報]
+
+    L --> N[巴西境內收入課稅]
+
+    style A fill:#A5C4D4
+
+    style K fill:#A5D4B5
+
+    style L fill:#D4A5A5
+
+    style M fill:#D4B5A5
+
+    style N fill:#D4B5A5
+
+```

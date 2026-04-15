@@ -1,0 +1,116 @@
+---
+interface Props {
+  class?: string;
+  dark?: boolean;
+  compact?: boolean;
+  hoverable?: boolean;
+}
+
+const { class: className, dark, compact, hoverable } = Astro.props;
+
+const classes = [
+  'glass-panel',
+  dark && 'glass-panel-dark',
+  compact && 'glass-panel-compact',
+  hoverable && 'glass-panel-hoverable',
+  className
+].filter(Boolean);
+---
+
+<div class:list={classes}>
+  <slot />
+</div>
+
+<style>
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(var(--color-gold-rgb, 212, 168, 67), 0.15);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  @supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+    .glass-panel {
+      background: rgba(15, 15, 24, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(var(--color-gold-rgb, 212, 168, 67), 0.12);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(var(--color-gold-rgb, 212, 168, 67), 0.05);
+    }
+  }
+
+  .glass-panel-dark {
+    background: rgba(8, 8, 15, 0.7);
+    border: 1px solid rgba(var(--color-gold-rgb, 212, 168, 67), 0.1);
+  }
+
+  @supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+    .glass-panel-dark {
+      background: rgba(8, 8, 15, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(var(--color-gold-rgb, 212, 168, 67), 0.1);
+    }
+  }
+
+  .glass-panel-compact {
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  @supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+    .glass-panel-compact {
+      background: rgba(15, 15, 24, 0.3);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+  }
+
+  .glass-panel-hoverable {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .glass-panel-hoverable:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 12px 40px rgba(var(--color-gold-rgb, 212, 168, 67), 0.15),
+      inset 0 0 0 1px rgba(var(--color-gold-rgb, 212, 168, 67), 0.15);
+    border-color: rgba(var(--color-gold-rgb, 212, 168, 67), 0.3);
+  }
+
+  .glass-panel h1,
+  .glass-panel h2,
+  .glass-panel h3,
+  .glass-panel h4 {
+    color: var(--color-text, #F5F5F0);
+    margin: 0 0 1rem 0;
+  }
+
+  .glass-panel p,
+  .glass-panel li {
+    color: var(--color-muted, #A8B4C4);
+    line-height: 1.6;
+  }
+
+  .glass-panel a {
+    color: var(--color-gold, #D4A843);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .glass-panel a:hover {
+    color: var(--color-gold-light, #E5C76A);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-panel-hoverable {
+      transition: none;
+    }
+
+    .glass-panel-hoverable:hover {
+      transform: none;
+    }
+  }
+</style>

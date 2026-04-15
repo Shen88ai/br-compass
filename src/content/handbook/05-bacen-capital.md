@@ -7,6 +7,9 @@ order: 5
 icon: "🏦"
 tags: ["BACEN", "SCE-IED", "RDE-IED", "資本注入", "外資登記", "匯款", "CNPJ", "合規", "gov.br", "定期申報"]
 featured: true
+
+images:
+  cover: 05-bacen-capital-cover.jpeg
 ---
 
 > **因果連接**：資金是公司的血液，但巴西的中央銀行（BACEN）是心臟瓣膜——血液必須按照正確的通道流動。如果在匯款前未完成 SCE-IED (RDE-IED) 登記，你的資金將被卡在海關或退回，公司將因缺血而死亡。
@@ -183,3 +186,45 @@ featured: true
 - [ ] 我是否已確認公司的定期申報類型（年度/季度/五年）？
 
 完成資金合規注入後，你的公司已經具備了運營的血液——下一步是入駐主流電商平台，開始銷售！
+
+
+## 3. Mermaid 流程圖
+
+
+```mermaid
+
+flowchart TD
+
+    A[💰 海外資金準備匯入巴西] --> B[🏦 巴西接收銀行確認到帳]
+
+    B --> C{⏱️ 30天倒數計時開始}
+
+    C --> D[📝 準備SCE-IED申報文件]
+
+    D --> E[🖥️ 提交BACEN系統]
+
+    E --> F{央行審核}
+
+    F -->|通過| G[✅ SCE-IED登記完成]
+
+    F -->|補件| D
+
+    G --> H[🔓 資金合法化]
+
+    H --> I[💸 未來利潤可合法匯出]
+
+    C -.->|⚠️ 逾期| J[🚫 資金被鎖]
+
+    J --> K[❌ 無法匯出 + 罰款]
+
+    style A fill:#8FA4B8
+
+    style C fill:#C9B88A
+
+    style G fill:#9BB09A
+
+    style J fill:#C9B88A
+
+    style K fill:#8FA4B8
+
+```

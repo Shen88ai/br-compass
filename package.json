@@ -1,5 +1,5 @@
 {
-  "name": "tidal-telescope",
+  "name": "br-compass",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -11,7 +11,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "deploy:production": "npm run build && wrangler pages deploy dist --project-name=br-compass"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
@@ -30,6 +32,7 @@
     "@testing-library/dom": "^10.4.1",
     "cheerio": "^1.2.0",
     "jsdom": "^29.0.1",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.2",
+    "wrangler": "^4.83.0"
   }
 }

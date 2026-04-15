@@ -27,15 +27,16 @@ const { title = '巴西出海實戰手冊', description = '跨境電商出海、
     <!-- Navbar -->
     <nav class="glass-nav fixed top-0 left-0 right-0 z-50">
       <div class="nav-container">
-        <a href="https://braziltax.netlify.app" class="brand">
-          專業會計服務
+        <a href="/" class="brand">
+          黃金雨林 <span style="font-weight:400;font-size:0.8em;opacity:0.7;">GOLDEN RAINFOREST</span>
         </a>
 
         <div class="nav-links">
           <a href="/" class="nav-link">🏠 首頁</a>
-          <a href="https://braziltax.netlify.app/#pain-points" class="nav-link">客戶痛點</a>
-          <a href="https://braziltax.netlify.app/#solutions" class="nav-link">解決方案</a>
-          <a href="/handbook" class="nav-link nav-link-active">📖 出海實戰手冊</a>
+          <a href="/handbook" class="nav-link">📖 實戰手冊</a>
+          <a href="/handbook#phase-insights" class="nav-link">📊 市場洞察</a>
+          <a href="/media" class="nav-link">🎬 媒體中心</a>
+          <a href="/tools" class="nav-link">🧮 免費工具</a>
           <a href="https://braziltax.netlify.app/#contact" class="nav-link">聯繫我們</a>
         </div>
 
@@ -295,5 +296,221 @@ const { title = '巴西出海實戰手冊', description = '跨境電商出海、
       resultsEl.style.display = 'none';
     }
   });
+})();
+
+// Mermaid Diagram Rendering
+async function initMermaid() {
+  if (typeof window === 'undefined') return;
+  
+  const mermaidModule = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+  mermaidModule.default.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#D4A843',
+      primaryTextColor: '#f5f5f5',
+      primaryBorderColor: '#D4A843',
+      lineColor: '#D4A843',
+      secondaryColor: '#0f0f18',
+      tertiaryColor: '#1a1a2e',
+      fontFamily: 'Inter, Noto Sans TC, sans-serif',
+      fontSize: '14px',
+      textColor: '#e5e5e5',
+      nodeTextColor: '#e5e5e5',
+    },
+    flowchart: {
+      curve: 'basis',
+      padding: 15,
+      nodeSpacing: 50,
+      rankSpacing: 60,
+    },
+    sequence: {
+      actorMargin: 40,
+      boxMargin: 10,
+    },
+  });
+  
+  // Find all mermaid code blocks (Astro renders as pre.astro-code with data-language="mermaid")
+  const codeBlocks = document.querySelectorAll('pre.astro-code[data-language="mermaid"]');
+  
+  for (const pre of codeBlocks) {
+    if (pre.classList.contains('mermaid-rendered')) continue;
+    pre.classList.add('mermaid-rendered');
+    
+    const code = pre.querySelector('code');
+    if (!code) continue;
+    
+    const graphDefinition = code.textContent || '';
+    if (!graphDefinition.trim()) continue;
+    
+    const div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = graphDefinition;
+    
+    pre.parentNode?.insertBefore(div, pre);
+  }
+  
+  try {
+    await mermaidModule.default.run({ querySelector: '.mermaid' });
+  } catch (e) {
+    console.warn('Mermaid render error:', e);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMermaid);
+} else {
+  initMermaid();
+}
+
+// ── Mouse Trail Particle Effect ──────────────────────────
+(function initMouseTrail() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'mouse-trail-canvas';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1;pointer-events:none;overflow:hidden;opacity:0.5';
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+
+  window.addEventListener('resize', function() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  });
+
+  const particles: Array<{x:number;y:number;vx:number;vy:number;size:number;color:string;life:number;decay:number;isRing?:boolean;ringRadius?:number}> = [];
+  const clickEffects: Array<{x:number;y:number;vx:number;vy:number;size:number;color:string;life:number;decay:number;isRing?:boolean;ringRadius?:number}> = [];
+  let mouseX = width / 2;
+  let mouseY = height / 2;
+
+  document.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (Math.random() > 0.4) {
+      createTrailParticle(mouseX, mouseY);
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    createClickBurst(e.clientX, e.clientY);
+  });
+
+  function createTrailParticle(x: number, y: number) {
+    if (particles.length >= 40) particles.shift();
+    const colors = ['rgba(212,168,67,', 'rgba(229,255,0,', 'rgba(0,255,135,', 'rgba(125,211,252,', 'rgba(232,228,217,'];
+    particles.push({
+      x: x + (Math.random() - 0.5) * 15,
+      y: y + (Math.random() - 0.5) * 15,
+      vx: (Math.random() - 0.5) * 2,
+      vy: (Math.random() - 0.5) * 2,
+      size: Math.random() * 8 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      life: 1,
+      decay: 0.025 + Math.random() * 0.025
+    });
+  }
+
+  function createClickBurst(x: number, y: number) {
+    const colors = ['rgba(212,168,67,', 'rgba(229,255,0,', 'rgba(0,255,135,', 'rgba(125,211,252,'];
+    for (let i = 0; i < 15; i++) {
+      const angle = (Math.PI * 2 * i) / 15;
+      const speed = 2 + Math.random() * 3;
+      clickEffects.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 5 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1,
+        decay: 0.035 + Math.random() * 0.02
+      });
+    }
+    clickEffects.push({
+      x: x,
+      y: y,
+      vx: 0,
+      vy: 0,
+      size: 3,
+      color: 'rgba(212,168,67,',
+      life: 1,
+      decay: 0.05,
+      isRing: true,
+      ringRadius: 3
+    });
+  }
+
+  function drawGlow(x: number, y: number, size: number, color: string, life: number) {
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 2);
+    gradient.addColorStop(0, color + (life * 0.8) + ')');
+    gradient.addColorStop(0.5, color + (life * 0.4) + ')');
+    gradient.addColorStop(1, color + '0)');
+    ctx.beginPath();
+    ctx.arc(x, y, size * 2, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  function drawRing(x: number, y: number, radius: number, color: string, life: number) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = color + (life * 0.6) + ')';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      p.size *= 0.96;
+      if (p.life <= 0 || p.size < 0.5) {
+        particles.splice(i, 1);
+        continue;
+      }
+      drawGlow(p.x, p.y, p.size, p.color, p.life);
+    }
+
+    for (let i = clickEffects.length - 1; i >= 0; i--) {
+      const e = clickEffects[i];
+      if (e.isRing) {
+        e.ringRadius! += 6;
+        e.life -= e.decay;
+        if (e.life <= 0) {
+          clickEffects.splice(i, 1);
+          continue;
+        }
+        drawRing(e.x, e.y, e.ringRadius!, e.color, e.life);
+      } else {
+        e.x += e.vx;
+        e.y += e.vy;
+        e.vx *= 0.95;
+        e.vy *= 0.95;
+        e.life -= e.decay;
+        e.size *= 0.97;
+        if (e.life <= 0 || e.size < 0.5) {
+          clickEffects.splice(i, 1);
+          continue;
+        }
+        drawGlow(e.x, e.y, e.size, e.color, e.life);
+      }
+    }
+
+    drawGlow(mouseX, mouseY, 18, 'rgba(212,168,67,', 0.4);
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 })();
 </script>

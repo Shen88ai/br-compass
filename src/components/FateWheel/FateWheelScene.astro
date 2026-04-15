@@ -12,25 +12,70 @@ import '../../styles/fate-wheel.css';
   <p class="loader-text">命運之輪運轉中...</p>
 </div>
 
+<div class="path-label-panel" id="path-label-panel" style="display: none;">
+  <button class="panel-close" id="panel-close">&times;</button>
+  <h3 class="panel-title" id="panel-title"></h3>
+  <p class="panel-strategy" id="panel-strategy"></p>
+  <div class="panel-checkpoints" id="panel-checkpoints"></div>
+  <a href="#" class="panel-cta" id="panel-cta">開始征途</a>
+</div>
+
 <script>
   import { initFateWheel, disposeFateWheel } from '../../lib/fate-wheel/scene-manager';
+  import { pathConfigs, pathInfo } from '../../data/path-mapping';
 
   let canvas: HTMLCanvasElement | null = null;
 
   function init() {
     canvas = document.getElementById('fate-wheel-canvas') as HTMLCanvasElement;
     const loader = document.getElementById('fate-wheel-loader');
-    if (!canvas) return;
+    if (!canvas) {
+      console.error('[FateWheel] Canvas not found!');
+      return;
+    }
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    console.log('[FateWheel] Canvas found, initializing...');
+    console.log('[FateWheel] Canvas dimensions:', canvas.width, canvas.height);
 
     initFateWheel(canvas)
       .then(() => {
+        console.log('[FateWheel] Init successful');
         if (loader) loader.classList.add('hidden');
       })
       .catch((err) => {
-        console.warn('Fate Wheel 3D init failed, falling back to CSS:', err);
+        console.error('[FateWheel] Init failed:', err);
         if (loader) loader.classList.add('hidden');
         showFallback();
       });
+
+    window.addEventListener('path-label-click', onPathLabelClick as EventListener);
+  }
+
+  function onPathLabelClick(e: CustomEvent) {
+    const { pathKey } = e.detail;
+    const config = pathConfigs[pathKey] || [];
+    const info = pathInfo[pathKey];
+    
+    const panel = document.getElementById('path-label-panel');
+    const titleEl = document.getElementById('panel-title');
+    const strategyEl = document.getElementById('panel-strategy');
+    const checkpointsEl = document.getElementById('panel-checkpoints');
+    const ctaEl = document.getElementById('panel-cta') as HTMLAnchorElement;
+    
+    if (panel && titleEl && strategyEl && checkpointsEl && ctaEl && info) {
+      titleEl.textContent = info.name;
+      strategyEl.textContent = config.length > 0 ? config[0].strategy : '';
+      
+      checkpointsEl.innerHTML = config.map((cp: { slug: string; title: string }, i: number) => 
+        `<div class="checkpoint-item">${i + 1}. ${cp.title}</div>`
+      ).join('');
+      
+      ctaEl.href = `/handbook/${config[0]?.slug || ''}`;
+      panel.style.display = 'block';
+    }
   }
 
   function showFallback() {
@@ -48,11 +93,28 @@ import '../../styles/fate-wheel.css';
     }
   }
 
-  // Initialize when component is in viewport
-  if (typeof window !== 'undefined') {
-    init();
+  document.addEventListener('click', (e) => {
+    const closeBtn = document.getElementById('panel-close');
+    const panel = document.getElementById('path-label-panel');
+    if (e.target === closeBtn || e.target === panel) {
+      if (panel) panel.style.display = 'none';
+    }
+  });
 
-    // Cleanup on page navigation
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', () => {
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
     window.addEventListener('beforeunload', () => {
       disposeFateWheel();
     });

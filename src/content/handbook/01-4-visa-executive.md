@@ -7,6 +7,9 @@ order: 6
 icon: "👔"
 tags: ["VITEM V", "高管簽證", "技術服務簽證", "最低工資", "學歷認證", "CLT", "INSS", "FGTS", "Pró-labore"]
 featured: true
+
+images:
+  cover: 01-4-visa-executive-cover.png
 ---
 
 > **因果連接**：如果你的母公司已在巴西設立子公司，VITEM V 是外派人員最快速的路徑——無需投資門檻，審批通常只需 3~6 週。但學歷不對位、薪資不合規，申請會被直接退回。
@@ -271,3 +274,42 @@ featured: true
 - [ ] 是否已了解 4 年后可申請永久居留的路徑？
 
 完成高管簽證評估後，你的外派路徑已清晰——下一步是了解所有簽證類型的完整決策地圖！
+
+
+## 流程圖
+
+```mermaid
+
+flowchart TD
+
+    A[VITEM V 高管簽證] --> B{職位等級}
+
+    B -->|技術人員| C[2x 最低工資]
+
+    B -->|中層管理| D[4x 最低工資]
+
+    B -->|高管/董事| E[6x 最低工資]
+
+    C & D & E --> F{學歷檢驗}
+
+    F -->|專業對口 ✅| G[通過]
+
+    F -->|不對口 ❌| H[申請被拒]
+
+    G --> I[提交申請文件]
+
+    I --> J[聯邦警察局審批]
+
+    J -->|3-6週| K[✅ 簽證核發]
+
+    style A fill:#A5A5C4
+
+    style E fill:#C4A5A5
+
+    style G fill:#A5D4B5
+
+    style H fill:#D4A5A5
+
+    style K fill:#8FA4C4
+
+```

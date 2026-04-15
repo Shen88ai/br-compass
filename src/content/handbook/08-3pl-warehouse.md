@@ -6,6 +6,9 @@ phaseLabel: "第三階段：供應鏈營運"
 order: 8
 icon: "🏭"
 tags: ["3PL", "倉儲", "ICMS", "TTD", "Santa Catarina", "物流", "稅務優化"]
+
+images:
+  cover: 08-3pl-warehouse-cover.jpeg
 ---
 
 > **因果連接**：倉庫不僅是存放貨物的地方，更是你稅務策略的核心節點。倉庫所在的州決定了 ICMS 稅率、跨州配送成本，以及你是否能享受進口稅務優惠。選錯倉庫，每一筆訂單都在多繳稅。
@@ -129,3 +132,47 @@ tags: ["3PL", "倉儲", "ICMS", "TTD", "Santa Catarina", "物流", "稅務優化
 - [ ] ERP 系統是否已與 3PL 系統完成對接測試？
 
 完成倉儲選擇與系統串接後，你的供應鏈已經打通——下一步是建立神經網絡（ERP 與支付系統）！
+
+
+## 3. Mermaid 流程圖
+
+
+```mermaid
+
+flowchart TD
+
+    A[📦 選擇3PL倉庫位置] --> B{評估維度}
+    
+    subgraph 稅務
+    B --> C[🏛️ 稅務]
+    C --> C1["SC州: TTD 4%"]
+    C --> C2[SP州: 標準 12%]
+    end
+    
+    subgraph 物流
+    B --> D[🚚 配送]
+    D --> D1[SC: +1-3天]
+    D --> D2[SP: 最快]
+    end
+    
+    subgraph 成本
+    B --> E[💰 成本]
+    E --> E1[SC: 較低]
+    E --> E2[SP: 較高]
+    end
+    
+    C1 & D1 & E1 --> H1[SC方案]
+    C2 & D2 & E2 --> H2[SP方案]
+    
+    H1 --> I{最終決策}
+    H2 --> I
+    
+    I -->|稅務優先| J[🏭 SC州]
+    I -->|速度優先| K[🏙️ SP州]
+    I -->|混合策略| L[🔄 雙州]
+    
+    style J fill:#C4A088
+    style K fill:#B8B8C4
+    style L fill:#A8B890
+
+```

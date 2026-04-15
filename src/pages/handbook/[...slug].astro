@@ -19,6 +19,13 @@ interface Props {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 
+// Get cover image from frontmatter
+const images = post.data.images || {};
+const coverFilename = images.cover;
+const coverImagePath = coverFilename 
+  ? `/images/handbook/${post.id}/${coverFilename}` 
+  : null;
+
 const allPosts = (await getCollection('handbook')).sort((a, b) => a.data.order - b.data.order);
 const idx = allPosts.findIndex(p => p.id === post.id);
 const prev = idx > 0 ? allPosts[idx - 1] : null;
@@ -76,11 +83,20 @@ glossaryData.forEach(g => { glossaryMap[g.term] = g; });
       <h1 class="article-title-main text-gradient-hope">{post.data.title}</h1>
       <p class="article-subtitle">{post.data.description}</p>
 
-      <!-- Cover Placeholder -->
-      <div class="img-placeholder article-cover" title="[圖片佔位] 請上傳封面圖">
-        <span class="cover-icon">{post.data.icon}</span>
-        <span class="cover-hint">封面圖片 · 點擊上傳</span>
-      </div>
+      <!-- Cover Image -->
+      {coverImagePath ? (
+        <div class="article-cover">
+          <img 
+            src={coverImagePath} 
+            alt={post.data.title}
+          />
+        </div>
+      ) : (
+        <div class="img-placeholder article-cover" title="[圖片佔位] 請上傳封面圖">
+          <span class="cover-icon">{post.data.icon}</span>
+          <span class="cover-hint">封面圖片 · 點擊上傳</span>
+        </div>
+      )}
 
       <!-- Tags -->
       {post.data.tags && post.data.tags.length > 0 && (
@@ -1429,5 +1445,322 @@ glossaryData.forEach(g => { glossaryMap[g.term] = g; });
   }, { threshold: 0.3 });
 
   if (nav) navObserver.observe(nav);
+})();
+
+// ── Tax Calculator Logic ──────────────────────────────────
+(function initTaxCalculator() {
+  const container = document.getElementById('tax-calc-container');
+  const simulatorContainer = document.getElementById('simulator-container');
+  if (!container && !simulatorContainer) return;
+
+  // State
+  let regime = '';
+  let pisCofinsType = '';
+  let currentAplicavel = false;
+  let is2026Reform = false;
+
+  // Constants
+  const LIMITS = {
+    simples: 4800000,
+    presumido: 78000000
+  };
+
+  // ── Formatting Helpers ────────────────────────────────
+  function fmt(n) {
+    return 'R$ ' + n.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function parseBR(val) {
+    if (!val) return 0;
+    const cleaned = val.replace(/\./g, '').replace(/,/g, '.');
+    return parseFloat(cleaned) || 0;
+  }
+
+  function handleInputFormatting(el) {
+    let val = el.value.replace(/\D/g, '');
+    if (val === '') {
+      el.value = '';
+      return;
+    }
+    el.value = parseInt(val, 10).toLocaleString('pt-BR');
+  }
+
+  // ── Import Tax Calculation ────────────────────────────
+  function calcImportTaxes(va) {
+    const alii = 0.20;
+    const alipi = 0.10;
+    const alicms = 0.18;
+
+    const ii = va * alii;
+    const ipi = (va + ii) * alipi;
+    const pis_imp = va * 0.021;
+    const cofins_imp = va * 0.0965;
+    const icms_bc = (va + ii + ipi + pis_imp + cofins_imp) / (1 - alicms);
+    const icms = icms_bc * alicms;
+    const total_imp = ii + ipi + pis_imp + cofins_imp + icms;
+
+    return { ii, ipi, pis_imp, cofins_imp, icms, total_imp };
+  }
+
+  function renderTaxItem(label, value) {
+    return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+      <span style="color:#666;">${label}:</span>
+      <span class="num-col">${fmt(value)}</span>
+    </div>`;
+  }
+
+  function renderImportTaxes(va) {
+    const { ii, ipi, icms, pis_imp, cofins_imp, total_imp } = calcImportTaxes(va);
+
+    let pisCofHtml = renderTaxItem('PIS/COF Imp.', pis_imp + cofins_imp);
+    if (is2026Reform) {
+      pisCofHtml = renderTaxItem('PIS/COF Imp. (減 1%)', (pis_imp + cofins_imp) - (va * 0.01)) +
+        renderTaxItem('CBS (0.9%)', va * 0.009) +
+        renderTaxItem('IBS (0.1%)', va * 0.001);
+    }
+
+    return `<div style="margin-top:12px;padding:10px 14px;background:#fdfdfe;border:1px solid #eee;border-radius:6px;max-width:400px;">
+      <div style="font-weight:700;font-size:.9rem;color:#444;margin-bottom:6px;border-bottom:1px solid #eee;">🛃進口環節 (Importação)</div>
+      ${renderTaxItem('II (20%)', ii)}
+      ${renderTaxItem('IPI (10%)', ipi)}
+      ${renderTaxItem('ICMS (18%)', icms)}
+      ${pisCofHtml}
+      <div style="margin-top:6px;border-top:1px dashed #ccc;padding-top:6px;color:#1a6fbd;font-weight:700;">
+        ${renderTaxItem('進口稅合計', total_imp)}
+      </div>
+    </div>`;
+  }
+
+  // ── Regime Selection ──────────────────────────────────
+  function chooseRegime(choice) {
+    regime = choice;
+
+    const adicionalSel = document.getElementById('adicional-selection');
+    if (!adicionalSel) return;
+
+    currentAplicavel = false;
+
+    if (choice === 'simples') {
+      adicionalSel.style.display = 'none';
+    } else {
+      adicionalSel.style.display = 'block';
+    }
+
+    renderResult();
+    updateSimTable();
+  }
+
+  function chooseAdicional(aplicavel) {
+    currentAplicavel = aplicavel;
+    renderResult();
+  }
+
+  function toggleReform2026() {
+    is2026Reform = document.getElementById('toggle-2026').checked;
+    renderResult();
+    updateSimTable();
+  }
+
+  // ── Result Rendering ─────────────────────────────────
+  function renderResult() {
+    const resultDiv = document.getElementById('tax-result');
+    const vaInput = document.getElementById('va-input');
+    if (!resultDiv || !vaInput) return;
+
+    const va = parseBR(vaInput.value);
+    let output = '';
+
+    if (!regime) return;
+
+    if (regime === 'simples') {
+      const receitaInput = document.getElementById('receita-input');
+      const rb = receitaInput ? parseBR(receitaInput.value) : 0;
+
+      output = `<h3>✅ 您選擇了：<span style="color:#e07b00;">Simples Nacional</span></h3>
+        <div class="info-box" style="margin-bottom:12px;max-width:400px;">ℹ️ Simples Nacional 不適用 Adicional IRPJ，IRPJ/CSLL 已含於 DAS。</div>
+        <div style="padding:10px 14px;background:#fdfdfe;border:1px solid #eee;border-radius:6px;max-width:400px;">
+          <div style="font-weight:700;font-size:.9rem;color:#444;margin-bottom:6px;border-bottom:1px solid #eee;">🇧🇷國內環節 (Brasil)</div>
+          ${renderTaxItem('DAS (預估 6%)', rb * 0.06)}
+        </div>`;
+    } else {
+      const receitaInput = document.getElementById('receita-input');
+      const rb = receitaInput ? parseBR(receitaInput.value) : 0;
+      const pisType = (regime === 'presumido' || regime === 'real-cumulative') ? '累積' : '非累積';
+      const regimeColor = regime === 'presumido' ? '#1a6fbd' : '#1a8f4c';
+
+      output = `<h3>✅ 您選擇了：<span style="color:${regimeColor}">${regime === 'presumido' ? 'Lucro Presumido' : 'Lucro Real'}</span>
+        → PIS/COFINS ${pisType}
+        → Adicional IRPJ: <em>${currentAplicavel ? '適用 ✅' : '不適用 ❌'}</em></h3>`;
+
+      let domHtml = `<div style="padding:10px 14px;background:#fdfdfe;border:1px solid #eee;border-radius:6px;max-width:400px;">
+        <div style="font-weight:700;font-size:.9rem;color:#444;margin-bottom:6px;border-bottom:1px solid #eee;">🇧🇷國內環節 (Brasil)</div>`;
+
+      if (pisType === '累積') {
+        let pVal = rb * 0.0365;
+        if (is2026Reform) {
+          domHtml += renderTaxItem('PIS/COF (3.65% 減 1%)', pVal - rb * 0.01) +
+            renderTaxItem('CBS (0.9%)', rb * 0.009) +
+            renderTaxItem('IBS (0.1%)', rb * 0.001);
+        } else {
+          domHtml += renderTaxItem('PIS/COF (累積 3.65%)', pVal);
+        }
+      } else {
+        let pVal = rb * 0.04625;
+        if (is2026Reform) {
+          domHtml += renderTaxItem('PIS/COF (非累積 減 1%)', pVal - rb * 0.01) +
+            renderTaxItem('CBS (0.9%)', rb * 0.009) +
+            renderTaxItem('IBS (0.1%)', rb * 0.001);
+        } else {
+          domHtml += renderTaxItem('PIS/COF (非累積預估 4.625%)', pVal);
+        }
+      }
+
+      if (regime === 'presumido') {
+        const base = rb * 0.08;
+        const irpj = base * 0.15 + (currentAplicavel ? Math.max(0, base - 240000) * 0.10 : 0);
+        domHtml += renderTaxItem('IRPJ (15% + Add)', irpj);
+        domHtml += renderTaxItem('CSLL (9%)', rb * 0.12 * 0.09);
+      } else {
+        const lucro = rb * 0.30;
+        const irpj = lucro * 0.15 + (currentAplicavel ? Math.max(0, lucro - 240000) * 0.10 : 0);
+        domHtml += renderTaxItem('IRPJ (15% + Add)', irpj);
+        domHtml += renderTaxItem('CSLL (9%)', lucro * 0.09);
+      }
+
+      domHtml += '</div>';
+      output += domHtml;
+    }
+
+    output += renderImportTaxes(va);
+    resultDiv.innerHTML = output;
+  }
+
+  // ── Simulator Table Update ─────────────────────────────
+  function updateSimTable() {
+    const receitaInput = document.getElementById('receita-input');
+    const vaInput = document.getElementById('va-input');
+    if (!receitaInput || !vaInput) return;
+
+    const rb = parseBR(receitaInput.value);
+    const va = parseBR(vaInput.value);
+    const { total_imp } = calcImportTaxes(va);
+
+    // Highlight selected row
+    ['row-presumido', 'row-real'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.outline = '';
+        el.style.background = '';
+      }
+    });
+
+    if (regime === 'presumido') {
+      const el = document.getElementById('row-presumido');
+      if (el) { el.style.outline = '2px solid #1a6fbd'; el.style.background = '#f0f6ff'; }
+    } else if (regime === 'real-non-cumulative' || regime === 'real-cumulative') {
+      const el = document.getElementById('row-real');
+      if (el) { el.style.outline = '2px solid #1a8f4c'; el.style.background = '#f0fff5'; }
+    }
+
+    // 1. Simples Nacional
+    const simSimplesDetail = document.getElementById('sim-simples-detail');
+    const simSimplesTotal = document.getElementById('sim-simples-total');
+    if (simSimplesDetail && simSimplesTotal) {
+      if (rb > LIMITS.simples) {
+        simSimplesDetail.innerHTML = `<span style="color:#cf222e;font-weight:700;">⛔ 超額，須退出 Simples</span>`;
+        simSimplesTotal.innerHTML = `<span style="color:#cf222e;font-weight:700;">N/A</span>`;
+      } else {
+        const das = rb * 0.06;
+        simSimplesDetail.innerHTML = `${renderTaxItem('DAS (預估 6%)', das)}`;
+        simSimplesTotal.textContent = fmt(das + total_imp);
+      }
+    }
+
+    // 2. Lucro Presumido
+    const simPresumidoDetail = document.getElementById('sim-presumido-detail');
+    const simPresumidoTotal = document.getElementById('sim-presumido-total');
+    if (simPresumidoDetail && simPresumidoTotal) {
+      if (rb > LIMITS.presumido) {
+        simPresumidoDetail.innerHTML = `<span style="color:#cf222e;font-weight:700;">⛔ 超額，強制 Lucro Real</span>`;
+        simPresumidoTotal.innerHTML = `<span style="color:#cf222e;font-weight:700;">N/A</span>`;
+      } else {
+        const pis_p = rb * 0.0065;
+        const cofins_p = rb * 0.03;
+        const base_p = rb * 0.08;
+        const irpj_p = base_p * 0.15 + (Math.max(0, base_p - 240000) * 0.10);
+        const csll_p = rb * 0.12 * 0.09;
+        const total_domestico = pis_p + cofins_p + irpj_p + csll_p;
+
+        simPresumidoDetail.innerHTML = `${renderTaxItem('PIS/COF (3.65%)', pis_p + cofins_p)}${renderTaxItem('IRPJ (15% + Add)', irpj_p)}${renderTaxItem('CSLL (9%)', csll_p)}`;
+        simPresumidoTotal.textContent = fmt(total_domestico + total_imp);
+      }
+    }
+
+    // 3. Lucro Real
+    const simRealDetail = document.getElementById('sim-real-detail');
+    const simRealTotal = document.getElementById('sim-real-total');
+    if (simRealDetail && simRealTotal) {
+      let pis_r, cofins_r, pLabel;
+      if (regime === 'real-cumulative') {
+        pis_r = rb * 0.0065; cofins_r = rb * 0.03; pLabel = '累積 3.65%';
+      } else {
+        pis_r = rb * 0.0165 * 0.5; cofins_r = rb * 0.076 * 0.5; pLabel = '非累積 (抵扣後)';
+      }
+      const lucro = rb * 0.30;
+      const irpj_r = lucro * 0.15 + (Math.max(0, lucro - 240000) * 0.10);
+      const csll_r = lucro * 0.09;
+      const total_domestico_r = pis_r + cofins_r + irpj_r + csll_r;
+
+      simRealDetail.innerHTML = `${renderTaxItem(`PIS/COF (${pLabel})`, pis_r + cofins_r)}${renderTaxItem('IRPJ (15% + Add)', irpj_r)}${renderTaxItem('CSLL (9%)', csll_r)}`;
+      simRealTotal.textContent = fmt(total_domestico_r + total_imp);
+    }
+  }
+
+  // ── Event Listeners ───────────────────────────────────
+  // Regime selection buttons
+  if (container) {
+    container.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const btn = target.closest('[data-action="choose-regime"]');
+      if (btn) {
+        const r = btn.getAttribute('data-regime');
+        if (r === 'simples') chooseRegime('simples');
+        else if (r === 'presumido') chooseRegime('presumido');
+        else if (r === 'real-non-cumulative') chooseRegime('real-non-cumulative');
+        else if (r === 'real-cumulative') chooseRegime('real-cumulative');
+      }
+
+      const adicionalBtn = target.closest('[data-action="choose-adicional"]');
+      if (adicionalBtn) {
+        const val = adicionalBtn.getAttribute('data-value');
+        chooseAdicional(val === 'true');
+      }
+    });
+  }
+
+  // Simulator inputs
+  if (simulatorContainer) {
+    simulatorContainer.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.id === 'receita-input' || target.id === 'va-input') {
+        handleInputFormatting(target);
+        renderResult();
+        updateSimTable();
+      }
+    });
+
+    simulatorContainer.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.id === 'toggle-2026') {
+        toggleReform2026();
+      }
+    });
+  }
+
+  // Initial render
+  updateSimTable();
 })();
 </script>

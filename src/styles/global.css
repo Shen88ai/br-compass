@@ -1262,6 +1262,13 @@ a:hover { color: #fff; }
   margin-bottom: var(--space-4);
   flex-direction: column;
   gap: var(--space-2);
+  overflow: hidden;
+}
+
+.article-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ── Article Tags ───────────────────────────────────────── */
@@ -4761,7 +4768,214 @@ code, .mono {
     height: 300px;
   }
 
-  .fate-wheel-fallback .ring-inner { width: 120px; height: 120px; }
-  .fate-wheel-fallback .ring-middle { width: 210px; height: 210px; }
-  .fate-wheel-fallback .ring-outer { width: 290px; height: 290px; }
+  .fate-wheel-fallback .ring_inner { width: 120px; height: 120px; }
+  .fate-wheel-fallback .ring_middle { width: 210px; height: 210px; }
+  .fate-wheel-fallback .ring_outer { width: 290px; height: 290px; }
 }
+
+/* ── Diagnosis Enhancement: Checklist Item Cards ─────────── */
+.checklist-item--card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(15,15,24,0.8), rgba(20,20,30,0.6));
+  border-radius: 0.75rem;
+  border-left: 3px solid var(--path-color);
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+.checklist-item--card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.checklist-item--status-completed {
+  position: relative;
+}
+.checklist-item--status-completed::after {
+  content: '✓';
+  position: absolute;
+  right: 12px;
+  color: var(--color-success);
+  font-weight: bold;
+}
+.checklist-item--status-current {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 168, 67, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(212, 168, 67, 0); }
+}
+.checklist-item--status-pending {
+  opacity: 0.6;
+}
+.checklist-item--path-A { --path-color: #7DD3FC; }
+.checklist-item--path-B { --path-color: #FFD700; }
+.checklist-item--path-C { --path-color: #D4A843; }
+.checklist-item--path-D { --path-color: #00FF87; }
+.checklist-item--path-E { --path-color: #E5FF00; }
+.checklist-item--path-F { --path-color: #FF6B6B; }
+.checklist-item--path-G { --path-color: #C0C0C0; }
+.checklist-item__strategy {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 280px;
+  padding: 12px;
+  background: rgba(10,10,18,0.95);
+  border: 1px solid var(--path-color);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 100;
+  margin-left: 8px;
+  pointer-events: none;
+}
+.checklist-item--card:hover .checklist-item__strategy {
+  opacity: 1;
+  visibility: visible;
+}
+.checklist-item__strategy::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 6px 6px 0;
+  border-style: solid;
+  border-color: transparent var(--path-color) transparent transparent;
+}
+.checklist-item__number {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--color-gold-rgb), 0.15);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  flex-shrink: 0;
+}
+.checklist-item__icon {
+  font-size: 1.1rem;
+}
+.checklist-item__title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.checklist-item__eta {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+/* ── Mermaid Diagram Styling ──────────────────────────── */
+.mermaid {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-4) 0;
+  padding: var(--space-3);
+  background: linear-gradient(135deg, rgba(15,15,24,0.8), rgba(20,20,30,0.6));
+  border: 1px solid rgba(212,168,67,0.2);
+  border-radius: var(--radius-card);
+  overflow-x: auto;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Node styling */
+.mermaid .node rect,
+.mermaid .node circle,
+.mermaid .node polygon,
+.mermaid .node stadium {
+  fill: rgba(15, 15, 24, 0.95) !important;
+  stroke: var(--color-gold) !important;
+  stroke-width: 2px !important;
+  rx: 8px !important;
+  ry: 8px !important;
+  transition: all 0.3s ease;
+}
+
+.mermaid .node rect:hover,
+.mermaid .node circle:hover,
+.mermaid .node polygon:hover {
+  fill: rgba(212, 168, 67, 0.15) !important;
+  filter: drop-shadow(0 0 8px rgba(212,168,67,0.4));
+}
+
+/* Label styling */
+.mermaid .node label,
+.mermaid .node text,
+.mermaid .node tspan {
+  fill: var(--color-text) !important;
+  font-family: 'Inter', 'Noto Sans TC', sans-serif !important;
+  font-size: 15px !important;
+}
+
+/* Edge/Line styling */
+.mermaid .edgePath .path,
+.mermaid .edgePath line,
+.mermaid line,
+.mermaid .link {
+  stroke: var(--color-gold) !important;
+  stroke-width: 2px !important;
+  opacity: 0.7;
+}
+
+.mermaid .edgePath .path:hover,
+.mermaid .edgePath line:hover {
+  stroke-width: 3px !important;
+  opacity: 1;
+}
+
+/* Arrow markers */
+.mermaid .marker {
+  fill: var(--color-gold) !important;
+  stroke: var(--color-gold) !important;
+}
+
+/* Subgraph styling */
+.mermaid .subgraph rect,
+.mermaid .subgraph polygon {
+  fill: rgba(10, 10, 18, 0.9) !important;
+  stroke: rgba(212,168,67,0.5) !important;
+  stroke-dasharray: 4, 4;
+}
+
+/* Decision diamond */
+.mermaid .node polygon[points*="5"] {
+  fill: rgba(212,168,67,0.1) !important;
+}
+
+/* Start/End nodes */
+.mermaid .node:nth-child(1) rect:first-child,
+.mermaid .node:last-child rect:first-child {
+  fill: rgba(212,168,67,0.2) !important;
+  stroke-width: 3px !important;
+}
+
+/* Grid background */
+.mermaid svg {
+  background-image: 
+    linear-gradient(rgba(212,168,67,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,67,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Hide original mermaid code blocks after rendering */
+pre.astro-code[data-language="mermaid"].mermaid-rendered {
+  display: none;
+}
+
+/* ── Tax Calculator Module ─────────────────────────────── */
+@import './tax-calculator.css';

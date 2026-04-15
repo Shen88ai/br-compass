@@ -5,6 +5,7 @@ import { getCollection } from 'astro:content';
 const allPosts = await getCollection('handbook');
 const sortedPosts = allPosts.sort((a, b) => a.data.order - b.data.order);
 
+// 僅傳遞輪播所需的輕量 Metadata，避免 HTML bloat
 const searchData = allPosts.map(p => ({
   slug: p.id,
   title: p.data.title,
@@ -13,7 +14,6 @@ const searchData = allPosts.map(p => ({
   phase: p.data.phase,
   icon: p.data.icon,
   phaseLabel: p.data.phaseLabel,
-  content: p.body
 }));
 
 const phases = [
@@ -65,6 +65,30 @@ const phases = [
     cause: '穩定銷售後應付稅務稽核，年底執行盈餘最大化並合法匯回母國。',
     posts: sortedPosts.filter(p => p.data.phase === 'harvest'),
   },
+  {
+    id: 'insights',
+    number: '05',
+    label: '市場洞察',
+    labelPt: 'Insights & Análise',
+    timeframe: '持續更新',
+    icon: '📊',
+    color: 'var(--color-sky-blue)',
+    glow: 'rgba(125,211,252,0.3)',
+    cause: '掌握巴西市場的最新趨勢、政策變化與宏觀經濟動態，做出明智決策。',
+    posts: sortedPosts.filter(p => p.data.phase === 'insights'),
+  },
+  {
+    id: 'media',
+    number: '06',
+    label: '媒體中心',
+    labelPt: 'Mídia & Vídeos',
+    timeframe: '持續更新',
+    icon: '🎬',
+    color: 'var(--color-neon-yellow)',
+    glow: 'rgba(229,255,0,0.3)',
+    cause: '通過 YouTube、小紅書、抖音等視頻平台，用視覺化方式理解巴西市場與稅制。',
+    posts: sortedPosts.filter(p => p.data.phase === 'media'),
+  },
 ];
 
 const heroSlides = [
@@ -74,6 +98,28 @@ const heroSlides = [
   { title: '電商平台入駐實戰', sub: 'Mercado Livre、Amazon、Shopee、TikTok Shop 完整指南', icon: '🛒', slug: '06-ecommerce-platforms' },
   { title: '3PL 倉庫選擇策略', sub: '從 SC 州 TTD 稅務優惠到尾程時效的完整評分矩陣', icon: '🏭', slug: '08-3pl-warehouse' },
 ];
+
+// 用於 SSR 的 getCoverImage - insights 使用已知的正確路徑
+function getCoverImage(slug: string, allPosts: any[]): string | null {
+  const post = allPosts.find(p => p.id === slug);
+  if (!post) return null;
+  
+  const images = post?.data?.images;
+  if (!images?.cover) return null;
+  
+  const phase = post.data?.phase || 'handbook';
+  
+  // insights 類型的圖片路徑（根據實際資料夾結構）
+  if (phase === 'insights') {
+    const insightsPaths: Record<string, string> = {
+      '03-2027巴西稅改': '/images/insights/2027 巴西稅改/file-20260317191056557.png',
+      '04-痛點需求解決方案對照表': '/images/insights/痛點–需求–解決方案對照表/file-20260317191551423.png',
+    };
+    return insightsPaths[slug] || null;
+  }
+  
+  return `/images/handbook/${slug}/${images.cover}`;
+}
 ---
 
 <Layout title="跨境電商出海、落地巴西實戰手冊" description="從稅制理解到利潤匯出，最完整的跨境電商巴西落地實戰指南">
@@ -110,9 +156,20 @@ const heroSlides = [
       </div>
 
       <div id="hero-carousel" class="carousel-track">
-        {heroSlides.map((slide) => (
+        {heroSlides.map((slide, idx) => {
+          const coverImage = getCoverImage(slide.slug, sortedPosts);
+          return (
           <div class="carousel-slide carousel-slide-fixed">
-            <a href={`/handbook/${slide.slug}`} class="link-none">
+            <div class="carousel-slide-card" data-slide-idx={idx} data-cover={coverImage || ''} data-preview={slide.preview}>
+              {coverImage ? (
+                <div class="card flex-col p-3" style="padding:0;overflow:hidden;">
+                  <img src={coverImage} alt={slide.title} style="width:100%;height:140px;object-fit:cover;" />
+                  <div class="p-3">
+                    <div style="font-weight:700;color:var(--color-text);margin-bottom:0.25rem;">{slide.title}</div>
+                    <div class="carousel-subtitle">{slide.sub}</div>
+                  </div>
+                </div>
+              ) : (
               <div class="card img-placeholder img-placeholder-md flex-col p-3" title={`[圖片佔位] ${slide.title}`}>
                 <span class="carousel-icon">{slide.icon}</span>
                 <div class="text-center">
@@ -121,9 +178,11 @@ const heroSlides = [
                 </div>
                 <div class="carousel-upload-hint">📷 上傳圖片</div>
               </div>
-            </a>
+              )}
+            </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   </section>
@@ -173,13 +232,19 @@ const heroSlides = [
             <!-- Phase Posts Grid - Bento Layout -->
             {phase.posts.length > 0 ? (
               <div class="bento-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));">
-                {phase.posts.map((post, postIdx) => (
+                {phase.posts.map((post, postIdx) => {
+                  const coverImage = getCoverImage(post.id, sortedPosts);
+                  return (
                   <a href={`/handbook/${post.id}`} style="text-decoration:none;" class={postIdx === 0 ? 'bento-featured' : ''}>
                     <article class={`tilt-card card ${postIdx === 0 ? 'bento-featured' : ''} relative overflow-hidden cursor-pointer`} style="padding:var(--space-3);">
                       <div class="tilt-inner">
+                      {coverImage ? (
+                        <img src={coverImage} alt={post.data.title} class="rounded mb-2" style="width:100%;height:120px;object-fit:cover;" />
+                      ) : (
                       <div class="img-placeholder img-placeholder-sm rounded mb-2" title="[圖片佔位] 點擊上傳封面圖">
                         <span class="z-1 relative">{post.data.icon} 封面圖片</span>
                       </div>
+                      )}
                       <div class="phase-label-inline" style={`color:${phase.color};`}>
                         {post.data.phaseLabel}
                       </div>
@@ -198,7 +263,8 @@ const heroSlides = [
                       <div class="tilt-shine"></div>
                     </article>
                   </a>
-                ))}
+                  );
+                })}
                 <div class="more-chapters-card" onclick={`openLightbox('${phase.id}')`}>
                   <div class="more-chapters-icon" style={`color:${phase.color};`}>+</div>
                   <div class="more-chapters-text">即將推出更多章節</div>
@@ -224,6 +290,9 @@ const heroSlides = [
     </div>
   </section>
 
+  <!-- ★ PATH CHECKPOINTS CONTAINER ───────────────────────── -->
+  <div id="path-checkpoints-container"></div>
+
   <!-- ★ LIGHTBOX ──────────────────────────────────────── -->
   <div id="lightbox" class="lightbox-overlay" onclick="if(event.target===this)closeLightbox()">
     <div class="lightbox-content" style="min-width:320px;max-width:600px;width:90vw;">
@@ -232,6 +301,17 @@ const heroSlides = [
         <button class="lightbox-close" onclick="closeLightbox()">×</button>
       </div>
       <div id="lb-content"></div>
+    </div>
+  </div>
+
+  <!-- ★ HERO SLIDES LIGHTBOX ───────────────────────────────── -->
+  <div id="hero-slides-lightbox" class="hero-slides-lightbox" onclick="if(event.target===this)closeHeroLightbox()">
+    <div class="hsl-content">
+      <button class="hsl-close" onclick="closeHeroLightbox()">×</button>
+      <button class="hsl-nav hsl-prev" id="hsl-prev">‹</button>
+      <button class="hsl-nav hsl-next" id="hsl-next">›</button>
+      <div id="hsl-slide-container"></div>
+      <div class="hsl-dots" id="hsl-dots"></div>
     </div>
   </div>
 
@@ -420,6 +500,176 @@ function scrollCarousel(dir: number) {
 }
 (window as any).scrollCarousel = scrollCarousel;
 
+// ── Hero Slides Lightbox ─────────────────────────────────────
+const heroSlidesData = [
+  { title: '破譯巴西複雜稅制', sub: '從 5 稅並存到 IVA Dual 雙軌制，看懂稅務地圖', icon: '⚖️', slug: '01-tax-system', preview: '巴西是全球稅制最複雜的國家之一，擁有超過 90 種稅種。本章節將幫助你建立完整的稅務地圖認知框架。' },
+  { title: '稅改 2026-2033 過渡期', sub: 'IVA Dual 雙軌制 — 把握視窗期建立先行者優勢', icon: '🗺️', slug: '01-1-tax-timeline', preview: '2026-2033 是巴西稅制改革的關鍵過渡期，現在進場的企業將享有先行者優勢。' },
+  { title: '注資路徑 SCE-IED (RDE-IED)', sub: '中央銀行申報 → CNPJ → 開戶 → 匯款，一步不能錯', icon: '🏦', slug: '05-bacen-capital', preview: 'SCE-IED 登記是合法匯款的唯一通道，漏掉這步資金進得來出不去。完整步驟詳解。' },
+  { title: '電商平台入駐實戰', sub: 'Mercado Livre、Amazon、Shopee、TikTok Shop 完整指南', icon: '🛒', slug: '06-ecommerce-platforms', preview: 'Mercado Livre 佔巴西電商 35% 市佔，但 Amazon 和 Shopee 也在快速成長。選擇哪個平台？' },
+  { title: '3PL 倉庫選擇策略', sub: '從 SC 州 TTD 稅務優惠到尾程時效的完整評分矩陣', icon: '🏭', slug: '08-3pl-warehouse', preview: '選 SC 州可省 12% ICMS，但尾程時效可能慢 2-3 天。倉庫選擇是跨境電商成敗的關鍵。' },
+];
+
+let currentHeroSlide = 0;
+
+function renderHeroSlide(index: number) {
+  const slide = heroSlidesData[index];
+  const container = document.getElementById('hsl-slide-container');
+  const dotsContainer = document.getElementById('hsl-dots');
+  if (!container || !dotsContainer) return;
+
+  // Single Source of Truth: 直接從 DOM 讀取 SSR 已計算好的資料
+  const cardEl = document.querySelector(`.carousel-slide-card[data-slide-idx="${index}"]`);
+  const coverImage = cardEl ? (cardEl as HTMLElement).dataset.cover : null;
+  const preview = cardEl ? (cardEl as HTMLElement).dataset.preview : slide.preview;
+
+  container.innerHTML = `
+    <div class="hsl-slide">
+      <div class="hsl-image-area">
+        ${coverImage ? `<img src="${coverImage}" alt="${slide.title}" class="hsl-image" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />` : ''}
+        <div class="hsl-image-placeholder" ${coverImage ? 'style="display:none;"' : ''}>
+          <span class="hsl-icon">${slide.icon}</span>
+        </div>
+        <div class="hsl-overlay">
+          <span class="hsl-badge">${slide.icon} ${slide.sub}</span>
+        </div>
+      </div>
+      <div class="hsl-info">
+        <h2 class="hsl-title">${slide.title}</h2>
+        <p class="hsl-preview">${preview}</p>
+        <div class="hsl-progress">
+          <span>${index + 1} / ${heroSlidesData.length}</span>
+        </div>
+        <div class="hsl-actions">
+          <a href="/handbook/${slide.slug}" class="hsl-btn hsl-btn-primary">完整閱讀 →</a>
+          <span class="hsl-hint">或點擊周圍區域關閉</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  dotsContainer.innerHTML = heroSlidesData.map((_, i) => `
+    <button class="hsl-dot ${i === index ? 'active' : ''}" data-idx="${i}"></button>
+  `).join('');
+
+  dotsContainer.querySelectorAll('.hsl-dot').forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      const idx = parseInt((e.currentTarget as HTMLElement).dataset.idx || '0');
+      currentHeroSlide = idx;
+      renderHeroSlide(idx);
+    });
+  });
+}
+
+function openHeroLightbox(startIndex: number) {
+  currentHeroSlide = startIndex;
+  const lb = document.getElementById('hero-slides-lightbox');
+  if (lb) {
+    renderHeroSlide(startIndex);
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeHeroLightbox() {
+  const lb = document.getElementById('hero-slides-lightbox');
+  if (lb) {
+    lb.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function navigateHeroSlide(dir: number) {
+  currentHeroSlide = (currentHeroSlide + dir + heroSlidesData.length) % heroSlidesData.length;
+  renderHeroSlide(currentHeroSlide);
+}
+
+(window as any).openHeroLightbox = openHeroLightbox;
+(window as any).closeHeroLightbox = closeHeroLightbox;
+
+// Init carousel slide click handlers (with DOMContentLoaded to ensure DOM is ready)
+// 防呆機制：重試計數器
+let carouselInitRetries = 0;
+const MAX_CAROUSEL_INIT_RETRIES = 10;
+
+function initCarouselLightbox() {
+  const cards = document.querySelectorAll('.carousel-slide-card');
+  
+  if (cards.length === 0) {
+    carouselInitRetries++;
+    if (carouselInitRetries >= MAX_CAROUSEL_INIT_RETRIES) {
+      console.warn(`⚠️ Carousel init failed after ${MAX_CAROUSEL_INIT_RETRIES} retries. Elements not found.`);
+      return; // 防呆退出
+    }
+    setTimeout(initCarouselLightbox, 100);
+    return;
+  }
+  
+  // 重置計數器
+  carouselInitRetries = 0;
+  
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      const idx = parseInt((card as HTMLElement).dataset.slideIdx || '0');
+      openHeroLightbox(idx);
+    });
+    (card as HTMLElement).style.cursor = 'pointer';
+  });
+
+  // Nav buttons
+  document.getElementById('hsl-prev')?.addEventListener('click', () => navigateHeroSlide(-1));
+  document.getElementById('hsl-next')?.addEventListener('click', () => navigateHeroSlide(1));
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const lb = document.getElementById('hero-slides-lightbox');
+    if (!lb?.classList.contains('active')) return;
+    if (e.key === 'Escape') closeHeroLightbox();
+    if (e.key === 'ArrowLeft') navigateHeroSlide(-1);
+    if (e.key === 'ArrowRight') navigateHeroSlide(1);
+  });
+  
+  // Auto-scroll carousel every 5 seconds (only if not hovering)
+  let autoScrollInterval: number | undefined;
+  
+  function stopAutoScroll() {
+    if (autoScrollInterval !== undefined) {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = undefined;
+    }
+  }
+  
+  function startAutoScroll() {
+    stopAutoScroll(); // 防呆：確保不會有計時器堆疊
+    autoScrollInterval = window.setInterval(() => {
+      const carousel = document.getElementById('hero-carousel');
+      if (!carousel) return;
+      
+      const slideWidth = 340;
+      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+      
+      if (carousel.scrollLeft >= maxScroll - 10) {
+        carousel.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        carousel.scrollBy({ left: slideWidth, behavior: 'smooth' });
+      }
+    }, 5000);
+  }
+  
+  const carousel = document.getElementById('hero-carousel');
+  if (carousel) {
+    carousel.addEventListener('mouseenter', stopAutoScroll);
+    carousel.addEventListener('mouseleave', startAutoScroll);
+    startAutoScroll();
+  }
+}
+
+// Start initialization
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCarouselLightbox);
+} else {
+  initCarouselLightbox();
+}
+
 const phaseDetails: Record<string, { title: string; items: string[] }> = {
   preparation: {
     title: '🗺️ 第一階段：戰略藍圖與落地籌備',
@@ -493,28 +743,44 @@ function closeLightbox() {
   if (!input || !resultsEl) return;
 
   let fuse: any = null;
-  let searchIndex: any[] = (window as any).searchData || [];
+  let searchLoaded = false;
 
-  // Initialize Fuse.js with the injected data
-  import('https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js').then(mod => {
-    const Fuse = mod.default || (mod as any).Fuse;
-    fuse = new Fuse(searchIndex, {
-      keys: [
-        { name: 'title', weight: 0.5 },
-        { name: 'description', weight: 0.3 },
-        { name: 'tags', weight: 0.15 },
-        { name: 'content', weight: 0.1 },
-        { name: 'phaseLabel', weight: 0.05 },
-      ],
-      threshold: 0.35,
-      ignoreLocation: true,
-      includeScore: true,
-      includeMatches: true,
-    });
-  }).catch(() => {
-    // Fallback: use simple search if CDN fails
-    fuse = null;
-  });
+  // 非同步載入全文搜尋索引（避免 HTML bloat）
+  async function loadSearchIndex() {
+    if (searchLoaded) return;
+    try {
+      const res = await fetch('/search-index.json');
+      const searchIndex = await res.json();
+      searchLoaded = true;
+      
+      const Fuse = (await import('https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js')).default;
+      fuse = new Fuse(searchIndex, {
+        keys: [
+          { name: 'title', weight: 0.5 },
+          { name: 'description', weight: 0.3 },
+          { name: 'tags', weight: 0.15 },
+          { name: 'phaseLabel', weight: 0.05 },
+        ],
+        threshold: 0.35,
+        ignoreLocation: true,
+        includeScore: true,
+        includeMatches: true,
+      });
+    } catch (err) {
+      console.warn('⚠️ Search index failed to load:', err);
+    }
+  }
+
+  // 使用 window.searchData 做即時篩選（輕量 Metadata）
+  const quickSearch = (q: string) => {
+    const data = (window as any).searchData || [];
+    const lowerQ = q.toLowerCase();
+    return data.filter((item: any) =>
+      item.title.toLowerCase().includes(lowerQ) ||
+      item.description.toLowerCase().includes(lowerQ) ||
+      (item.tags || []).some((t: string) => t.toLowerCase().includes(lowerQ))
+    );
+  };
 
   let searchTimeout: any;
 
@@ -532,14 +798,14 @@ function closeLightbox() {
 
   input.addEventListener('input', () => {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
+    searchTimeout = setTimeout(async () => {
       const q = input.value.trim();
       if (!q) { resultsEl.style.display = 'none'; return; }
 
       let results: any[] = [];
 
       if (fuse) {
-        // Use Fuse.js fuzzy search
+        // Fuse.js fuzzy search (全文索引載入後)
         const fuseResults = fuse.search(q);
         results = fuseResults.map((r: any) => ({
           slug: r.item.slug,
@@ -550,23 +816,10 @@ function closeLightbox() {
           score: r.score,
         }));
       } else {
-        // Fallback: simple text search
-        const lowerQ = q.toLowerCase();
-        results = searchIndex
-          .filter(item =>
-            item.title.toLowerCase().includes(lowerQ) ||
-            item.description.toLowerCase().includes(lowerQ) ||
-            (item.tags || []).some((t: string) => t.toLowerCase().includes(lowerQ)) ||
-            (item.content && item.content.toLowerCase().includes(lowerQ))
-          )
-          .map(item => ({
-            slug: item.slug,
-            title: item.title,
-            description: item.description,
-            icon: item.icon,
-            phase: item.phase,
-            score: 0,
-          }));
+        // 即時快速搜尋（使用 window.searchData 輕量 Metadata）
+        results = quickSearch(q);
+        // 背景載入全文索引以增強搜尋
+        loadSearchIndex();
       }
 
       resultsEl.style.display = 'block';
@@ -595,4 +848,390 @@ function closeLightbox() {
     }, 250);
   });
 })();
+
+// 處理 #path-{letter} hash
+const pathNames: Record<string, string> = {
+  A: '🛡️ 移民征途',
+  B: '🚀 閃電出海',
+  C: '🏗️ 企業遠征',
+  D: '⚡ 落地加速',
+  E: '🔧 運營優化',
+  F: '🎯 試水偵察',
+  G: '💻 數位遊民征途',
+};
+
+const pathConfigs = {
+    A: [
+      { slug: '01-0-pre-entry-checklist', title: '入境前合規準備清單', eta: '25min', difficulty: 1, strategy: '📋 先辦 CPF + 海牙認證，沒有這些你連銀行都開不了戶' },
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 巴西是全球稅制最複雜的國家之一，先看懂地圖再出發' },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2, strategy: '🗺️ 2026-2033 是 IVA Dual 過渡期，現在進場有先行者優勢' },
+      { slug: '01-2-visa-golden', title: '黃金簽證', eta: '20min', difficulty: 1, strategy: '🏠 被動投資路徑：買房即可，每 2 年只需入境 14 天，4 年轉永居' },
+      { slug: '01-3-visa-digital-nomad', title: '數位遊民簽證', eta: '20min', difficulty: 1, strategy: '💻 最低成本試水溫：月收入 USD 1,500 即可，但 183 天觸發稅務居民' },
+      { slug: '01-4-visa-executive', title: '高管簽證 VITEM V', eta: '25min', difficulty: 2, strategy: '👔 需有母公司外派：最快審批，但學位必須與職位匹配' },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3, strategy: '🛂 5 種簽證完整對比，選錯路徑可能浪費 2 年以上時間' },
+      { slug: '03-local-team', title: '在地團隊組建', eta: '20min', difficulty: 2, strategy: '🤝 找對會計師和律師比選簽證更重要——他們決定你的合規底線' },
+      { slug: '04-company-setup', title: '外資企業閃電成立', eta: '25min', difficulty: 3, strategy: '🏛️ CNPJ + Pre-acordo + Pleno Poder，三步到位' },
+      { slug: '05-bacen-capital', title: 'BACEN 資金申報', eta: '25min', difficulty: 3, strategy: '🏦 SCE-IED 登記是合法匯款的唯一通道，漏掉這步資金進得來出不去' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 Mercado Livre 佔巴西 35% 市佔，但 Amazon 和 Shopee 也在快速成長' },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3, strategy: '📦 沒有 RADAR 你無法進口商品，這是供應鏈的敲門磚' },
+      { slug: '08-3pl-warehouse', title: '3PL 倉庫選擇', eta: '20min', difficulty: 2, strategy: '🏭 選 SC 州可省 12% ICMS，但尾程時效可能慢 2-3 天' },
+      { slug: '08-1-3pl-contract', title: '3PL 合約談判', eta: '30min', difficulty: 3, strategy: '📋 稅務條款和賠償責任是談判核心，標準合約對你極度不利' },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3, strategy: '💳 Pix 佔巴西電子支付 70%，不支持 Pix 等於放棄一半市場' },
+      { slug: '09-1-split-payment', title: 'Split Payment 現金流', eta: '20min', difficulty: 3, strategy: '💸 稅款即時扣繳是 2026 新規，現金流規劃不當可能導致資金鏈斷裂' },
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2, strategy: '🔄 巴西消費者法 CDC 全球最嚴格，退貨率是一般市場的 3 倍' },
+      { slug: '11-tax-compliance', title: '日常稅務合規', eta: '35min', difficulty: 4, strategy: '📋 SPED + NF-e + Malha Fiscal，漏報一次罰款可能吃掉整月利潤' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 JCP 抵稅 + 特許權使用費，組合使用可將匯出稅率從 34% 降至 15%' },
+    ],
+    B: [
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 跨境賣家可直接入駐，不需要 CNPJ' },
+      { slug: '07-radar-import', title: 'RADAR 進口資質', eta: '25min', difficulty: 3, strategy: '📦 跨境進口需要 RADAR 臨時執照' },
+      { slug: '09-erp-payment', title: 'ERP 與支付整合', eta: '25min', difficulty: 3, strategy: '💳 整合支付閘道是收款關鍵' },
+      { slug: '10-after-sales-service', title: '售後服務', eta: '20min', difficulty: 2, strategy: '🔄 建立退換貨機制' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 合法的利潤匯出機制' },
+    ],
+    C: [
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 先看懂稅制地圖' },
+      { slug: '01-1-tax-timeline', title: '稅改時間軸', eta: '20min', difficulty: 2, strategy: '🗺️ 2026-2033 IVA 過渡期' },
+      { slug: '01-4-visa-executive', title: '高管簽證 VITEM V', eta: '25min', difficulty: 2, strategy: '👔 企業外派高管理簽證' },
+      { slug: '02-visa-strategy', title: '簽證戰略與決策地圖', eta: '30min', difficulty: 3, strategy: '🛂 企業簽證策略' },
+      { slug: '03-local-team', title: '在地團隊組建', eta: '20min', difficulty: 2, strategy: '🤝 組建巴西團隊' },
+      { slug: '04-company-setup', title: '外资企业闪电成立', eta: '25min', difficulty: 3, strategy: '🏛️ CNPJ + Pre-acordo + Pleno Poder' },
+      { slug: '05-bacen-capital', title: 'BACEN 资金申报', eta: '25min', difficulty: 3, strategy: '🏦 SCE-IED 登记' },
+      { slug: '06-ecommerce-platforms', title: '电商平台入驻', eta: '20min', difficulty: 2, strategy: '🛒 Mercado Livre 等平台' },
+      { slug: '07-radar-import', title: 'RADAR 进口资质', eta: '25min', difficulty: 3, strategy: '📦 进口资质申请' },
+      { slug: '08-3pl-warehouse', title: '3PL 仓库选择', eta: '20min', difficulty: 2, strategy: '🏭 仓库合作伙伴' },
+      { slug: '08-1-3pl-contract', title: '3PL 合约谈判', eta: '30min', difficulty: 3, strategy: '📋 合约核心条款' },
+      { slug: '09-erp-payment', title: 'ERP 与支付整合', eta: '25min', difficulty: 3, strategy: '💳 系统整合' },
+      { slug: '09-1-split-payment', title: 'Split Payment 现金流', eta: '20min', difficulty: 3, strategy: '💸 现金流规划' },
+      { slug: '10-after-sales-service', title: '售后服务', eta: '20min', difficulty: 2, strategy: '🔄 客户服务体系' },
+      { slug: '11-tax-compliance', title: '日常税务合规', eta: '35min', difficulty: 4, strategy: '📋 SPED + NF-e' },
+      { slug: '12-profit-remittance', title: '利润汇出', eta: '30min', difficulty: 5, strategy: '💰 合法汇出机制' },
+    ],
+    D: [
+      { slug: '04-company-setup', title: '外资企业闪电成立', eta: '25min', difficulty: 3, strategy: '🏛️ 已有公司的完善' },
+      { slug: '05-bacen-capital', title: 'BACEN 资金申报', eta: '25min', difficulty: 3, strategy: '🏦 资金合规' },
+      { slug: '06-ecommerce-platforms', title: '电商平台入驻', eta: '20min', difficulty: 2, strategy: '🛒 平台业务扩张' },
+      { slug: '07-radar-import', title: 'RADAR 进口资质', eta: '25min', difficulty: 3, strategy: '📦 供应链优化' },
+      { slug: '08-3pl-warehouse', title: '3PL 仓库选择', eta: '20min', difficulty: 2, strategy: '🏭 物流优化' },
+      { slug: '09-erp-payment', title: 'ERP 与支付整合', eta: '25min', difficulty: 3, strategy: '💳 运营系统' },
+      { slug: '10-after-sales-service', title: '售后服务', eta: '20min', difficulty: 2, strategy: '🔄 服务体系' },
+      { slug: '11-tax-compliance', title: '日常税务合规', eta: '35min', difficulty: 4, strategy: '📋 税务管理' },
+    ],
+    E: [
+      { slug: '09-erp-payment', title: 'ERP 与支付整合', eta: '25min', difficulty: 3, strategy: '💳 运营优化' },
+      { slug: '09-1-split-payment', title: 'Split Payment 现金流', eta: '20min', difficulty: 3, strategy: '💸 现金流管理' },
+      { slug: '10-after-sales-service', title: '售后服务', eta: '20min', difficulty: 2, strategy: '🔄 服务优化' },
+      { slug: '11-tax-compliance', title: '日常税务合规', eta: '35min', difficulty: 4, strategy: '📋 税务合规' },
+      { slug: '12-profit-remittance', title: '利润汇出', eta: '30min', difficulty: 5, strategy: '💰 利润最大化' },
+    ],
+    F: [
+      { slug: '06-ecommerce-platforms', title: '电商平台入驻', eta: '20min', difficulty: 2, strategy: '🛒 快速测试市场' },
+      { slug: '07-radar-import', title: 'RADAR 进口资质', eta: '25min', difficulty: 3, strategy: '📦 最小化进货' },
+      { slug: '10-after-sales-service', title: '售后服务', eta: '20min', difficulty: 2, strategy: '🔄 基础服务' },
+    ],
+    G: [
+      { slug: '01-tax-system', title: '破譯巴西複雜稅制', eta: '30min', difficulty: 2, strategy: '⚖️ 稅制基礎' },
+      { slug: '01-3-visa-digital-nomad', title: '數位遊民簽證', eta: '20min', difficulty: 1, strategy: '💻 遠程工作者簽證' },
+      { slug: '06-ecommerce-platforms', title: '電商平台入駐', eta: '20min', difficulty: 2, strategy: '🛒 跨境電商' },
+      { slug: '12-profit-remittance', title: '利潤匯出', eta: '30min', difficulty: 5, strategy: '💰 遠程收入匯回' },
+    ],
+  };
+
+  function handlePathHash() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#path-')) {
+      const path = hash.replace('#path-', '').toUpperCase();
+      const checkpoints = pathConfigs[path] || [];
+      const pathName = pathNames[path] || `路徑 ${path}`;
+      
+      const container = document.getElementById('path-checkpoints-container');
+      if (container && checkpoints.length > 0) {
+        container.innerHTML = `
+          <section class="section-pad" style="padding-top: 2rem; padding-bottom: 2rem;">
+            <div class="container">
+              <h2 class="section-title" style="margin-bottom: 1.5rem;">${pathName} <span style="font-size: 1rem; font-weight: 400; color: var(--color-muted);">${checkpoints.length} 個 checkpoint</span></h2>
+              <div class="bento-grid grid-auto-fit">
+                ${checkpoints.map((cp, i) => `
+                  <a href="/handbook/${cp.slug}" class="bento-card phase-card" style="display: flex; align-items: flex-start; gap: 1rem; text-decoration: none;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 2rem; height: 2rem; background: var(--color-gold); color: #000; border-radius: 50%; font-weight: 700; font-size: 0.9rem;">${i + 1}</span>
+                    <div style="flex: 1;">
+                      <h3 class="phase-card-title" style="font-size: 1rem; margin-bottom: 0.25rem;">${cp.title}</h3>
+                      <p class="phase-card-desc" style="font-size: 0.8rem;">⏱️ ${cp.eta}</p>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+        `;
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+
+  window.addEventListener('hashchange', handlePathHash);
+  if (window.location.hash) {
+    handlePathHash();
+  }
 </script>
+
+<style>
+  /* Hero Slides Lightbox */
+  .hero-slides-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .hero-slides-lightbox.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .hsl-content {
+    position: relative;
+    max-width: 900px;
+    width: 100%;
+    background: rgba(20, 20, 30, 0.98);
+    border: 1px solid rgba(212, 168, 67, 0.3);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(212, 168, 67, 0.15);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .hero-slides-lightbox.active .hsl-content {
+    transform: scale(1);
+  }
+
+  .hsl-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .hsl-close:hover {
+    background: rgba(212, 168, 67, 0.3);
+    border-color: var(--color-gold);
+  }
+
+  .hsl-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .hsl-nav:hover {
+    background: rgba(212, 168, 67, 0.3);
+    border-color: var(--color-gold);
+  }
+
+  .hsl-prev { left: 1rem; }
+  .hsl-next { right: 1rem; }
+
+  #hsl-slide-container {
+    width: 100%;
+  }
+
+  .hsl-slide {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    .hsl-slide {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hsl-image-area {
+    position: relative;
+    min-height: 300px;
+    overflow: hidden;
+  }
+
+  .hsl-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-height: 300px;
+  }
+
+  .hsl-image-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background: linear-gradient(135deg, rgba(30, 30, 50, 0.9), rgba(50, 50, 80, 0.7));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hsl-icon {
+    font-size: 5rem;
+    opacity: 0.6;
+  }
+
+  .hsl-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  }
+
+  .hsl-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    background: rgba(212, 168, 67, 0.2);
+    border: 1px solid rgba(212, 168, 67, 0.4);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--color-gold);
+  }
+
+  .hsl-info {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hsl-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 1rem;
+    line-height: 1.3;
+  }
+
+  .hsl-preview {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+  }
+
+  .hsl-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .hsl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .hsl-btn-primary {
+    background: var(--color-gold);
+    color: #000;
+    border: none;
+  }
+
+  .hsl-btn-primary:hover {
+    background: var(--color-gold-light, #f0d875);
+    box-shadow: 0 0 20px rgba(212, 168, 67, 0.4);
+  }
+
+  .hsl-hint {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .hsl-progress {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 1rem;
+  }
+  
+  .hsl-progress span {
+    background: rgba(212, 168, 67, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 168, 67, 0.3);
+  }
+
+  .hsl-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .hsl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+  }
+
+  .hsl-dot.active {
+    background: var(--color-gold);
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(212, 168, 67, 0.5);
+  }
+
+  .hsl-dot:hover {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Hover effect on carousel cards */
+  .carousel-slide-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .carousel-slide-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(212, 168, 67, 0.2);
+  }
+</style>

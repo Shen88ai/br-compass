@@ -1,0 +1,439 @@
+---
+import Layout from '../layouts/Layout.astro';
+import GeometricCanvas from '../components/GeometricBackground/GeometricCanvas.astro';
+---
+
+<Layout title="免費工具 | 黃金雨林" description="巴西稅務計算器、進口稅估算、合規檢查清單等免費工具">
+  <GeometricCanvas />
+
+  <div class="tools-overlay">
+    <section class="hero-section">
+      <h1 class="hero-title">
+        免費<span class="text-gradient-hope">工具</span>
+      </h1>
+      <p class="hero-subtitle">
+        3 分鐘算出你的巴西稅負，降低出海不確定性
+      </p>
+    </section>
+
+    <section class="section-pad">
+      <div class="container">
+        <div class="tools-grid">
+          <div class="tool-card animate-on-scroll delay-100">
+            <div class="tool-icon">🧮</div>
+            <h3 class="tool-title">進口稅計算器</h3>
+            <p class="tool-desc">輸入產品 CIF 價格，即時計算巴西進口環節各項稅費（II、IPI、PIS、COFINS、ICMS）</p>
+            <div id="import-tax-calc" class="tool-body">
+              <div class="calc-form">
+                <label class="calc-label">產品 CIF 價格 (BRL)</label>
+                <input type="text" id="cif-price" class="calc-input" placeholder="例如：10000" />
+                <label class="calc-label">進口稅率 II (%)</label>
+                <input type="text" id="ii-rate" class="calc-input" placeholder="例如：14" value="14" />
+                <label class="calc-label">IPI 稅率 (%)</label>
+                <input type="text" id="ipi-rate" class="calc-input" placeholder="例如：5" value="5" />
+                <label class="calc-label">ICMS 稅率 (%)</label>
+                <input type="text" id="icms-rate" class="calc-input" placeholder="例如：18" value="18" />
+                <button class="btn-calc" onclick="calcImportTax()">計算稅費</button>
+              </div>
+              <div id="calc-result" class="calc-result" style="display:none;"></div>
+            </div>
+          </div>
+
+          <div class="tool-card animate-on-scroll delay-200">
+            <div class="tool-icon">📊</div>
+            <h3 class="tool-title">稅制對比工具</h3>
+            <p class="tool-desc">比較 Simples Nacional、Lucro Presumido、Lucro Real 三種稅制的稅負差異</p>
+            <div id="tax-compare" class="tool-body">
+              <div class="calc-form">
+                <label class="calc-label">年營業額 (BRL)</label>
+                <input type="text" id="annual-revenue" class="calc-input" placeholder="例如：500000" />
+                <label class="calc-label">行業類型</label>
+                <select id="biz-type" class="calc-input">
+                  <option value="commerce">商業 / 貿易</option>
+                  <option value="service">服務業</option>
+                </select>
+                <button class="btn-calc" onclick="calcTaxCompare()">對比稅制</button>
+              </div>
+              <div id="compare-result" class="calc-result" style="display:none;"></div>
+            </div>
+          </div>
+
+          <div class="tool-card animate-on-scroll delay-300">
+            <div class="tool-icon">✅</div>
+            <h3 class="tool-title">合規檢查清單</h3>
+            <p class="tool-desc">進入巴西市場前必做的 12 項合規檢查，確保每一步都穩健</p>
+            <div class="checklist-body">
+              <ul class="checklist">
+                <li>☐ 確認產品 NCM 編碼與進口稅率</li>
+                <li>☐ 申請 RADAR（進出口許可）</li>
+                <li>☐ 註冊 CNPJ（公司稅號）</li>
+                <li>☐ 選擇稅制（Simples / Presumido / Real）</li>
+                <li>☐ BACEN 外資申報</li>
+                <li>☐ 州級 ICMS 註冊</li>
+                <li>☐ 市政服務許可</li>
+                <li>☐ 產品 ANVISA / INMETRO 認證</li>
+                <li>☐ 商標 INPI 註冊</li>
+                <li>☐ 勞動合規（CLT 制度）</li>
+                <li>☐ SPED 電子申報系統設置</li>
+                <li>☐ 利潤匯出方案規劃</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container-xs">
+        <h2 class="heading-xl mb-2">稅務情況比想像中<span class="text-gradient-hope">更複雜</span>？</h2>
+        <p class="text-lg mb-4" style="color:var(--color-muted);line-height:1.6;">
+          免費工具只能提供初步估算，實際情況需要專業團隊為您量身定制方案
+        </p>
+        <div class="hero-actions">
+          <a href="https://braziltax.netlify.app/#contact" class="btn-red btn-md magnetic-btn">💬 預約免費諮詢</a>
+          <a href="/handbook" class="btn-outline btn-md magnetic-btn">📖 閱讀實戰手冊</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  function parseNum(val: string): number {
+    return parseFloat(val.replace(/[^0-9.]/g, '')) || 0;
+  }
+
+  function formatBRL(n: number): string {
+    return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  (window as any).calcImportTax = function() {
+    const cif = parseNum((document.getElementById('cif-price') as HTMLInputElement).value);
+    const iiRate = parseNum((document.getElementById('ii-rate') as HTMLInputElement).value) / 100;
+    const ipiRate = parseNum((document.getElementById('ipi-rate') as HTMLInputElement).value) / 100;
+    const icmsRate = parseNum((document.getElementById('icms-rate') as HTMLInputElement).value) / 100;
+
+    if (cif <= 0) {
+      alert('請輸入有效的 CIF 價格');
+      return;
+    }
+
+    const ii = cif * iiRate;
+    const ipiBase = cif + ii;
+    const ipi = ipiBase * ipiRate;
+    const pisBase = cif + ii + ipi;
+    const pis = pisBase * 0.021;
+    const cofins = pisBase * 0.0965;
+    const icmsBase = (pisBase + pis + cofins) / (1 - icmsRate);
+    const icms = icmsBase * icmsRate;
+    const total = ii + ipi + pis + cofins + icms;
+    const effectiveRate = (total / cif * 100).toFixed(1);
+
+    const resultEl = document.getElementById('calc-result') as HTMLDivElement;
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `
+      <div class="result-table">
+        <div class="result-row"><span class="result-label">II (進口稅)</span><span class="result-value">${formatBRL(ii)}</span></div>
+        <div class="result-row"><span class="result-label">IPI (工業產品稅)</span><span class="result-value">${formatBRL(ipi)}</span></div>
+        <div class="result-row"><span class="result-label">PIS</span><span class="result-value">${formatBRL(pis)}</span></div>
+        <div class="result-row"><span class="result-label">COFINS</span><span class="result-value">${formatBRL(cofins)}</span></div>
+        <div class="result-row"><span class="result-label">ICMS (州增值稅)</span><span class="result-value">${formatBRL(icms)}</span></div>
+        <div class="result-row result-total"><span class="result-label">稅費合計</span><span class="result-value">${formatBRL(total)}</span></div>
+        <div class="result-row result-note"><span class="result-label">綜合稅率</span><span class="result-value" style="color:var(--color-neon-yellow);">${effectiveRate}%</span></div>
+      </div>
+      <p class="result-hint">⚠️ 此為初步估算，實際稅費可能因產品類別、州別、貿易協定等因素有所差異</p>
+    `;
+  };
+
+  (window as any).calcTaxCompare = function() {
+    const revenue = parseNum((document.getElementById('annual-revenue') as HTMLInputElement).value);
+    const bizType = (document.getElementById('biz-type') as HTMLSelectElement).value;
+
+    if (revenue <= 0) {
+      alert('請輸入有效的年營業額');
+      return;
+    }
+
+    let simples: number, presumido: number, real: number;
+
+    if (bizType === 'commerce') {
+      simples = revenue * 0.06;
+      const presumidoBase = revenue * 0.08;
+      presumido = presumidoBase * (0.15 + 0.10 + 0.09 + 0.0365 + 0.01 + 0.002);
+      real = revenue * 0.05;
+    } else {
+      simples = revenue * 0.155;
+      const presumidoBase = revenue * 0.32;
+      presumido = presumidoBase * (0.15 + 0.10 + 0.09 + 0.0365 + 0.01 + 0.002);
+      real = revenue * 0.12;
+    }
+
+    const resultEl = document.getElementById('compare-result') as HTMLDivElement;
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `
+      <div class="result-table">
+        <div class="result-row result-highlight"><span class="result-label">⭐ Simples Nacional</span><span class="result-value">${formatBRL(simples)}</span></div>
+        <div class="result-row"><span class="result-label">Lucro Presumido</span><span class="result-value">${formatBRL(presumido)}</span></div>
+        <div class="result-row"><span class="result-label">Lucro Real</span><span class="result-value">${formatBRL(real)}</span></div>
+      </div>
+      <p class="result-hint">⚠️ Simples Nacional 僅適用於年營收 ≤ R$ 4.8M 的企業。實際稅負需根據具體業務類型和成本結構計算</p>
+    `;
+  };
+</script>
+
+<style>
+  .tools-overlay {
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-section {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: var(--space-2);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--color-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 768px) {
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .tool-card {
+    background: var(--color-bg-800);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-hope);
+    opacity: 0.6;
+  }
+
+  .tool-card:hover {
+    border-color: rgba(var(--color-gold-rgb), 0.4);
+    transform: translateY(-4px);
+    box-shadow: var(--glow-gold);
+  }
+
+  .tool-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .tool-title {
+    font-size: var(--text-h3);
+    margin: 0 0 var(--space-1);
+    color: var(--color-text);
+  }
+
+  .tool-desc {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin: 0 0 var(--space-3);
+  }
+
+  .tool-body {
+    margin-top: var(--space-2);
+  }
+
+  .calc-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .calc-label {
+    font-size: var(--text-small);
+    color: var(--color-gold);
+    font-weight: 600;
+  }
+
+  .calc-input {
+    background: rgba(var(--color-gold-rgb), 0.06);
+    border: 1px solid rgba(var(--color-gold-rgb), 0.2);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+
+  .calc-input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(var(--color-gold-rgb), 0.15);
+  }
+
+  .calc-input::placeholder {
+    color: var(--color-muted);
+  }
+
+  select.calc-input {
+    cursor: pointer;
+  }
+
+  .btn-calc {
+    background: linear-gradient(135deg, var(--color-neon-yellow), var(--color-gold-light));
+    color: var(--color-bg-900);
+    font-weight: 700;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    margin-top: var(--space-1);
+  }
+
+  .btn-calc:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(var(--color-neon-yellow-rgb), 0.4);
+  }
+
+  .calc-result {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background: rgba(var(--color-gold-rgb), 0.05);
+    border: 1px solid rgba(var(--color-gold-rgb), 0.15);
+    border-radius: 0.5rem;
+  }
+
+  .result-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(var(--color-gold-rgb), 0.06);
+    font-size: 0.85rem;
+  }
+
+  .result-label {
+    color: var(--color-muted);
+  }
+
+  .result-value {
+    font-weight: 600;
+    color: var(--color-text);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .result-total {
+    border-top: 2px solid rgba(var(--color-gold-rgb), 0.2);
+    padding-top: 0.6rem;
+    margin-top: 0.4rem;
+  }
+
+  .result-total .result-value {
+    color: var(--color-gold);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .result-highlight {
+    background: rgba(var(--color-gold-rgb), 0.08);
+    border-radius: 0.4rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .result-highlight .result-label {
+    color: var(--color-gold);
+    font-weight: 600;
+  }
+
+  .result-note .result-value {
+    color: var(--color-neon-yellow);
+  }
+
+  .result-hint {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin: var(--space-2) 0 0;
+    line-height: 1.4;
+  }
+
+  .checklist-body {
+    margin-top: var(--space-2);
+  }
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .checklist li {
+    padding: 0.5rem 0.75rem;
+    background: rgba(var(--color-gold-rgb), 0.04);
+    border-radius: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+  }
+
+  .checklist li:hover {
+    background: rgba(var(--color-gold-rgb), 0.1);
+  }
+
+  .checklist li.checked {
+    background: rgba(var(--color-neon-green-rgb), 0.08);
+    color: var(--color-neon-green);
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', () => {
+      li.classList.toggle('checked');
+      const text = li.textContent || '';
+      li.textContent = li.classList.contains('checked')
+        ? text.replace('☐', '✅')
+        : text.replace('✅', '☐');
+    });
+  });
+</script>

@@ -1,0 +1,181 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import GeometricCanvas from '../../components/GeometricBackground/GeometricCanvas.astro';
+import '../../components/MediaShowcase/MediaShowcase.css';
+import { initMediaShowcase } from '../../components/MediaShowcase/MediaShowcase';
+
+const allHandbook = await getCollection('handbook');
+const mediaItems = allHandbook.filter(e => e.data.phase === 'media');
+const sortedMedia = mediaItems.sort((a, b) => a.data.order - b.data.order);
+
+const featuredItems = sortedMedia.filter(m => m.data.featured);
+
+const categories = [
+  { key: 'all', label: '全部', icon: '🎬' },
+  { key: 'youtube', label: 'YouTube', icon: '▶️' },
+  { key: 'xiaohongshu', label: '小紅書', icon: '📕' },
+  { key: 'douyin', label: '抖音', icon: '🎵' },
+  { key: 'ai-video', label: 'AI 視頻', icon: '🤖' },
+  { key: 'other', label: '其他', icon: '📎' },
+];
+
+const mediaData = sortedMedia.map(item => ({
+  id: item.id,
+  title: item.data.title,
+  description: item.data.description,
+  date: item.data.publishDate?.toISOString() || new Date().toISOString(),
+  tags: item.data.tags || [],
+  featured: item.data.featured || false,
+  embedType: item.data.embedType || 'link',
+  youtubeId: item.data.youtubeId,
+  thumbnail: item.data.thumbnail,
+  mediaUrl: item.data.mediaUrl,
+  mediaCategory: item.data.mediaCategory || 'other',
+}));
+
+const allTags = [...new Set(mediaData.flatMap(m => m.tags))];
+const categoryCounts = categories.slice(1).map(cat => ({
+  ...cat,
+  count: mediaData.filter(m => m.mediaCategory === cat.key).length,
+}));
+---
+
+<Layout title="媒體中心 | 黃金雨林" description="巴西稅務、市場分析、出海策略的視頻與社交媒體內容合集">
+  <GeometricCanvas />
+
+  <div class="media-overlay">
+    <section class="hero-section">
+      <h1 class="hero-title">
+        媒體<span class="text-gradient-hope">中心</span>
+      </h1>
+      <p class="hero-subtitle">
+        YouTube 解說、小紅書短視頻、AI 生成內容<br/>
+        用視覺化方式理解巴西市場
+      </p>
+    </section>
+
+    <div class="media-page-layout">
+      <aside class="media-sidebar">
+        <div class="media-sidebar-section">
+          <h3 class="media-sidebar-title">分類導覽</h3>
+          <nav class="media-sidebar-nav">
+            <a href="#featured" class="media-sidebar-link active">
+              <span>⭐</span> 焦點推薦
+              <span class="count">{featuredItems.length}</span>
+            </a>
+            {categoryCounts.map(cat => (
+              <a href={`#${cat.key}`} class="media-sidebar-link" data-category={cat.key}>
+                <span>{cat.icon}</span> {cat.label}
+                <span class="count">{cat.count}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        {allTags.length > 0 && (
+          <div class="media-sidebar-section">
+            <h3 class="media-sidebar-title">標籤雲</h3>
+            <div class="media-tag-cloud">
+              {allTags.slice(0, 15).map(tag => (
+                <span class="media-tag-item" data-tag={tag}>{tag}</span>
+              ))}
+            </div>
+          </div>
+        )}
+      </aside>
+
+      <main class="media-main-content">
+        <div id="media-carousel" class="media-carousel-section"></div>
+
+        <div class="media-controls">
+          <div class="media-search-box">
+            <input 
+              type="text" 
+              id="media-search" 
+              placeholder="搜尋標題、描述或標籤..." 
+              autocomplete="off"
+            />
+          </div>
+          <select id="media-sort" class="media-sort-select">
+            <option value="date-desc">最新優先</option>
+            <option value="date-asc">最舊優先</option>
+            <option value="title-asc">標題 A → Z</option>
+            <option value="title-desc">標題 Z → A</option>
+          </select>
+        </div>
+
+        <div class="media-filters" id="media-filters"></div>
+
+        <div class="media-results-count" id="media-results-count"></div>
+
+        <div class="media-grid" id="media-grid"></div>
+
+        <div class="media-pagination" id="media-pagination"></div>
+      </main>
+    </div>
+
+    <section class="cta-section">
+      <div class="container-xs">
+        <h2 class="heading-xl mb-2">想看到更多<span class="text-gradient-hope">巴西相關內容</span>？</h2>
+        <p class="text-lg mb-4" style="color:var(--color-muted);line-height:1.6;">
+          訂閱我們的 YouTube 頻道，或關注小紅書、抖音帳號<br/>
+          獲取最新巴西市場資訊與實戰技巧
+        </p>
+        <div class="hero-actions">
+          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="btn-red btn-md magnetic-btn">▶️ YouTube 頻道</a>
+          <a href="https://xiaohongshu.com" target="_blank" rel="noopener noreferrer" class="btn-outline btn-md magnetic-btn">📕 小紅書</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script define:vars={{ mediaData }}>
+  window.__MEDIA_DATA__ = mediaData;
+</script>
+
+<script>
+  import { initMediaShowcase } from '../../components/MediaShowcase/MediaShowcase';
+  
+  const mediaData = (window as any).__MEDIA_DATA__;
+  if (mediaData) {
+    initMediaShowcase(mediaData);
+  }
+</script>
+
+<style>
+  .media-overlay {
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-section {
+    min-height: 40vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: var(--space-2);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--color-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .cta-section {
+    padding: var(--space-6) var(--space-3);
+    text-align: center;
+  }
+</style>

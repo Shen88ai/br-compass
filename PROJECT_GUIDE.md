@@ -1,4 +1,4 @@
-# TIDAL TELESCOPE — 專案開發指引
+# BR-COMPASS — 專案開發指引
 
 > 本文檔紀錄 ASTRO 巴西跨境電商手冊項目的所有風格、設計、架構、格式、規劃及已解決問題的最終方案。新增內容時請嚴格遵循本文檔。
 
@@ -8,7 +8,7 @@
 
 ### 目錄結構
 ```
-tidal-telescope/
+br-compass/
 ├── src/
 │   ├── content/
 │   │   └── handbook/              # 所有章节 MD 文件（19 篇）
@@ -669,9 +669,19 @@ npx tsx scripts/generate-search-index.ts  # 手动生成
 **解决方案**：补充缺失的 `corporate-immigration-*`（4 条）和 `crossborder-immigration-*`（4 条）映射。
 
 ### 问题 7：Mermaid 流程图在 Astro 中无法渲染
-**现象**：````mermaid` 代码块显示为原始代码，而非流程图。
+**现象**：```mermaid` 代码块显示为原始代码，而非流程图。
 **原因**：Astro 默认不处理 Mermaid 语法。
-**解决方案**：将所有 Mermaid 和 ASCII 流程图转换为 card 格式（`flow-card` / `decision-flow-card`）。
+**解决方案**：
+1. 在 `src/layouts/Layout.astro` 添加客户端 JavaScript，使用 CDN 加载 Mermaid 库并渲染
+2. CSS 样式已在 `src/styles/global.css` 中配置（金色主题）
+3. 修复 pipe 字符 `|` 问题 - 使用引号包裹包含 `|` 的节点文本
+
+### 问题 7.1：Mermaid 流程图文字太小
+**解决方案**：
+1. 调大 CSS 字体：13px → 15px
+2. 使用 subgraphs 分组简化结构
+3. 简化节点文字（移除冗余描述）
+4. 使用 `flowchart TD` 垂直走向
 
 ### 问题 8：四大实战阶段链接 404
 **现象**：点击首页阶段卡片跳转到 `/handbook/preparation` 等不存在的路由。
@@ -701,3 +711,428 @@ npx tsx scripts/generate-search-index.ts  # 手动生成
 | `tests/slug-page.test.ts` | 19 | 文章页面渲染 |
 | 其他测试文件 | ~186 | 各章节内容、格式、风格验证 |
 | **总计** | **256** | 全部通过 ✅ |
+
+---
+
+## 十九、首頁 3D 羅盤（Fate Wheel）優化記錄
+
+### 19.1 羅盤核心優化
+
+#### 19.1.1 添加方向文字標籤
+**檔案**：`src/lib/fate-wheel/compass-core.ts`
+
+在 3D 羅盤的四個方位水晶旁邊添加文字標籤（偵察兵、奠基者、領航員、收割者），使用 `THREE.Sprite` 技術實現始終面向攝影機的文字。
+
+#### 19.1.2 "BR" 中心文字
+**檔案**：`src/lib/fate-wheel/compass-core.ts`
+
+在羅盤中心添加 "BR" 文字：
+- 使用 900 字重的 Inter 字體
+- 色彩在箔金→金色→熒黃→螢綠→淡藍之間輪迴漸變
+- 與呼吸動畫同步週期（2.5秒）
+- 立體陰影效果
+
+#### 19.1.3 水晶改為透明玻璃質感
+**檔案**：`src/lib/fate-wheel/compass-core.ts`
+
+將實心水晶改為透明玻璃質感：
+- 使用 `transmission: 0.9` 產生玻璃折射效果
+- 低 `opacity: 0.15`，低 `metalness: 0.1`
+- 使用 `EdgesGeometry` 描繪彩色邊框
+
+#### 19.1.4 刪除小白字標籤
+**檔案**：`src/lib/fate-wheel/compass-core.ts`
+
+原本每個方向有兩個標籤（小白字 + 有色大字），簡化為只有一個有色大字的標籤，字體加大 1.2 倍。
+
+### 19.2 互動效果優化
+
+#### 19.2.1 每次點擊都觸發光芒效果
+**檔案**：`src/lib/fate-wheel/scene-manager.ts`
+
+每次點擊水晶時都會觸發光芒向四方射出的動畫：
+- `triggerRayEffect()` - 從中心向四個方向射出光束
+- `createRayBurst()` - 使用 `BoxGeometry` 產生有厚度的光束
+- 光束會在 1 秒後消失並清理資源
+
+#### 19.2.2 Hover 時也有光芒效果
+**檔案**：`src/lib/fate-wheel/scene-manager.ts`
+
+在滑鼠移動時檢測是否 hover 到水晶，若 hover 到則觸發單向光芒效果。
+
+#### 19.2.3 Hover 時水晶邊框效果
+**檔案**：`src/lib/fate-wheel/compass-core.ts`
+
+- hover 時水晶變得更透明（`opacity: 0.08`）
+- 邊框發光更強（`emissiveIntensity: 1.0`）
+- 邊框從隱藏（opacity 0.5）變為顯示（opacity 1.0）
+- 標籤放大效果增強
+
+### 19.3 路徑標籤系統
+
+#### 19.3.1 診斷完成後顯示路徑標籤
+**檔案**：`src/lib/fate-wheel/scene-manager.ts`
+
+回答 Q1/Q2/Q3 完成診斷後，在半徑 2.65 的軌道（與 planet 同一軌道）顯示 7 個路徑標籤：
+- 🛡️ 移民征途 (A)
+- 🚀 閃電出海 (B)
+- 🏗️ 企業遠征 (C)
+- ⚡ 落地加速 (D)
+- 🔧 運營優化 (E)
+- 🎯 試水偵察 (F)
+- 💻 數位遊民征途 (G)
+
+所有標籤繞著軌道旋轉（60秒一圈）。
+
+#### 19.3.2 選中路徑顯示透明有色框
+**檔案**：`src/lib/fate-wheel/scene-manager.ts`
+
+被選中的路徑會顯示 `RingGeometry` 框住的透明邊框，顏色根據路徑：
+- A: 淡藍 #7DD3FC
+- B: 金色 #FFD700
+- C: 箔金 #D4A843
+- D: 螢綠 #00FF87
+- E: 熒黃 #E5FF00
+- F: 紅 #FF6B6B
+- G: 銀灰 #C0C0C0
+
+#### 19.3.3 修復重複選擇邊框問題
+**檔案**：`src/lib/fate-wheel/scene-manager.ts`
+
+每次重新選擇時會先清理舊的資源：
+- `createPathLabels()` 會先移除並釋放舊的標籤 Sprite
+- `createPathFrame()` 會先移除並釋放舊的邊框 Mesh
+
+### 19.4 踏上征途功能
+
+#### 19.4.1 路徑頁面渲染
+**檔案**：`src/pages/handbook/index.astro`
+
+點擊「踏上征途」會導航到 `/handbook#path-{letter}`，頁面會：
+1. 檢測 URL hash
+2. 從 `pathConfigs` 取得該路徑的所有 checkpoint
+3. 使用 bento-grid 卡片形式渲染列表
+4. 標題顯示路徑名稱（如「🛡️ 移民征途」）
+
+### 19.5 Hero 區域樣式
+
+**檔案**：`src/pages/index.astro`
+
+```css
+.hero-section-fullscreen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;  /* 內容在底部 */
+  text-align: center;
+  padding: var(--space-3) var(--space-3) var(--space-5);
+  position: relative;
+  z-index: 10;
+}
+```
+
+羅盤顯示在頁面上方，標題和按鈕顯示在底部。
+
+### 19.6 已解決問題（續）
+
+#### 問題 11：光芒射出後不消失
+**現象**：點擊水晶後光芒一直顯示，不再消失。
+**原因**：`gsap` 未正確導入。
+**解決方案**：在 `scene-manager.ts` 添加 `import gsap from 'gsap'`，並改用 `BoxGeometry` 代替 `Line`。
+
+#### 問題 12：hover 時邊框不明顯
+**現象**：hover 時有色邊框沒有顯示。
+**原因**：`EdgesGeometry` 的邊框線條太細，且被其他物體遮擋。
+**解決方案**：
+- 邊框使用 `opacity: 1`（不透明）
+- 使用 `EdgesGeometry(crystalGeo, 15)` 增加邊緣檢測閾值
+- 邊框與水晶一起縮放動畫
+
+#### 問題 13：調整選項後邊框重複
+**現象**：返回調整兩次就出現兩個幾何邊框。
+**原因**：每次選擇時都創建新的邊框，但沒有清理舊的。
+**解決方案**：在 `createPathLabels()` 和 `createPathFrame()` 中先清理舊資源。
+
+#### 問題 14：踏上征途連結無效
+**現象**：點擊「踏上征途」後 URL 正確但沒有顯示列表。
+**原因**：`handbook/index.astro` 沒有處理 `#path-{letter}` hash。
+**解決方案**：添加 `handlePathHash()` 函數檢測 hash 並渲染 checkpoint 列表。
+
+#### 問題 15：首頁羅盤與標題重疊
+**現象**：羅盤與英雄區文字重疊。
+**解決方案**：調整 `hero-section-fullscreen` 的 `justify-content: flex-end`，讓文字內容顯示在底部。
+
+---
+
+## 二十、閱讀清單與羅盤銜接優化（Path Navigation Enhancement）
+
+### 20.1 計劃背景
+用戶痛點：回答 Q1/Q2/Q3 之後出現的路徑能與後續的羅盤金黃色的按鈕（必須閱讀的網頁清單）有更好的銜接。
+
+### 20.2 實施方案
+
+#### 20.2.1 方案一：強化閱讀清單（Phase 1）
+
+**目標**：將 result-checklist 改為可點擊的卡片網格
+
+**修改檔案**：
+- `src/styles/global.css` — 新增卡片樣式
+- `src/components/DiagnosisForm.astro` — 渲染可點擊卡片
+- `tests/diagnosis-enhancement.test.ts` — 新增測試
+
+**CSS 樣式**（`src/styles/global.css`）：
+```css
+.checklist-item--card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(15,15,24,0.8), rgba(20,20,30,0.6));
+  border-radius: 0.75rem;
+  border-left: 3px solid var(--path-color);
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+
+/* 狀態樣式 */
+.checklist-item--status-completed::after { content: '✓'; ... }
+.checklist-item--status-current { animation: pulse-gold 2s ... }
+.checklist-item--status-pending { opacity: 0.6; }
+
+/* 路徑顏色邊框 */
+.checklist-item--path-A { --path-color: #7DD3FC; }
+.checklist-item--path-B { --path-color: #FFD700; }
+.checklist-item--path-C { --path-color: #D4A843; }
+.checklist-item--path-D { --path-color: #00FF87; }
+.checklist-item--path-E { --path-color: #E5FF00; }
+.checklist-item--path-F { --path-color: #FF6B6B; }
+.checklist-item--path-G { --path-color: #C0C0C0; }
+
+/* 懸浮顯示 strategy */
+.checklist-item__strategy {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 280px;
+  padding: 12px;
+  background: rgba(10,10,18,0.95);
+  border: 1px solid var(--path-color);
+  border-radius: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 100;
+  margin-left: 8px;
+}
+.checklist-item--card:hover .checklist-item__strategy {
+  opacity: 1;
+  visibility: visible;
+}
+```
+
+**功能特性**：
+- 每個 checklist-item 變為可點擊的卡片
+- 狀態圓點反映 localStorage 進度（已完成=綠鉤、當前=金色閃爍、待讀=灰色）
+- 路徑顏色邊框與羅盤一致
+- 懸浮時顯示戰略揭示文字（strategy）
+
+#### 20.2.2 方案二：羅盤路徑可點擊（Phase 2）
+
+**目標**：3D 羅盤診斷後顯示的路徑標籤可互動
+
+**修改檔案**：
+- `src/lib/fate-wheel/scene-manager.ts` — 添加路徑標籤點擊事件
+- `src/components/FateWheel/FateWheelScene.astro` — 添加路徑面板
+- `src/styles/fate-wheel.css` — 面板樣式
+- `tests/fate-wheel-click.test.ts` — 新增測試
+
+**場景管理器**（`src/lib/fate-wheel/scene-manager.ts`）：
+```typescript
+function onPathLabelClick(raycaster, camera, mouse) {
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(pathLabelSprites);
+  
+  if (intersects.length > 0) {
+    const clickedSprite = intersects[0].object;
+    const pathKey = clickedSprite.userData.pathKey;
+    
+    window.dispatchEvent(new CustomEvent('path-label-click', {
+      detail: { pathKey }
+    }));
+  }
+}
+```
+
+**路徑面板 HTML**：
+```html
+<div class="path-label-panel" id="path-label-panel" style="display: none;">
+  <button class="panel-close" id="panel-close">&times;</button>
+  <h3 class="panel-title" id="panel-title"></h3>
+  <p class="panel-strategy" id="panel-strategy"></p>
+  <div class="panel-checkpoints" id="panel-checkpoints"></div>
+  <a href="#" class="panel-cta" id="panel-cta">開始征途</a>
+</div>
+```
+
+**面板樣式**（`src/styles/fate-wheel.css`）：
+```css
+.path-label-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 480px;
+  background: rgba(10, 10, 18, 0.98);
+  border: 1px solid var(--color-gold);
+  border-radius: 1rem;
+  padding: var(--space-4);
+  z-index: 1000;
+  box-shadow: 0 0 60px rgba(var(--color-gold-rgb), 0.3);
+}
+```
+
+**功能特性**：
+- Raycaster 檢測滑鼠點擊路徑標籤
+- dispatch 'path-label-click' 事件
+- 面板顯示完整 checkpoint 列表
+- 金色 CTA 按鈕直接跳轉
+
+### 20.3 Checkpoint 數量對照表
+
+| 路徑 | Checkpoint 數 |
+|------|--------------|
+| A    | 19           |
+| B    | 5            |
+| C    | 17           |
+| D    | 8            |
+| E    | 5            |
+| F    | 3            |
+| G    | 5            |
+
+### 20.4 測試結果
+- Phase 1 測試：12 tests ✅
+- Phase 2 測試：14 tests ✅
+- 總測試數：329 tests ✅
+- Build：成功 ✅
+
+---
+
+## 二十一、圖片管理系統（Image Management）
+
+### 21.1 系統架構
+
+```
+resources/Image/              →  同步  →  public/images/handbook/  →  發布  →  dist/images/handbook/
+     ↑                            ↑                                   ↑
+   AI 生成圖片                 腳本複制                            Astro build
+```
+
+### 21.2 圖片來源與命名規範
+
+**來源資料夾**：`C:\Users\YANG\Antigravity\20260331\resources\Image\`
+
+**命名格式**：`{章節slug}-{用途}.{副檔名}`
+
+| 用途關鍵字 | 說明 |
+|-----------|------|
+| `cover` | 封面圖 |
+| `infographic` | 資訊圖表 |
+| `diagram` | 示意圖 |
+| `flowchart` | 流程圖 |
+| `warning` | 警示圖 |
+| `example` | 範例截圖 |
+
+**範例**：
+```
+01-tax-system-cover.png       # 封面圖
+01-tax-system-infographic.png # 資訊圖表
+05-bacen-capital-cover.jpeg   # 封面圖
+```
+
+### 21.3 同步腳本
+
+**檔案**：`scripts/sync-images.ts`
+
+**功能**：
+1. 讀取 `resources/Image/` 下的所有圖片
+2. 解析檔名提取 slug 和用途
+3. 複製到 `public/images/handbook/{slug}/`
+4. 保留原始檔名
+
+**使用方式**：
+```bash
+npx tsx scripts/sync-images.ts
+# 或
+npm run sync-images
+```
+
+### 21.4 Obsidian Frontmatter 整合
+
+**frontmatter 格式**：
+```yaml
+---
+title: "破譯巴西複雜稅制"
+images:
+  cover: 01-tax-system-cover.png
+  infographic: 01-tax-system-infographic.png
+---
+```
+
+**自動添加腳本**：`scripts/add-images-frontmatter.ts`
+- 掃描 `resources/Image/` 自動為每個章節添加 `images.cover`
+- 已完成 19 個章節的 frontmatter 添加
+
+### 21.5 Content Schema
+
+**檔案**：`src/content.config.ts`
+
+**新增欄位**：
+```typescript
+images: z.object({
+  cover: z.string().optional(),
+  diagram: z.string().optional(),
+  flowchart: z.string().optional(),
+  comparison: z.string().optional(),
+  warning: z.string().optional(),
+  example: z.string().optional(),
+}).optional(),
+```
+
+### 21.6 頁面渲染
+
+**文章頁面**：`src/pages/handbook/[...slug].astro`
+- 讀取 frontmatter `images.cover`
+- 渲染封面圖到文章頂部
+
+**Handbook 首頁**：`src/pages/handbook/index.astro`
+- 關鍵議題快覽（Carousel）：5張縮圖
+- 英雄之旅時間軸：19張縮圖
+- 使用 `getCoverImage()` 函數讀取
+
+### 21.7 圖片資料夾說明
+
+| 資料夾 | 用途 |
+|-------|------|
+| `resources/Image/` | AI 生成圖片來源 |
+| `public/images/handbook/` | 開發時使用 |
+| `dist/images/handbook/` | 發布後正式上線 |
+
+### 21.8 發布流程
+
+```bash
+# 1. 同步圖片
+npm run sync-images
+
+# 2. 發布 build
+npm run build
+
+# 3. 部署 dist/ 到網站
+```
+
+### 21.9 未來規劃
+
+- **中期**：串接 Cloudinary 優化圖片載入
+- **長期**：CMS 管理（非必要）

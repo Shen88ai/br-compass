@@ -68,6 +68,7 @@ export function createBridge(
 
 export function animateBridgeProgress(line: THREE.Line, duration: number = 1.0): void {
   const mat = line.material as THREE.ShaderMaterial;
+  mat.uniforms.uProgress.value = 0;
   gsap.to(mat.uniforms.uProgress, {
     value: 1,
     duration,
@@ -79,4 +80,13 @@ export function activateAllBridges(): void {
   bridgeLines.forEach((line, i) => {
     setTimeout(() => animateBridgeProgress(line), i * 150);
   });
+}
+
+export function clearBridges(): void {
+  bridgeLines.forEach((line) => {
+    bridgesGroup.remove(line);
+    line.geometry.dispose();
+    (line.material as THREE.ShaderMaterial).dispose();
+  });
+  bridgeLines = [];
 }

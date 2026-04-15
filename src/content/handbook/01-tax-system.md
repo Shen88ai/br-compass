@@ -7,6 +7,9 @@ order: 1
 icon: "⚖️"
 tags: ["稅制", "IVA Dual", "Lucro Real", "IRPJ", "CSLL", "CBS", "IBS"]
 featured: true
+
+images:
+  cover: 01-tax-system-cover.png
 ---
 
 > **因果連接**：在公司成立的第一天，你必須選定稅制——這是不可逆的全年決定。選錯稅制，就像在荆棘叢中選了一條只能前進不能後退的路，代價是整個財年的稅負計算全盤重來。
@@ -172,3 +175,48 @@ PIS、COFINS、IPI（非 ZFM 區）逐年退出歷史舞台。
 - [ ] 我是否了解 Split Payment 對現金流的即時影響並已規劃應對？
 
 完成上述確認後，方可前往下一章：**設立外資公司（CNPJ 申請與 Pre-acordo 策略）**。
+
+
+## 流程圖
+
+```mermaid
+
+flowchart TD
+
+    A[舊制 90+ 種稅] --> B{進口 5 重稅}
+
+    B --> B1[II 進口稅]
+
+    B --> B2[IPI 工業稅]
+
+    B --> B3[PIS 進口]
+
+    B --> B4[COFINS 進口]
+
+    B --> B5[ICMS 州增值稅]
+
+    A --> C[級聯效應 75.7%]
+
+    B1 & B2 & B3 & B4 & B5 --> D[稅改合併]
+
+    C --> D
+
+    D --> E[CBS 聯邦貢獻]
+
+    D --> F[IBS 州縣市共享]
+
+    E & F --> G[IVA Dual 新制]
+
+    G --> H[Cascading 降至 51.8%]
+
+    I[Lucro Real] -.選擇.-> G
+
+    J[Lucro Presumido] -.選擇.-> G
+
+    style A fill:#B5A8A3
+
+    style G fill:#A3B5A8
+
+    style H fill:#8FA4C4
+
+```

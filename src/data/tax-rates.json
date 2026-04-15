@@ -1,0 +1,126 @@
+{
+  "regimes": {
+    "simplesNacional": {
+      "name": "Simples Nacional",
+      "color": "#e07b00",
+      "description": "適合小微企業，PIS/COFINS 已含於單一稅率",
+      "annualRevenueLimit": 4800000,
+      "estimatedRate": 0.06,
+      "pisCofinsIncluded": true
+    },
+    "lucroPresumido": {
+      "name": "Lucro Presumido (累積制)",
+      "color": "#1a6fbd",
+      "description": "法律強制綁定：PIS 0.65% / COFINS 3.0%",
+      "annualRevenueLimit": 78000000,
+      "pisRate": 0.0065,
+      "cofinsRate": 0.03,
+      "irpjRate": 0.15,
+      "csllRate": 0.09,
+      "presumedMargin": 0.08,
+      "addicionalThreshold": 240000,
+      "addicionalRate": 0.10
+    },
+    "lucroRealCumulative": {
+      "name": "Lucro Real (累積制)",
+      "color": "#6f42c1",
+      "description": "法律強制特定行業：金融、電信、教育等 (3.65% 無抵扣)",
+      "pisRate": 0.0065,
+      "cofinsRate": 0.03,
+      "irpjRate": 0.15,
+      "csllRate": 0.09,
+      "presumedMargin": 0.08,
+      "addicionalThreshold": 240000,
+      "addicionalRate": 0.10,
+      "deductible": false
+    },
+    "lucroRealNonCumulative": {
+      "name": "Lucro Real (非累積制)",
+      "color": "#1a8f4c",
+      "description": "一般大型企業標準：PIS 1.65% / COFINS 7.6% (可抵扣)",
+      "pisRate": 0.0165,
+      "cofinsRate": 0.076,
+      "irpjRate": 0.15,
+      "csllRate": 0.09,
+      "presumedMargin": 0.30,
+      "addicionalThreshold": 240000,
+      "addicionalRate": 0.10,
+      "deductible": true,
+      "estimatedCreditRate": 0.5
+    }
+  },
+  "importTaxes": {
+    "ii": {
+      "name": "II - Imposto de Importação",
+      "description": "進口關稅",
+      "airFryerRate": 0.20,
+      "typicalRange": [0.10, 0.20]
+    },
+    "ipi": {
+      "name": "IPI - Imposto sobre Produtos Industrializados",
+      "description": "工業產品稅",
+      "appliesTo": "eletrodomésticos",
+      "typicalRate": 0.10
+    },
+    "pisImportacao": {
+      "name": "PIS - Importação",
+      "description": "進口社會團結稅",
+      "rate": 0.021
+    },
+    "cofinsImportacao": {
+      "name": "COFINS - Importação",
+      "description": "進口社會融資稅",
+      "rate": 0.0965
+    },
+    "icms": {
+      "name": "ICMS - Imposto sobre Circulação",
+      "description": "州流通稅",
+      "sp": 0.18,
+      "typicalRange": [0.12, 0.20]
+    }
+  },
+  "reform2026": {
+    "enabled": true,
+    "description": "2026 稅改過渡期模擬",
+    "cbsRate": 0.009,
+    "ibsRate": 0.001,
+    "creditDeduction": 0.01
+  },
+  "riskAssessment": {
+    "lowReporting": {
+      "riskLevel": "high",
+      "description": "低報進口價值",
+      "consequences": [
+        "海關查驗機率提高",
+        "補繳稅款 + 罰款 (75%-225%)",
+        "貨物扣押風險",
+        "可能面臨刑事起訴"
+      ],
+      "penaltyRates": {
+        "minor": 0.75,
+        "medium": 1.50,
+        "severe": 2.25
+      }
+    },
+    "fullReporting": {
+      "riskLevel": "low",
+      "description": "全額申報",
+      "benefits": [
+        "合規通關",
+        "無罰款風險",
+        "可建立良好信用記錄",
+        "順利進入電商平台"
+      ]
+    }
+  },
+  "comparisonFactors": {
+    "taxDifference": {
+      "fullReporting": "依法納稅，無額外風險",
+      "lowReporting": "節省稅款但面臨查驗風險"
+    },
+    "businessImpact": {
+      "fullReporting": "有利長期發展，可入駐主流電商",
+      "lowReporting": "可能影響 RADAR 評級"
+    }
+  }
+}

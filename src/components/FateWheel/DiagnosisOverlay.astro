@@ -75,6 +75,7 @@ import { questions } from '../../lib/fate-wheel/config';
     if (nextStep) {
       nextStep.classList.add('active');
       currentStep = step + 1;
+      if (btnPrev) btnPrev.hidden = false;
     }
   });
 
@@ -85,7 +86,34 @@ import { questions } from '../../lib/fate-wheel/config';
       const prevStep = form?.querySelector(`.question-step[data-step="${currentStep - 1}"]`) as HTMLElement;
       if (prevStep) prevStep.classList.add('active');
       currentStep--;
+      if (currentStep > 1) {
+        btnPrev.hidden = false;
+      } else {
+        btnPrev.hidden = true;
+      }
     }
+  });
+
+  const btnBackAdjust = document.getElementById('btn-back-adjust');
+  btnBackAdjust?.addEventListener('click', () => {
+    const reveal = document.getElementById('result-reveal');
+    if (reveal) {
+      reveal.style.display = 'none';
+    }
+    if (form) {
+      form.style.display = 'block';
+    }
+    const advisor = document.querySelector('.advisor-dialogue');
+    if (advisor) {
+      advisor.style.display = 'flex';
+    }
+    const firstStep = form?.querySelector('.question-step[data-step="1"]') as HTMLElement;
+    if (firstStep) {
+      firstStep.classList.add('active');
+      currentStep = 1;
+    }
+    if (btnPrev) btnPrev.hidden = true;
+    if (btnNext) btnNext.disabled = true;
   });
 
   window.addEventListener('fate-wheel:direction-selected', () => {
@@ -99,15 +127,15 @@ import { questions } from '../../lib/fate-wheel/config';
     const reveal = document.getElementById('result-reveal');
     const nameEl = document.getElementById('result-path-name');
     const summaryEl = document.getElementById('result-summary');
-    const formEl = document.getElementById('diagnosis-form-el');
     const startBtn = document.getElementById('btn-start-journey') as HTMLAnchorElement;
+    const formEl = document.getElementById('diagnosis-form-el');
 
     if (reveal) reveal.style.display = 'block';
     if (nameEl) nameEl.textContent = info.name;
     if (summaryEl) summaryEl.textContent = `共 ${info.checkpoints} 關，預估 ${info.hours} 小時`;
-    if (formEl) formEl.style.display = 'none';
     if (startBtn && info.checkpoints > 0) {
-      startBtn.href = '/handbook';
+      startBtn.href = `/handbook#path-${detail.path.toLowerCase()}`;
     }
+    if (formEl) formEl.style.display = 'none';
   });
 </script>
