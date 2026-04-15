@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 # Local image attachments (synced via pipeline to public/assets/)
 attachments/
+
+# Wrangler state
+.wrangler/

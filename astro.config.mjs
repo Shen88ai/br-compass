@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
-import cloudflare from '@astrojs/cloudflare';
 
 // Obsidian-compatible remark/rehype plugins
 import remarkWikiLink from 'remark-wiki-link';
@@ -13,10 +12,6 @@ import { generateSearchIndex } from './scripts/generate-search-index.ts';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',
-  adapter: cloudflare({
-    imageService: 'cloudflare',
-  }),
   vite: {
     plugins: [tailwindcss()]
   },
