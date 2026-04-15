@@ -1,8 +1,9 @@
-# Cloudflare Workers/Pages Configuration for br-compass
+# Cloudflare Pages Configuration for br-compass
 # For Astro Static Site
 
 name = "br-compass"
 compatibility_date = "2024-01-01"
 
-# Static assets configuration
-pages_build_output_dir = "dist"
+# Pages configuration
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"

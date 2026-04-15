@@ -12,8 +12,8 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy": "npm run build && wrangler pages deploy dist",
-    "deploy:production": "npm run build && wrangler pages deploy dist --project-name=br-compass"
+    "deploy": "astro build && wrangler pages deploy dist",
+    "pages:deploy": "astro build && wrangler pages deploy dist --project-name=br-compass"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
