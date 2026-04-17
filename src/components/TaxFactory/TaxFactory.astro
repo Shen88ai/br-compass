@@ -158,6 +158,20 @@ const {
     </div>
     <div class="adicional-note">* 年化利潤超過 R$240,000 時加徵 10%</div>
   </div>
+
+  <div class="tax-reform-notice">
+    <h4>📅 2026 稅改過渡期提醒</h4>
+    <p>自 2026 年 1 月 1 日起，PIS/COFINS 將逐步被 CBS (0.9%) + IBS (0.1%) 取代</p>
+    <label class="reform-toggle">
+      <input type="checkbox" id="enable-2026-reform" />
+      啟用 2026 稅改模擬 (Reforma Tributária)
+    </label>
+    <div class="cbs-ibs-result" id="cbs-ibs-result" style="display: none;">
+      <div class="tax-line">CBS (0.9%): <span id="cbs-value">0</span></div>
+      <div class="tax-line">IBS (0.1%): <span id="ibs-value">0</span></div>
+      <div class="tax-line total">CBS+IBS 合計: <span id="cbs-ibs-total">0</span></div>
+    </div>
+  </div>
 </div>
 
 <script define:vars={{ fullMode, subfMode }}>
@@ -221,6 +235,34 @@ function updateAdicional() {
   const adicionalEl = document.getElementById('adicional-value');
   if (adicionalEl) {
     adicionalEl.textContent = 'R$ ' + adicional.toFixed(2);
+  }
+}
+
+const CBS_RATE = 0.009;
+const IBS_RATE = 0.001;
+
+function calculateCBS_IBS(revenue) {
+  return {
+    cbs: revenue * CBS_RATE,
+    ibs: revenue * IBS_RATE,
+    total: revenue * (CBS_RATE + IBS_RATE)
+  };
+}
+
+function toggleReformSimulation() {
+  const checkbox = document.getElementById('enable-2026-reform');
+  const resultDiv = document.getElementById('cbs-ibs-result');
+  if (checkbox && resultDiv) {
+    if (checkbox.checked) {
+      resultDiv.style.display = 'block';
+      const revenue = parseFloat(document.getElementById('annual-revenue')?.value.replace(/,/g, '')) || 0;
+      const result = calculateCBS_IBS(revenue);
+      document.getElementById('cbs-value').textContent = 'R$ ' + result.cbs.toFixed(2);
+      document.getElementById('ibs-value').textContent = 'R$ ' + result.ibs.toFixed(2);
+      document.getElementById('cbs-ibs-total').textContent = 'R$ ' + result.total.toFixed(2);
+    } else {
+      resultDiv.style.display = 'none';
+    }
   }
 }
 
@@ -317,6 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const profitInput = document.getElementById('annual-profit');
   if (profitInput) {
     profitInput.addEventListener('input', updateAdicional);
+  }
+
+  const reformCheckbox = document.getElementById('enable-2026-reform');
+  if (reformCheckbox) {
+    reformCheckbox.addEventListener('change', toggleReformSimulation);
   }
 });
 </script>
@@ -743,5 +790,44 @@ document.addEventListener('DOMContentLoaded', () => {
   color: #666;
   margin-top: 0.5rem;
   font-style: italic;
+}
+
+.tax-reform-notice {
+  background: rgba(125, 211, 252, 0.1);
+  border: 1px solid #7DD3FC;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.tax-reform-notice h4 {
+  color: #7DD3FC;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.tax-reform-notice p {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 0.75rem 0;
+}
+
+.reform-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #f5f5f0;
+  cursor: pointer;
+}
+
+.reform-toggle input {
+  accent-color: #7DD3FC;
+}
+
+.cbs-ibs-result {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #7DD3FC;
 }
 </style>
