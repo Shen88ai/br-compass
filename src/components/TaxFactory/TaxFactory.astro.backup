@@ -80,14 +80,24 @@ const {
   </div>
   
   <div class="factory-controls">
-    <div class="mode-label">🔄 模式切換：</div>
-    <div class="mode-buttons">
-      <button class="factory-btn active" data-mode="full" data-action="switch-factory">
-        ☀️ 全報模式
-      </button>
-      <button class="factory-btn" data-mode="subf" data-action="switch-factory">
-        🌙 低報模式
-      </button>
+    <div class="tax-regime-selector">
+      <label for="tax-regime">稅制選擇:</label>
+      <select id="tax-regime" class="tax-select">
+        <option value="simples">Simples Nacional (單一稅)</option>
+        <option value="presumido-cumulativo">Lucro Presumido (累積制)</option>
+        <option value="presumido-nao-cumulativo">Lucro Presumido (非累積制)</option>
+        <option value="real-cumulativo">Lucro Real (累積制-特定行業)</option>
+        <option value="real-nao-cumulativo">Lucro Real (非累積制-一般行業)</option>
+      </select>
+      <div class="rate-display">
+        <span class="rate-badge">PIS: <span id="pis-rate">0%</span></span>
+        <span class="rate-badge">COFINS: <span id="cofins-rate">0%</span></span>
+      </div>
+    </div>
+    <div class="threshold-check">
+      <label for="annual-revenue">年度營業額 (R$/年):</label>
+      <input type="text" id="annual-revenue" class="revenue-input" placeholder="例如: 5000000" />
+      <div class="threshold-warning" id="threshold-warning"></div>
     </div>
   </div>
   
@@ -108,6 +118,41 @@ const {
 </div>
 
 <script define:vars={{ fullMode, subfMode }}>
+const PIS_RATES = {
+  'simples': 0,
+  'presumido-cumulativo': 0.0065,
+  'presumido-nao-cumulativo': 0.0165,
+  'real-cumulativo': 0.0365,
+  'real-nao-cumulativo': 0.0165
+};
+
+const COFINS_RATES = {
+  'simples': 0,
+  'presumido-cumulativo': 0.03,
+  'presumido-nao-cumulativo': 0.076,
+  'real-cumulativo': 0.0365,
+  'real-nao-cumulativo': 0.076
+};
+
+function updateRateDisplay(regime) {
+  const pisRate = (PIS_RATES[regime] * 100).toFixed(2);
+  const cofinsRate = (COFINS_RATES[regime] * 100).toFixed(2);
+  const pisEl = document.getElementById('pis-rate');
+  const cofinsEl = document.getElementById('cofins-rate');
+  if (pisEl) pisEl.textContent = pisRate + '%';
+  if (cofinsEl) cofinsEl.textContent = cofinsRate + '%';
+}
+
+function checkThreshold(revenue) {
+  if (revenue > 4800000) {
+    return { regime: 'simples', warning: '⚠️ 超過 R$4.8M/年，Simples必須退出，強制使用 Lucro Presumido 或 Lucro Real' };
+  }
+  if (revenue > 78000000) {
+    return { regime: 'presumido', warning: '⚠️ 超過 R$78M/年，必須使用 Lucro Real' };
+  }
+  return { regime: '', warning: '' };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const factoryBtns = document.querySelectorAll('[data-action="switch-factory"]');
   const importStation = document.querySelector('[data-value="import"]');
@@ -135,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
         salesTax.textContent = data.salesTax;
         netStation.textContent = data.net;
         
-        // Animate update
         [importStation, salesStation, netStation].forEach(el => {
           el.closest('.factory-station')?.classList.add('animate-update');
           setTimeout(() => el.closest('.factory-station')?.classList.remove('animate-update'), 400);
@@ -143,6 +187,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  const revenueInput = document.getElementById('annual-revenue');
+  const thresholdWarning = document.getElementById('threshold-warning');
+  const taxRegimeSelect = document.getElementById('tax-regime');
+  
+  if (taxRegimeSelect) {
+    taxRegimeSelect.addEventListener('change', (e) => {
+      updateRateDisplay(e.target.value);
+    });
+    updateRateDisplay(taxRegimeSelect.value);
+  }
+  
+  if (revenueInput && thresholdWarning && taxRegimeSelect) {
+    revenueInput.addEventListener('input', (e) => {
+      const revenue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+      const result = checkThreshold(revenue);
+      
+      if (result.warning) {
+        thresholdWarning.textContent = result.warning;
+        thresholdWarning.style.display = 'block';
+      } else {
+        thresholdWarning.textContent = '';
+        thresholdWarning.style.display = 'none';
+      }
+    });
+  }
 });
 </script>
 
@@ -316,37 +386,73 @@ document.addEventListener('DOMContentLoaded', () => {
   flex-wrap: wrap;
 }
 
-.mode-label {
+.tax-regime-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tax-regime-selector label {
   color: #888;
   font-size: 0.85rem;
 }
 
-.mode-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.factory-btn {
+.tax-select {
   background: #1a1a24;
   border: 1px solid #333;
   color: #f5f5f0;
   padding: 0.5rem 1rem;
   border-radius: 8px;
+  font-size: 0.85rem;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s;
 }
 
-.factory-btn:hover {
-  background: #252530;
+.tax-select:focus {
+  outline: none;
   border-color: #D4A843;
 }
 
-.factory-btn.active {
-  background: #D4A843;
-  color: #0a0a0f;
+.rate-display {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.rate-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(212, 168, 67, 0.15);
+  color: #D4A843;
+}
+
+.threshold-check {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.revenue-input {
+  background: #1a1a24;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.revenue-input:focus {
+  outline: none;
   border-color: #D4A843;
-  font-weight: 600;
+}
+
+.threshold-warning {
+  font-size: 0.75rem;
+  color: #E5FF00;
+  margin-top: 0.25rem;
+  min-height: 1rem;
 }
 
 /* Factory Dashboard */

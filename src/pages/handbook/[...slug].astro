@@ -7,6 +7,7 @@ import TaxFunnel from '../../components/TaxVisualization/TaxFunnel.astro';
 import TaxRiver from '../../components/TaxVisualization/TaxRiver.astro';
 import TaxScale from '../../components/TaxVisualization/TaxScale.astro';
 import TaxFactory from '../../components/TaxFactory/TaxFactory.astro';
+import TaxRegimeComparator from '../../components/TaxFactory/TaxRegimeComparator.astro';
 
 export const prerender = true;
 
@@ -66,10 +67,11 @@ const glossaryMap: Record<string, typeof glossaryData[0]> = {};
 glossaryData.forEach(g => { glossaryMap[g.term] = g; });
 
 // Show Tax visualization components
-const showTaxFactory = post.id.includes('04b-tax-comparison-modes');
+const showTaxRegimeComparator = post.id.includes('04b-tax-comparison-modes');
 const showTaxFunnel = post.id.includes('04b-tax-comparison-modes');
 const showTaxScale = post.id.includes('04b-tax-comparison-modes');
 const showTaxRiver = post.id.includes('04a-tax-comparison-intro');
+const showTaxFactory = false;
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
@@ -201,6 +203,7 @@ const showTaxRiver = post.id.includes('04a-tax-comparison-intro');
 
       {showTaxScale && <TaxScale />}
       {showTaxFactory && <TaxFactory />}
+      {showTaxRegimeComparator && <TaxRegimeComparator />}
       {showTaxFunnel && <TaxFunnel />}
       {showTaxRiver && <TaxRiver />}
 
