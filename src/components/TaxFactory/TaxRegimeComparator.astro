@@ -81,21 +81,45 @@ const { class: className } = Astro.props;
   </div>
 
   <div class="import-tax-section">
-    <h4 class="section-title">🛃 進口稅計算 - Tributos na Importação</h4>
-    <div class="import-tax-grid">
-      <div class="import-input-row">
-        <div class="import-input-group">
-          <label>II 稅率 (%) 依NCM:</label>
-          <input type="number" id="ncm-rate" value="20" />
+    <h4 class="section-title">🛃 進口稅率設定 - Tributos na Importação</h4>
+    <div class="import-tax-cards">
+      <label class="regime-option">
+        <input type="radio" name="ncm-rate-group" value="10" />
+        <div class="regime-card">
+          <span class="regime-name">II 10%</span>
+          <span class="regime-desc">一般電子產品</span>
         </div>
-        <div class="import-input-group">
-          <label>IPI 稅率 (%):</label>
-          <input type="number" id="ipi-rate" value="10" />
+      </label>
+      <label class="regime-option">
+        <input type="radio" name="ncm-rate-group" value="15" />
+        <div class="regime-card">
+          <span class="regime-name">II 15%</span>
+          <span class="regime-desc">紡織品/家具</span>
         </div>
-        <div class="import-input-group">
-          <label>ICMS 稅率 (%):</label>
-          <input type="number" id="icms-rate" value="18" />
+      </label>
+      <label class="regime-option">
+        <input type="radio" name="ncm-rate-group" value="20" checked />
+        <div class="regime-card">
+          <span class="regime-name">II 20%</span>
+          <span class="regime-desc">電器/機械</span>
         </div>
+      </label>
+      <label class="regime-option">
+        <input type="radio" name="ncm-rate-group" value="35" />
+        <div class="regime-card">
+          <span class="regime-name">II 35%</span>
+          <span class="regime-desc">奢侈品/汽機車</span>
+        </div>
+      </label>
+    </div>
+    <div class="import-rate-inputs">
+      <div class="import-input-group">
+        <label>IPI 稅率 (%):</label>
+        <input type="number" id="ipi-rate" value="10" />
+      </div>
+      <div class="import-input-group">
+        <label>ICMS 稅率 (%):</label>
+        <input type="number" id="icms-rate" value="18" />
       </div>
     </div>
   </div>
@@ -431,7 +455,8 @@ function updateCalculation() {
   const cif = parseMoney(cifInput.value);
   const useReform = reformCheckbox?.checked || false;
   
-  const ncmRate = parseFloat((document.getElementById('ncm-rate') as HTMLInputElement)?.value) || 10;
+  const ncmRateGroup = document.querySelector('input[name="ncm-rate-group"]:checked') as HTMLInputElement;
+  const ncmRate = ncmRateGroup ? parseFloat(ncmRateGroup.value) : 20;
   const ipiRate = parseFloat((document.getElementById('ipi-rate') as HTMLInputElement)?.value) || 10;
   const icmsRate = parseFloat((document.getElementById('icms-rate') as HTMLInputElement)?.value) || 18;
   
@@ -552,16 +577,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const revenueInput = document.getElementById('annual-revenue');
   const cifInput = document.getElementById('cif-value');
   const reformCheckbox = document.getElementById('enable-reform');
-  const ncmInput = document.getElementById('ncm-rate');
   const ipiInput = document.getElementById('ipi-rate');
   const icmsInput = document.getElementById('icms-rate');
   const adicionalInputs = document.querySelectorAll('input[name="adicional"]');
+  const ncmInputs = document.querySelectorAll('input[name="ncm-rate-group"]');
   
-  [revenueInput, cifInput, ncmInput, ipiInput, icmsInput].forEach(input => {
+  [revenueInput, cifInput, ipiInput, icmsInput].forEach(input => {
     input?.addEventListener('input', updateCalculation);
   });
   
   adicionalInputs.forEach(input => {
+    input?.addEventListener('change', updateCalculation);
+  });
+  
+  ncmInputs.forEach(input => {
     input?.addEventListener('change', updateCalculation);
   });
   
