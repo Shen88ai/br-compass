@@ -6,6 +6,7 @@ import { glossaryData, chapterTerms, categoryLabels } from '../../data/glossary'
 import TaxFunnel from '../../components/TaxVisualization/TaxFunnel.astro';
 import TaxRiver from '../../components/TaxVisualization/TaxRiver.astro';
 import TaxScale from '../../components/TaxVisualization/TaxScale.astro';
+import TaxFactory from '../../components/TaxFactory/TaxFactory.astro';
 
 export const prerender = true;
 
@@ -64,7 +65,8 @@ const chapterGlossaryEntries = glossaryData.filter(g => chapterTermKeys.includes
 const glossaryMap: Record<string, typeof glossaryData[0]> = {};
 glossaryData.forEach(g => { glossaryMap[g.term] = g; });
 
-// Show TaxFunnel visualization for 04b pages
+// Show Tax visualization components
+const showTaxFactory = post.id.includes('04b-tax-comparison-modes');
 const showTaxFunnel = post.id.includes('04b-tax-comparison-modes');
 const showTaxScale = post.id.includes('04b-tax-comparison-modes');
 const showTaxRiver = post.id.includes('04a-tax-comparison-intro');
@@ -198,6 +200,7 @@ const showTaxRiver = post.id.includes('04a-tax-comparison-intro');
       </div>
 
       {showTaxScale && <TaxScale />}
+      {showTaxFactory && <TaxFactory />}
       {showTaxFunnel && <TaxFunnel />}
       {showTaxRiver && <TaxRiver />}
 
