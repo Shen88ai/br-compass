@@ -564,37 +564,134 @@ function updateCalculation() {
   Object.entries(REGIME_DATA).forEach(([key, data]) => {
     if (key !== selectedRegime) return;
     
+    let domesticRows = '';
     let domesticTotal = 0;
-    let domesticFormula = '';
     let importPis = importTax.pis;
     let importCofins = importTax.cofins;
     let reformSavings = 0;
     
     if (key === 'simples') {
-      domesticTotal = revenue * data.rate;
-      domesticFormula = `DAS (預估 6%)`;
+      const das = revenue * data.rate;
+      domesticTotal = das;
+      domesticRows = `
+        <div class="breakdown-row">
+          <span class="label">DAS (6%):</span>
+          <span class="value">${formatMoney(das)}</span>
+        </div>
+      `;
     } else if (key.includes('presumido')) {
-      domesticTotal = revenue * (data.pis + data.cofins) + profit * 0.25 + adicionalAmount;
-      domesticFormula = `PIS + COFINS + IRPJ/CSLL`;
+      const pisBr = revenue * data.pis;
+      const cofinsBr = revenue * data.cofins;
+      const irpj = profit * 0.15;
+      const csll = profit * 0.09;
+      const adicional = adicionalAmount;
+      domesticTotal = pisBr + cofinsBr + irpj + csll + adicional;
+      domesticRows = `
+        <div class="breakdown-row">
+          <span class="label">PIS (0.65%):</span>
+          <span class="value">${formatMoney(pisBr)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">COFINS (3%):</span>
+          <span class="value">${formatMoney(cofinsBr)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">IRPJ (15%):</span>
+          <span class="value">${formatMoney(irpj)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">CSLL (9%):</span>
+          <span class="value">${formatMoney(csll)}</span>
+        </div>
+        ${adicional > 0 ? `
+        <div class="breakdown-row">
+          <span class="label">Adicional IRPJ (10%):</span>
+          <span class="value">${formatMoney(adicional)}</span>
+        </div>
+        ` : ''}
+      `;
       if (useReform) {
         reformSavings = revenue * 0.01;
         importPis -= reformSavings * (importTax.pis / (importTax.pis + importTax.cofins));
         importCofins -= reformSavings * (importTax.cofins / (importTax.pis + importTax.cofins));
       }
     } else if (key.includes('real-nao-cumulativo')) {
-      const irpjCsll = profit * 0.25 + adicionalAmount;
+      const pisBr = revenue * data.pis;
+      const cofinsBr = revenue * data.cofins;
+      const irpj = profit * 0.15;
+      const csll = profit * 0.09;
+      const adicional = adicionalAmount;
       const creditablePis = revenue * data.pis * CREDIT_RATIO;
       const creditableCofins = revenue * data.cofins * CREDIT_RATIO;
-      domesticTotal = revenue * (data.pis + data.cofins) + irpjCsll - creditablePis - creditableCofins;
-      domesticFormula = `PIS/COFINS + IRPJ/CSLL - 可抵扣`;
+      domesticTotal = pisBr + cofinsBr + irpj + csll + adicional - creditablePis - creditableCofins;
+      domesticRows = `
+        <div class="breakdown-row">
+          <span class="label">PIS (1.65%):</span>
+          <span class="value">${formatMoney(pisBr)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">COFINS (7.6%):</span>
+          <span class="value">${formatMoney(cofinsBr)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">IRPJ (15%):</span>
+          <span class="value">${formatMoney(irpj)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">CSLL (9%):</span>
+          <span class="value">${formatMoney(csll)}</span>
+        </div>
+        ${adicional > 0 ? `
+        <div class="breakdown-row">
+          <span class="label">Adicional IRPJ (10%):</span>
+          <span class="value">${formatMoney(adicional)}</span>
+        </div>
+        ` : ''}
+        <div class="breakdown-row">
+          <span class="label" style="color:#00FF87">可抵扣 PIS (-50%):</span>
+          <span class="value" style="color:#00FF87">-${formatMoney(creditablePis)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label" style="color:#00FF87">可抵扣 COFINS (-50%):</span>
+          <span class="value" style="color:#00FF87">-${formatMoney(creditableCofins)}</span>
+        </div>
+      `;
       if (useReform) {
         reformSavings = revenue * 0.01;
         importPis -= reformSavings * 0.21 / 1.165;
         importCofins -= reformSavings * 0.965 / 1.165;
       }
     } else if (key.includes('real-cumulativo')) {
-      domesticTotal = revenue * (data.pis + data.cofins) + profit * 0.25 + adicionalAmount;
-      domesticFormula = `PIS + COFINS + IRPJ/CSLL`;
+      const pisBr = revenue * data.pis;
+      const cofinsBr = revenue * data.cofins;
+      const irpj = profit * 0.15;
+      const csll = profit * 0.09;
+      const adicional = adicionalAmount;
+      domesticTotal = pisBr + cofinsBr + irpj + csll + adicional;
+      domesticRows = `
+        <div class="breakdown-row">
+          <span class="label">PIS (3.65%):</span>
+          <span class="value">${formatMoney(pisBr)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">COFINS (3.65%):</span>
+          <span class="value">${formatMoney(cofinsBr)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">IRPJ (15%):</span>
+          <span class="value">${formatMoney(irpj)}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">CSLL (9%):</span>
+          <span class="value">${formatMoney(csll)}</span>
+        </div>
+        ${adicional > 0 ? `
+        <div class="breakdown-row">
+          <span class="label">Adicional IRPJ (10%):</span>
+          <span class="value">${formatMoney(adicional)}</span>
+        </div>
+        ` : ''}
+      `;
       if (useReform) {
         reformSavings = revenue * 0.01;
         importPis -= reformSavings * 0.21 / 1.165;
@@ -626,9 +723,10 @@ function updateCalculation() {
         
         <div class="breakdown-section">
           <div class="breakdown-section-title">🇧🇷 國內環節 (Brasil)</div>
-          <div class="breakdown-row">
-            <span class="label">${domesticFormula}:</span>
-            <span class="value">${formatMoney(domesticTotal)}</span>
+          ${domesticRows}
+          <div class="breakdown-row" style="border-top:1px solid #333;margin-top:0.5rem;padding-top:0.5rem">
+            <span class="label" style="font-weight:600">國內稅合計:</span>
+            <span class="value" style="font-weight:600">${formatMoney(domesticTotal)}</span>
           </div>
         </div>
         
@@ -647,13 +745,17 @@ function updateCalculation() {
             <span class="value">${formatMoney(importTax.icms)}</span>
           </div>
           <div class="breakdown-row">
-            <span class="label">PIS/COF Imp.:</span>
-            <span class="value">${formatMoney(newImportPis + newImportCofins)}</span>
+            <span class="label">PIS Imp. (2.1%):</span>
+            <span class="value">${formatMoney(newImportPis)}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="label">COFINS Imp. (9.65%):</span>
+            <span class="value">${formatMoney(newImportCofins)}</span>
           </div>
           ${reformRow}
-          <div class="breakdown-row">
-            <span class="label">進口稅合計:</span>
-            <span class="value">${formatMoney(importTotalWithReform)}</span>
+          <div class="breakdown-row" style="border-top:1px solid #333;margin-top:0.5rem;padding-top:0.5rem">
+            <span class="label" style="font-weight:600">進口稅合計:</span>
+            <span class="value" style="font-weight:600">${formatMoney(importTotalWithReform)}</span>
           </div>
         </div>
         
