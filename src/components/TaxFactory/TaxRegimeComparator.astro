@@ -7,7 +7,7 @@ const { class: className } = Astro.props;
 ---
 
 <div class:list={["tax-regime-comparator", className]}>
-  <h3 class="comparator-title">🇧🇷 稅務決策流程</h3>
+  <h3 class="comparator-title">🇧🇷 進口商品稅務決策流程</h3>
   
   <div class="step-container">
     <div class="step" data-step="1">
@@ -48,13 +48,19 @@ const { class: className } = Astro.props;
       <h4 class="step-title">Step 2 / 第二層：Adicional do IRPJ</h4>
       <p class="step-desc">當年度 Lucro Real / Presumido 超過 R$20,000/月（年化 R$240,000）時，IRPJ 須加收 10% 附加稅</p>
       <div class="adicional-options">
-        <label class="adicional-option">
+        <label class="regime-option">
           <input type="radio" name="adicional" value="yes" />
-          <span>✅ 適用 Adicional (lucro > R$240k/年)</span>
+          <div class="regime-card">
+            <span class="regime-name">✅ 適用 Adicional</span>
+            <span class="regime-desc">lucro > R$240k/年時加徵 10%</span>
+          </div>
         </label>
-        <label class="adicional-option">
+        <label class="regime-option">
           <input type="radio" name="adicional" value="no" checked />
-          <span>❌ 不適用 Adicional</span>
+          <div class="regime-card">
+            <span class="regime-name">❌ 不適用 Adicional</span>
+            <span class="regime-desc">利潤未超過門檻</span>
+          </div>
         </label>
       </div>
     </div>
@@ -65,37 +71,12 @@ const { class: className } = Astro.props;
     <div class="input-grid">
       <div class="input-group">
         <label for="annual-revenue">年度營業額 (R$/年):</label>
-        <input type="text" id="annual-revenue" class="money-input" placeholder="例如: 5000000" value="5000000" />
+        <input type="text" id="annual-revenue" class="money-input" placeholder="例如: 5000000" value="100000" />
       </div>
       <div class="input-group">
         <label for="cif-value">進口貨值 CIF (R$):</label>
-        <input type="text" id="cif-value" class="money-input" placeholder="例如: 100000" value="100000" />
+        <input type="text" id="cif-value" class="money-input" placeholder="例如: 100000" value="50000" />
       </div>
-    </div>
-  </div>
-
-  <div class="reform-toggle">
-    <label>
-      <input type="checkbox" id="enable-reform" />
-      <span>🎯 啟動 2026 稅改��渡期模擬 (Reforma Tributária)</span>
-    </label>
-    <p class="reform-note">PIS/COFINS 將自動全員抵扣 1% 並獨立為 CBS (0.9%) 及 IBS (0.1%)</p>
-  </div>
-
-  <div class="results-section">
-    <h4 class="results-title">📊 計算結果</h4>
-    <div class="results-table">
-      <table>
-        <thead>
-          <tr>
-            <th>制度</th>
-            <th>稅金組成與計算公式</th>
-            <th>年度預估合計</th>
-          </tr>
-        </thead>
-        <tbody id="results-body">
-        </tbody>
-      </table>
     </div>
   </div>
 
@@ -105,7 +86,7 @@ const { class: className } = Astro.props;
       <div class="import-input-row">
         <div class="import-input-group">
           <label>II 稅率 (%) 依NCM:</label>
-          <input type="number" id="ncm-rate" value="10" />
+          <input type="number" id="ncm-rate" value="20" />
         </div>
         <div class="import-input-group">
           <label>IPI 稅率 (%):</label>
@@ -116,15 +97,18 @@ const { class: className } = Astro.props;
           <input type="number" id="icms-rate" value="18" />
         </div>
       </div>
-      <div class="import-results" id="import-results">
-        <div class="tax-row"><span>II (關稅):</span><span class="tax-value" id="tax-ii">0</span></div>
-        <div class="tax-row"><span>IPI:</span><span class="tax-value" id="tax-ipi">0</span></div>
-        <div class="tax-row"><span>PIS Importação:</span><span class="tax-value" id="tax-pis">0</span></div>
-        <div class="tax-row"><span>COFINS Importação:</span><span class="tax-value" id="tax-cofins">0</span></div>
-        <div class="tax-row"><span>ICMS:</span><span class="tax-value" id="tax-icms">0</span></div>
-        <div class="tax-row total"><span>進口稅合計:</span><span class="tax-value" id="tax-total">0</span></div>
-      </div>
     </div>
+  </div>
+
+  <div class="reform-toggle">
+    <label>
+      <input type="checkbox" id="enable-reform" />
+      <span>🎯 啟動 2026 稅改過渡期模擬 (Reforma Tributária)</span>
+    </label>
+    <p class="reform-note">PIS/COFINS 將自動全員抵扣 1% 並獨立為 CBS (0.9%) 及 IBS (0.1%)</p>
+  </div>
+
+  <div class="detailed-results" id="detailed-results">
   </div>
 
   <p class="disclaimer">⚠️ 免責聲明：此模擬試算只是為了學習，如有業務需求請諮詢專業稅務會計師</p>
@@ -209,19 +193,13 @@ const { class: className } = Astro.props;
 }
 
 .adicional-options {
-  display: flex;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
 }
 
 .adicional-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.adicional-option input {
-  accent-color: #D4A843;
+  display: none;
 }
 
 .input-section {
@@ -292,46 +270,11 @@ const { class: className } = Astro.props;
   margin: 0.5rem 0 0 0;
 }
 
-.results-section {
+.detailed-results {
   margin-bottom: 1.5rem;
 }
 
-.results-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #D4A843;
-  margin: 0 0 1rem 0;
-}
-
-.results-table {
-  overflow-x: auto;
-}
-
-.results-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.results-table th,
-.results-table td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(212, 168, 67, 0.2);
-}
-
-.results-table th {
-  color: #D4A843;
-  font-weight: 600;
-}
-
-.results-table td:last-child {
-  text-align: right;
-  font-weight: 600;
-  color: #00FF87;
-}
-
-.import-tax-section {
+.tax-breakdown {
   background: rgba(26, 26, 36, 0.9);
   border: 1px solid rgba(212, 168, 67, 0.2);
   border-radius: 12px;
@@ -339,56 +282,56 @@ const { class: className } = Astro.props;
   margin-bottom: 1.5rem;
 }
 
-.import-tax-grid {
+.breakdown-header {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.import-input-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
+.breakdown-regime {
+  font-weight: 600;
+  color: #D4A843;
 }
 
-.import-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.import-input-group label {
+.breakdown-note {
   font-size: 0.75rem;
-  color: #888;
+  color: #00FF87;
 }
 
-.import-input-group input {
-  background: #0a0a0f;
-  border: 1px solid #333;
-  color: #f5f5f0;
-  padding: 0.5rem;
-  border-radius: 4px;
+.breakdown-section {
+  margin-bottom: 1rem;
 }
 
-.import-results {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.breakdown-section-title {
+  font-weight: 600;
+  color: #7DD3FC;
+  margin: 0 0 0.5rem 0;
 }
 
-.tax-row {
+.breakdown-row {
   display: flex;
   justify-content: space-between;
   padding: 0.25rem 0;
   font-size: 0.85rem;
 }
 
-.tax-row.total {
+.breakdown-row .label {
+  color: #888;
+}
+
+.breakdown-row .value {
+  color: #F5F5F0;
+}
+
+.breakdown-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
   font-weight: 700;
   color: #D4A843;
   border-top: 1px solid #D4A843;
   margin-top: 0.5rem;
-  padding-top: 0.5rem;
 }
 
 .disclaimer {
@@ -399,8 +342,7 @@ const { class: className } = Astro.props;
 }
 
 @media (max-width: 600px) {
-  .input-grid,
-  .import-input-row {
+  .input-grid {
     grid-template-columns: 1fr;
   }
   
@@ -422,19 +364,20 @@ const REGIME_DATA = {
     rate: 0.06,
     formula: 'DAS = RB × 6%',
     pis: 0,
-    cofins: 0
+    cofins: 0,
+    note: 'ℹ️ Simples Nacional 不適用 Adicional IRPJ，IRPJ/CSLL 已含於 DAS。'
   },
   'presumido-cumulativo': {
     name: 'Lucro Presumido (累積制)',
     rate: 0.0365,
-    formula: 'PIS = RB × 0.65% / COFINS = RB × 3% / IRPJ/CSLL (預估)',
+    formula: 'PIS = RB × 0.65% / COFINS = RB × 3%',
     pis: 0.0065,
     cofins: 0.03
   },
   'real-nao-cumulativo': {
     name: 'Lucro Real (非累積制)',
     rate: 0.0915,
-    formula: '依所選模式計算 / IRPJ/CSLL (實際按30%毛利估算)',
+    formula: 'IRPJ/CSLL (實際) + PIS/COFINS (可抵扣)',
     pis: 0.0165,
     cofins: 0.076
   },
@@ -459,7 +402,9 @@ function formatMoney(value: number): string {
 }
 
 function parseMoney(value: string): number {
-  return parseFloat(value.replace(/[R$\s.,]/g, '').replace(/\./g, '').replace(/,/g, '.')) || 0;
+  if (!value) return 0;
+  const cleaned = value.replace(/R\$\s/g, '').replace(/\./g, '').replace(/,/g, '.');
+  return parseFloat(cleaned) || 0;
 }
 
 function calculateImportTax(cif: number, ncmRate: number, ipiRate: number, icmsRate: number) {
@@ -478,10 +423,9 @@ function updateCalculation() {
   const revenueInput = document.getElementById('annual-revenue') as HTMLInputElement;
   const cifInput = document.getElementById('cif-value') as HTMLInputElement;
   const reformCheckbox = document.getElementById('enable-reform') as HTMLInputElement;
-  const resultsBody = document.getElementById('results-body');
-  const importResults = document.getElementById('import-results');
+  const resultsDiv = document.getElementById('detailed-results');
   
-  if (!revenueInput || !cifInput || !resultsBody) return;
+  if (!revenueInput || !cifInput || !resultsDiv) return;
   
   const revenue = parseMoney(revenueInput.value);
   const cif = parseMoney(cifInput.value);
@@ -497,66 +441,111 @@ function updateCalculation() {
   
   const importTax = calculateImportTax(cif, ncmRate, ipiRate, icmsRate);
   
-  if (document.getElementById('tax-ii')) {
-    document.getElementById('tax-ii').textContent = formatMoney(importTax.ii);
-    document.getElementById('tax-ipi').textContent = formatMoney(importTax.ipi);
-    document.getElementById('tax-pis').textContent = formatMoney(importTax.pis);
-    document.getElementById('tax-cofins').textContent = formatMoney(importTax.cofins);
-    document.getElementById('tax-icms').textContent = formatMoney(importTax.icms);
-    document.getElementById('tax-total').textContent = formatMoney(importTax.total);
-  }
-  
   let html = '';
   
   Object.entries(REGIME_DATA).forEach(([key, data]) => {
-    let total = 0;
-    let formula = data.formula;
+    let domesticTotal = 0;
+    let domesticFormula = '';
+    let importPis = importTax.pis;
+    let importCofins = importTax.cofins;
+    let reformSavings = 0;
     
     if (key === 'simples') {
-      total = revenue * data.rate;
-      formula = `DAS = RB × 6%`;
+      domesticTotal = revenue * data.rate;
+      domesticFormula = `DAS (預估 6%)`;
     } else if (key.includes('presumido')) {
-      total = revenue * (data.pis + data.cofins) + profit * 0.25 + adicionalAmount;
+      domesticTotal = revenue * (data.pis + data.cofins) + profit * 0.25 + adicionalAmount;
+      domesticFormula = `PIS + COFINS + IRPJ/CSLL`;
       if (useReform) {
-        total -= revenue * 0.01;
+        reformSavings = revenue * 0.01;
+        importPis -= reformSavings * (importTax.pis / (importTax.pis + importTax.cofins));
+        importCofins -= reformSavings * (importTax.cofins / (importTax.pis + importTax.cofins));
       }
     } else if (key.includes('real-nao-cumulativo')) {
       const irpjCsll = profit * 0.25 + adicionalAmount;
       const creditablePis = revenue * data.pis * CREDIT_RATIO;
       const creditableCofins = revenue * data.cofins * CREDIT_RATIO;
-      total = revenue * (data.pis + data.cofins) + irpjCsll - creditablePis - creditableCofins;
+      domesticTotal = revenue * (data.pis + data.cofins) + irpjCsll - creditablePis - creditableCofins;
+      domesticFormula = `PIS/COFINS + IRPJ/CSLL - 可抵扣`;
       if (useReform) {
-        total -= revenue * 0.01;
+        reformSavings = revenue * 0.01;
+        importPis -= reformSavings * 0.21 / 1.165;
+        importCofins -= reformSavings * 0.965 / 1.165;
       }
     } else if (key.includes('real-cumulativo')) {
-      total = revenue * (data.pis + data.cofins) + profit * 0.25 + adicionalAmount;
+      domesticTotal = revenue * (data.pis + data.cofins) + profit * 0.25 + adicionalAmount;
+      domesticFormula = `PIS + COFINS + IRPJ/CSLL`;
       if (useReform) {
-        total -= revenue * 0.01;
+        reformSavings = revenue * 0.01;
+        importPis -= reformSavings * 0.21 / 1.165;
+        importCofins -= reformSavings * 0.965 / 1.165;
       }
     }
     
+    const newImportPis = importPis < 0 ? 0 : importPis;
+    const newImportCofins = importCofins < 0 ? 0 : importCofins;
+    const importTotalWithReform = importTax.ii + importTax.ipi + newImportPis + newImportCofins + importTax.icms;
+    const grandTotal = domesticTotal + importTotalWithReform;
+    
+    let reformRow = '';
+    if (useReform) {
+      reformRow = `
+        <div class="breakdown-row">
+          <span class="label">📉 稅改抵扣 (1%):</span>
+          <span class="value" style="color:#00FF87">-${formatMoney(reformSavings)}</span>
+        </div>
+      `;
+    }
+    
     html += `
-      <tr>
-        <td>${data.name}</td>
-        <td>${formula}</td>
-        <td>${formatMoney(total)}</td>
-      </tr>
+      <div class="tax-breakdown">
+        <div class="breakdown-header">
+          <span class="breakdown-regime">${data.name}</span>
+        </div>
+        ${data.note ? `<p class="breakdown-note">${data.note}</p>` : ''}
+        
+        <div class="breakdown-section">
+          <div class="breakdown-section-title">🇧🇷 國內環節 (Brasil)</div>
+          <div class="breakdown-row">
+            <span class="label">${domesticFormula}:</span>
+            <span class="value">${formatMoney(domesticTotal)}</span>
+          </div>
+        </div>
+        
+        <div class="breakdown-section">
+          <div class="breakdown-section-title">🛃 進口環節 (Importação)</div>
+          <div class="breakdown-row">
+            <span class="label">II (${ncmRate}%):</span>
+            <span class="value">${formatMoney(importTax.ii)}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="label">IPI (${ipiRate}%):</span>
+            <span class="value">${formatMoney(importTax.ipi)}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="label">ICMS (${icmsRate}%):</span>
+            <span class="value">${formatMoney(importTax.icms)}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="label">PIS/COF Imp.:</span>
+            <span class="value">${formatMoney(newImportPis + newImportCofins)}</span>
+          </div>
+          ${reformRow}
+          <div class="breakdown-row">
+            <span class="label">進口稅合計:</span>
+            <span class="value">${formatMoney(importTotalWithReform)}</span>
+          </div>
+        </div>
+        
+        <div class="breakdown-total">
+          <span>總計:</span>
+          <span>${formatMoney(grandTotal)}</span>
+        </div>
+      </div>
     `;
   });
   
-  if (useReform) {
-    const cbs = revenue * CBS_RATE;
-    const ibs = revenue * IBS_RATE;
-    html += `
-      <tr style="background: rgba(125, 211, 252, 0.1);">
-        <td>CBS + IBS (2026稅改)</td>
-        <td>CBS = RB × 0.9% / IBS = RB × 0.1%</td>
-        <td>${formatMoney(cbs + ibs)}</td>
-      </tr>
-    `;
-  }
-  
-  resultsBody.innerHTML = html;
+  resultsDiv.innerHTML = html;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -567,7 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const ipiInput = document.getElementById('ipi-rate');
   const icmsInput = document.getElementById('icms-rate');
   const adicionalInputs = document.querySelectorAll('input[name="adicional"]');
-  const regimeInputs = document.querySelectorAll('input[name="tax-regime"]');
   
   [revenueInput, cifInput, ncmInput, ipiInput, icmsInput].forEach(input => {
     input?.addEventListener('input', updateCalculation);
