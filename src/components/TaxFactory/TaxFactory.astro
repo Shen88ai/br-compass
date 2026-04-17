@@ -145,6 +145,19 @@ const {
     <div class="tax-line total">進口稅合計: <span id="tax-total">618.90</span></div>
     </div>
   </div>
+
+  <div class="adicional-panel" id="adicional-panel">
+    <h4>📊 Adicional IRPJ 計算</h4>
+    <div class="profit-input-group">
+      <label for="annual-profit">年度利潤 (Lucro/年):</label>
+      <input type="number" id="annual-profit" class="profit-input" placeholder="例如: 300000" />
+    </div>
+    <div class="adicional-result">
+      <span class="adicional-label">Adicional IRPJ (10%):</span>
+      <span class="adicional-value" id="adicional-value">R$ 0.00</span>
+    </div>
+    <div class="adicional-note">* 年化利潤超過 R$240,000 時加徵 10%</div>
+  </div>
 </div>
 
 <script define:vars={{ fullMode, subfMode }}>
@@ -193,6 +206,22 @@ function calculateImportTax(cif, ncmRate, ipiRate, icmsRate) {
   const icms = baseIcms / (1 - icmsRate / 100) * (icmsRate / 100);
   
   return { ii, ipi, pis, cofins, icms, total: ii + ipi + pis + cofins + icms };
+}
+
+function calculateAdicional(profit) {
+  if (profit > 240000) {
+    return profit * 0.10;
+  }
+  return 0;
+}
+
+function updateAdicional() {
+  const profit = parseFloat(document.getElementById('annual-profit')?.value) || 0;
+  const adicional = calculateAdicional(profit);
+  const adicionalEl = document.getElementById('adicional-value');
+  if (adicionalEl) {
+    adicionalEl.textContent = 'R$ ' + adicional.toFixed(2);
+  }
 }
 
 function updateImportTax() {
@@ -283,6 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ncmInput.addEventListener('input', updateImportTax);
     ipiInput.addEventListener('input', updateImportTax);
     icmsInput.addEventListener('input', updateImportTax);
+  }
+  
+  const profitInput = document.getElementById('annual-profit');
+  if (profitInput) {
+    profitInput.addEventListener('input', updateAdicional);
   }
 });
 </script>
@@ -641,5 +675,73 @@ document.addEventListener('DOMContentLoaded', () => {
   border-top: 1px solid #D4A843;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
+}
+
+/* Adicional IRPJ Panel */
+.adicional-panel {
+  background: #1a1a24;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.adicional-panel h4 {
+  color: #00FF87;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+}
+
+.profit-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.profit-input-group label {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.profit-input {
+  background: #0a0a0f;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.profit-input:focus {
+  outline: none;
+  border-color: #00FF87;
+}
+
+.adicional-result {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(229, 255, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.adicional-label {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.adicional-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #E5FF00;
+}
+
+.adicional-note {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
 }
 </style>
