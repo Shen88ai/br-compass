@@ -460,15 +460,19 @@ function updateCalculation() {
   const ipiRate = parseFloat((document.getElementById('ipi-rate') as HTMLInputElement)?.value) || 10;
   const icmsRate = parseFloat((document.getElementById('icms-rate') as HTMLInputElement)?.value) || 18;
   
-  const adicionalYes = (document.querySelector('input[name="adicional"]:checked') as HTMLInputElement)?.value === 'yes';
+  const adicionalesYes = (document.querySelector('input[name="adicional"]:checked') as HTMLInputElement)?.value === 'yes';
   const profit = revenue * GROSS_MARGIN;
-  const adicionalAmount = adicionalYes && profit > 240000 ? (profit - 240000) * 0.10 : 0;
+  const adicionalAmount = adicionalesYes && profit > 240000 ? (profit - 240000) * 0.10 : 0;
   
   const importTax = calculateImportTax(cif, ncmRate, ipiRate, icmsRate);
+  
+  const selectedRegime = (document.querySelector('input[name="tax-regime"]:checked') as HTMLInputElement)?.value || 'simples';
   
   let html = '';
   
   Object.entries(REGIME_DATA).forEach(([key, data]) => {
+    if (key !== selectedRegime) return;
+    
     let domesticTotal = 0;
     let domesticFormula = '';
     let importPis = importTax.pis;
@@ -581,12 +585,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const icmsInput = document.getElementById('icms-rate');
   const adicionalInputs = document.querySelectorAll('input[name="adicional"]');
   const ncmInputs = document.querySelectorAll('input[name="ncm-rate-group"]');
+  const regimeInputs = document.querySelectorAll('input[name="tax-regime"]');
   
   [revenueInput, cifInput, ipiInput, icmsInput].forEach(input => {
     input?.addEventListener('input', updateCalculation);
   });
   
   adicionalInputs.forEach(input => {
+    input?.addEventListener('change', updateCalculation);
+  });
+  
+  regimeInputs.forEach(input => {
     input?.addEventListener('change', updateCalculation);
   });
   
