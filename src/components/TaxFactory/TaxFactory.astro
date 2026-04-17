@@ -115,6 +115,36 @@ const {
       <div class="card-status">⚠️ 高稅</div>
     </div>
   </div>
+  
+  <div class="import-tax-panel" id="import-tax-panel">
+    <h4>🛃 進口稅計算 (Tributos na Importação)</h4>
+    <div class="import-inputs">
+      <div class="input-group">
+        <label>CIF (Valor Aduaneiro):</label>
+        <input type="number" id="cif-value" value="1000" />
+      </div>
+      <div class="input-group">
+        <label>NCM 稅率 (%):</label>
+        <input type="number" id="ncm-rate" value="10" />
+      </div>
+      <div class="input-group">
+        <label>IPI 稅率 (%):</label>
+        <input type="number" id="ipi-rate" value="10" />
+      </div>
+      <div class="input-group">
+        <label>ICMS 稅率 (%):</label>
+        <input type="number" id="icms-rate" value="18" />
+      </div>
+    </div>
+    <div class="import-results">
+<div class="tax-line">II (關稅): <span id="tax-ii">100.00</span></div>
+    <div class="tax-line">IPI: <span id="tax-ipi">110.00</span></div>
+    <div class="tax-line">PIS Importação: <span id="tax-pis">21.00</span></div>
+    <div class="tax-line">COFINS Importação: <span id="tax-cofins">96.50</span></div>
+    <div class="tax-line">ICMS: <span id="tax-icms">291.40</span></div>
+    <div class="tax-line total">進口稅合計: <span id="tax-total">618.90</span></div>
+    </div>
+  </div>
 </div>
 
 <script define:vars={{ fullMode, subfMode }}>
@@ -151,6 +181,34 @@ function checkThreshold(revenue) {
     return { regime: 'presumido', warning: '⚠️ 超過 R$78M/年，必須使用 Lucro Real' };
   }
   return { regime: '', warning: '' };
+}
+
+function calculateImportTax(cif, ncmRate, ipiRate, icmsRate) {
+  const ii = cif * (ncmRate / 100);
+  const baseIpi = cif + ii;
+  const ipi = baseIpi * (ipiRate / 100);
+  const pis = cif * 0.021;
+  const cofins = cif * 0.0965;
+  const baseIcms = cif + ii + ipi + pis + cofins;
+  const icms = baseIcms / (1 - icmsRate / 100) * (icmsRate / 100);
+  
+  return { ii, ipi, pis, cofins, icms, total: ii + ipi + pis + cofins + icms };
+}
+
+function updateImportTax() {
+  const cif = parseFloat(document.getElementById('cif-value')?.value) || 0;
+  const ncmRate = parseFloat(document.getElementById('ncm-rate')?.value) || 0;
+  const ipiRate = parseFloat(document.getElementById('ipi-rate')?.value) || 0;
+  const icmsRate = parseFloat(document.getElementById('icms-rate')?.value) || 0;
+  
+  const result = calculateImportTax(cif, ncmRate, ipiRate, icmsRate);
+  
+  document.getElementById('tax-ii').textContent = result.ii.toFixed(2);
+  document.getElementById('tax-ipi').textContent = result.ipi.toFixed(2);
+  document.getElementById('tax-pis').textContent = result.pis.toFixed(2);
+  document.getElementById('tax-cofins').textContent = result.cofins.toFixed(2);
+  document.getElementById('tax-icms').textContent = result.icms.toFixed(2);
+  document.getElementById('tax-total').textContent = result.total.toFixed(2);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -212,6 +270,19 @@ document.addEventListener('DOMContentLoaded', () => {
         thresholdWarning.style.display = 'none';
       }
     });
+  }
+  
+  const cifInput = document.getElementById('cif-value');
+  const ncmInput = document.getElementById('ncm-rate');
+  const ipiInput = document.getElementById('ipi-rate');
+  const icmsInput = document.getElementById('icms-rate');
+  
+  if (cifInput && ncmInput && ipiInput && icmsInput) {
+    updateImportTax();
+    cifInput.addEventListener('input', updateImportTax);
+    ncmInput.addEventListener('input', updateImportTax);
+    ipiInput.addEventListener('input', updateImportTax);
+    icmsInput.addEventListener('input', updateImportTax);
   }
 });
 </script>
@@ -512,5 +583,63 @@ document.addEventListener('DOMContentLoaded', () => {
   .factory-dashboard {
     grid-template-columns: 1fr;
   }
+}
+
+/* Import Tax Panel */
+.import-tax-panel {
+  background: #1a1a24;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.import-tax-panel h4 {
+  color: #D4A843;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+}
+
+.import-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-group label {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.input-group input {
+  background: #0a0a0f;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.tax-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #222;
+  font-size: 0.85rem;
+}
+
+.tax-line.total {
+  font-weight: 700;
+  color: #D4A843;
+  border-top: 1px solid #D4A843;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
 }
 </style>
