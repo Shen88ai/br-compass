@@ -1,0 +1,644 @@
+---
+interface TaxData {
+  A: number;
+  B: number;
+  importTax: number;
+  C: number;
+  grossMargin: number;
+  E: number;
+  F: number;
+  I: number;
+  J: number;
+  D: number;
+  H: number;
+  totalRemittance: number;
+}
+
+interface TaxMode {
+  id: string;
+  label: string;
+  labelShort: string;
+  icon: string;
+  status: 'compliant' | 'warning';
+  data: TaxData;
+}
+
+interface Props {
+  modes?: TaxMode[];
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const defaultModes: TaxMode[] = [
+  {
+    id: 'lucro-real',
+    label: 'Lucro Real',
+    labelShort: '實際利潤制',
+    icon: '💼',
+    status: 'compliant',
+    data: {
+      A: 1000, B: 1000, importTax: -500, C: 1500,
+      grossMargin: 0.6, E: 900, F: 2400,
+      I: 60, J: 36, D: 500, H: 304,
+      totalRemittance: 1304
+    }
+  },
+  {
+    id: 'lucro-presumido',
+    label: 'Lucro Presumido',
+    labelShort: '利潤推算制',
+    icon: '☀️',
+    status: 'compliant',
+    data: {
+      A: 1000, B: 1000, importTax: -500, C: 1500,
+      grossMargin: 0.6, E: 900, F: 2400,
+      I: 28.8, J: 25.92, D: 500, H: 345.28,
+      totalRemittance: 1345.28
+    }
+  },
+  {
+    id: 'subf',
+    label: '低報模式',
+    labelShort: '低報',
+    icon: '🌙',
+    status: 'warning',
+    data: {
+      A: 1000, B: 500, importTax: -250, C: 750,
+      grossMargin: 1.85, E: 1387.5, F: 2137.5,
+      I: 25.65, J: 23.09, D: 500, H: 338.77,
+      totalRemittance: 1338.77
+    }
+  }
+];
+
+const modes = defaultModes;
+---
+
+<div class:list={["tax-scale-container", className]}>
+  <div class="scale-header">
+    <h3 class="scale-title">⚖️ 三制對決：誰能帶回最多？</h3>
+  </div>
+
+  <div class="scale-wrapper">
+    <div class="scale-beam">
+      {modes.map((mode) => (
+        <div class="scale-weight" 
+             data-mode={mode.id}
+             role="button"
+             tabindex="0"
+             aria-label={`${mode.labelShort}，總返款 R$ ${mode.data.totalRemittance.toFixed(2)}，點擊查看公式推導`}>
+          <div class="weight-icon">{mode.icon}</div>
+          <div class="weight-label">{mode.labelShort}</div>
+          <div class="weight-hint">點擊查看公式</div>
+          <div class="weight-value">R$ {mode.data.totalRemittance.toFixed(2)}</div>
+        </div>
+      ))}
+    </div>
+    <div class="scale-stand"></div>
+  </div>
+
+  <div class="scale-insight">
+    💡 洞察：利潤推算制正清全報 → 最高返款 <strong style="color: var(--color-neon-green)">R$ 1,345.28</strong>，且 100% 合規
+  </div>
+</div>
+
+<div class="formula-crystal" id="formula-crystal">
+  <div class="crystal-header">
+    <h4 class="crystal-title">📐 公式推導</h4>
+    <button class="crystal-close" aria-label="關閉">×</button>
+  </div>
+  <div class="crystal-content" id="crystal-content">
+  </div>
+</div>
+<div class="crystal-overlay" id="crystal-overlay"></div>
+
+<style>
+  .tax-scale-container {
+    background: linear-gradient(135deg, rgba(13, 13, 20, 0.95) 0%, rgba(20, 20, 35, 0.95) 100%);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+    font-family: var(--font-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .scale-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .scale-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-gold, #D4A843);
+    margin: 0;
+  }
+
+  .scale-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+  }
+
+  .scale-beam {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 800px;
+    transform-origin: center center;
+    animation: scale-sway 4s ease-in-out infinite;
+  }
+
+  @keyframes scale-sway {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+
+  .scale-stand {
+    width: 20px;
+    height: 60px;
+    background: linear-gradient(180deg, #D4A843 0%, #8B6914 100%);
+    border-radius: 4px;
+    margin-top: -2px;
+    position: relative;
+  }
+
+  .scale-stand::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -20px;
+    width: 60px;
+    height: 10px;
+    background: #D4A843;
+    border-radius: 4px;
+  }
+
+  .scale-weight {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: rgba(15, 15, 24, 0.9);
+    border: 2px solid rgba(212, 168, 67, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .scale-weight:hover {
+    transform: scale(1.05);
+    border-color: rgba(212, 168, 67, 0.6);
+    box-shadow: 0 0 30px rgba(212, 168, 67, 0.2);
+  }
+
+  .scale-weight:focus {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+
+  .scale-weight[data-mode="lucro-real"] {
+    border-color: rgba(0, 255, 135, 0.4);
+  }
+  .scale-weight[data-mode="lucro-real"]:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 135, 0.3);
+  }
+
+  .scale-weight[data-mode="subf"] {
+    border-color: rgba(147, 51, 234, 0.4);
+  }
+  .scale-weight[data-mode="subf"]:hover {
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.3);
+  }
+
+  .weight-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .weight-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text, #F5F5F0);
+    margin-bottom: 0.25rem;
+  }
+
+  .weight-hint {
+    font-size: 0.7rem;
+    color: var(--color-text-muted, #B8BCC8);
+    margin-bottom: 0.5rem;
+  }
+
+  .weight-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--color-gold, #D4A843);
+  }
+
+  .scale-insight {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(212, 168, 67, 0.1);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--color-text-muted, #B8BCC8);
+  }
+
+  /* Formula Crystal Modal */
+  .formula-crystal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(13, 13, 20, 0.98);
+    border: 2px solid rgba(212, 168, 67, 0.4);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1001;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .formula-crystal.active {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .crystal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+  }
+
+  .crystal-overlay.active {
+    display: block;
+  }
+
+  .crystal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(212, 168, 67, 0.2);
+  }
+
+  .crystal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-gold, #D4A843);
+    margin: 0;
+  }
+
+  .crystal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+  }
+
+  .crystal-close:hover {
+    color: var(--color-gold);
+  }
+
+  .formula-main {
+    font-size: 1.3rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--color-gold);
+    text-align: center;
+    padding: 1rem;
+    background: rgba(212, 168, 67, 0.1);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .formula-chain {
+    padding-left: 1rem;
+    border-left: 3px solid rgba(212, 168, 67, 0.3);
+    text-align: center;
+  }
+
+  .formula-line {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    text-align: center;
+  }
+
+  .formula-line .label {
+    color: var(--color-text-muted);
+  }
+
+  /* 與漏斗一致的顏色系統 */
+  .formula-line .a-cif { color: #D4A843; }      /* A (CIF) - 金色 */
+  .formula-line .b-declare { color: #9333EA; }    /* B (申報金額) - 紫色 */
+  .formula-line .c-input { color: #7DD3FC; }      /* C (進項發票) - 天藍 */
+  .formula-line .d-cost { color: #7DD3FC; }       /* D (營運成本) - 天藍 */
+  .formula-line .e-gross { color: #00FF87; }      /* E (毛利) - 綠色 */
+  .formula-line .f-sales { color: #00FF87; }       /* F (銷售額) - 綠色 */
+  .formula-line .i-irpj { color: #E5FF00; }       /* I (IRPJ) - 黃色 */
+  .formula-line .j-csll { color: #FF8C00; }         /* J (CSLL) - 橙色 */
+  .formula-line .h-net { color: #00FF87; }        /* H (稅後淨利) - 綠色 */
+  .formula-line .total { color: #D4A843; }        /* 總返款 - 金色 */
+
+  .formula-insight {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0,255,135,0.1);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .formula-insight.warning {
+    background: rgba(147,51,234,0.1);
+    color: #9333EA;
+  }
+
+  .formula-insight.compliant {
+    background: rgba(0,255,135,0.1);
+    color: #00FF87;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .scale-weight {
+      padding: 1rem 1.5rem;
+    }
+    
+    .weight-icon {
+      font-size: 2rem;
+    }
+    
+    .weight-value {
+      font-size: 1.25rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .tax-scale-container {
+      padding: 1rem;
+    }
+    
+    .scale-beam {
+      flex-direction: column;
+      gap: 1rem;
+      animation: none;
+    }
+    
+    .scale-weight {
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 1rem;
+    }
+    
+    .weight-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0;
+    }
+
+    .weight-hint {
+      display: none;
+    }
+    
+    .formula-crystal {
+      max-height: 90vh;
+      padding: 1rem;
+    }
+
+    .formula-main {
+      font-size: 1.1rem;
+    }
+
+    .formula-line {
+      font-size: 0.85rem;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const weights = document.querySelectorAll('.scale-weight');
+  const crystal = document.querySelector('.formula-crystal');
+  const crystalContent = document.getElementById('crystal-content');
+  const crystalClose = document.querySelector('.crystal-close');
+  const crystalOverlay = document.getElementById('crystal-overlay');
+
+  const modeData: Record<string, {icon: string; label: string; status: string; formula: string}> = {
+    'lucro-real': {
+      icon: '💼',
+      label: 'Lucro Real 實際利潤制',
+      status: '正清全報',
+      formula: `
+        <div class="formula-main">總返款中國 = <span class="a-cif">A</span> + <span class="h-net">H</span> = <span class="a-cif">1,000</span> + <span class="h-net">304</span> = <span class="total">1,304</span></div>
+        <div class="formula-chain">
+          <div class="formula-line">
+            <span class="label"><span class="h-net">H</span> (稅後淨利)</span>
+            = <span class="e-gross">E</span> - <span class="d-cost">D</span> - <span class="i-irpj">I</span> - <span class="j-csll">J</span>
+            = <span class="e-gross">900</span> - <span class="d-cost">500</span> - <span class="i-irpj">60</span> - <span class="j-csll">36</span>
+            = <span class="h-net">304</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="e-gross">E</span> (毛利)</span> = <span class="c-input">C</span> × 60% = <span class="c-input">1,500</span> × 60% = <span class="e-gross">900</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="i-irpj">I</span> (IRPJ)</span> = E × 15% = <span class="i-irpj">60</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="j-csll">J</span> (CSLL)</span> = E × 9% = <span class="j-csll">36</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="d-cost">D</span> (營運成本)</span> = <span class="d-cost">500</span>
+          </div>
+          <div class="formula-line">
+            <span class="label"><span class="a-cif">A</span> (CIF)</span> = <span class="a-cif">1,000</span> (實際貨價)
+          </div>
+          <div class="formula-line">
+            <span class="label"><span class="c-input">C</span> (進項發票)</span> = A + 進口稅費 = <span class="a-cif">1,000</span> + 500 = <span class="c-input">1,500</span>
+          </div>
+        </div>
+        <div class="formula-insight compliant">
+          💡 按實際利潤徵稅，適合帳目完整的大型企業
+        </div>
+      `
+    },
+    'lucro-presumido': {
+      icon: '☀️',
+      label: 'Lucro Presumido 利潤推算制',
+      status: '正清全報',
+      formula: `
+        <div class="formula-main">總返款中國 = <span class="a-cif">A</span> + <span class="h-net">H</span> = <span class="a-cif">1,000</span> + <span class="h-net">345.28</span> = <span class="total">1,345.28</span> 🏆</div>
+        <div class="formula-chain">
+          <div class="formula-line">
+            <span class="label"><span class="h-net">H</span> (稅後淨利)</span>
+            = <span class="e-gross">E</span> - <span class="d-cost">D</span> - <span class="i-irpj">I</span> - <span class="j-csll">J</span>
+            = <span class="e-gross">900</span> - <span class="d-cost">500</span> - <span class="i-irpj">28.8</span> - <span class="j-csll">25.92</span>
+            = <span class="h-net">345.28</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="e-gross">E</span> (毛利)</span> = <span class="c-input">C</span> × 60% = <span class="c-input">1,500</span> × 60% = <span class="e-gross">900</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="i-irpj">I</span> (IRPJ)</span> = <span class="f-sales">F</span>×8%×15% = 2,400×8%×15% = <span class="i-irpj">28.8</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="j-csll">J</span> (CSLL)</span> = <span class="f-sales">F</span>×12%×9% = 2,400×12%×9% = <span class="j-csll">25.92</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="f-sales">F</span> (銷售額)</span> = <span class="c-input">C</span> + E = <span class="c-input">1,500</span> + <span class="e-gross">900</span> = <span class="f-sales">2,400</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="d-cost">D</span> (營運成本)</span> = <span class="d-cost">500</span>
+          </div>
+          <div class="formula-line">
+            <span class="label"><span class="a-cif">A</span> (CIF)</span> = <span class="a-cif">1,000</span> (實際貨價)
+          </div>
+          <div class="formula-line">
+            <span class="label"><span class="c-input">C</span> (進項發票)</span> = A + 進口稅費 = <span class="a-cif">1,000</span> + 500 = <span class="c-input">1,500</span>
+          </div>
+        </div>
+        <div class="formula-insight compliant">
+          💡 為何淨利更高？推算制稅基 = 銷售額×8%/12%，低於實際毛利率 60%
+        </div>
+      `
+    },
+    'subf': {
+      icon: '🌙',
+      label: 'Lucro Presumido 低報模式',
+      status: '⚠️ 警示',
+      formula: `
+        <div class="formula-main">總返款中國 = <span class="a-cif">A</span> + <span class="h-net">H</span> = <span class="a-cif">1,000</span> + <span class="h-net">338.77</span> = <span class="total">1,338.77</span></div>
+        <div class="formula-chain">
+          <div class="formula-line">
+            <span class="label"><span class="h-net">H</span> (稅後淨利)</span>
+            = <span class="e-gross">E</span> - <span class="d-cost">D</span> - <span class="i-irpj">I</span> - <span class="j-csll">J</span> - <span class="b-declare">B</span>
+            = <span class="e-gross">1,387.5</span> - <span class="d-cost">500</span> - <span class="i-irpj">25.65</span> - <span class="j-csll">23.09</span> - <span class="b-declare">500</span>
+            = <span class="h-net">338.77</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem; color: #9333EA;">
+            ⚠️ 需扣除未申報差額 <span class="b-declare">B = 500</span> (<span class="a-cif">1,000</span> - <span class="b-declare">500</span>)
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="e-gross">E</span> (毛利)</span> = <span class="c-input">C</span> × 185% = <span class="b-declare">750</span> × 185% = <span class="e-gross">1,387.5</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="i-irpj">I</span> (IRPJ)</span> = <span class="f-sales">F</span>×8%×15% = 2,137.5×8%×15% = <span class="i-irpj">25.65</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="j-csll">J</span> (CSLL)</span> = <span class="f-sales">F</span>×12%×9% = 2,137.5×12%×9% = <span class="j-csll">23.09</span>
+          </div>
+          <div class="formula-line" style="padding-left: 1rem;">
+            <span class="label"><span class="f-sales">F</span> (銷售額)</span> = <span class="c-input">C</span> + E = <span class="b-declare">750</span> + <span class="e-gross">1,387.5</span> = <span class="f-sales">2,137.5</span>
+          </div>
+          <div class="formula-line">
+            <span class="label"><span class="a-cif">A</span> (CIF)</span> = <span class="a-cif">1,000</span> (實際貨價)
+          </div>
+          <div class="formula-line">
+            <span class="label"><span class="c-input">C</span> (進項發票)</span> = <span class="b-declare">B</span> + 進口稅費 = <span class="b-declare">500</span> + 250 = <span class="c-input">750</span>
+          </div>
+          <div class="formula-line" style="color: #9333EA;">
+            <span class="label"><span class="b-declare">B</span> (申報金額)</span> = <span class="b-declare">500</span> ← 低於實際貨價！
+          </div>
+        </div>
+        <div class="formula-insight warning">
+          ⚠️ 節稅效果最終被抵銷！低報端少付 250，但銷售端多繳稅
+        </div>
+      `
+    }
+  };
+
+  function openCrystal(modeId: string) {
+    const data = modeData[modeId];
+    if (!data) return;
+
+    crystalContent.innerHTML = `
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <span style="font-size: 3rem;">${data.icon}</span>
+        <div style="font-size: 1.25rem; font-weight: 600; margin-top: 0.5rem;">
+          ${data.label}
+          <span style="color: ${data.status.includes('警示') ? '#9333EA' : '#00FF87'};">
+            ${data.status}
+          </span>
+        </div>
+      </div>
+      ${data.formula}
+    `;
+
+    crystal.classList.add('active');
+    crystalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    gsap.fromTo(crystal, 
+      { scale: 0.8, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(1.7)' }
+    );
+  }
+
+  function closeCrystal() {
+    gsap.to(crystal, {
+      scale: 0.8,
+      opacity: 0,
+      duration: 0.2,
+      ease: 'power2.in',
+      onComplete: () => {
+        crystal.classList.remove('active');
+        crystalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  weights.forEach(weight => {
+    weight.addEventListener('click', () => {
+      const modeId = weight.getAttribute('data-mode');
+      if (modeId) openCrystal(modeId);
+    });
+
+    weight.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const modeId = weight.getAttribute('data-mode');
+        if (modeId) openCrystal(modeId);
+      }
+    });
+  });
+
+  crystalClose?.addEventListener('click', closeCrystal);
+  crystalOverlay?.addEventListener('click', closeCrystal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && crystal.classList.contains('active')) {
+      closeCrystal();
+    }
+  });
+</script>

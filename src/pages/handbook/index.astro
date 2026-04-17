@@ -109,13 +109,11 @@ function getCoverImage(slug: string, allPosts: any[]): string | null {
   
   const phase = post.data?.phase || 'handbook';
   
-  // insights 類型的圖片路徑（根據實際資料夾結構）
+  // insights 類型的圖片路徑（slug 包含 insights/ 前綴）
   if (phase === 'insights') {
-    const insightsPaths: Record<string, string> = {
-      '03-2027巴西稅改': '/images/insights/2027 巴西稅改/file-20260317191056557.png',
-      '04-痛點需求解決方案對照表': '/images/insights/痛點–需求–解決方案對照表/file-20260317191551423.png',
-    };
-    return insightsPaths[slug] || null;
+    // 移除 slug 中的 insights/ 前綴
+    const folderName = slug.replace(/^insights\//, '');
+    return `/images/handbook/insights/${folderName}/${images.cover}`;
   }
   
   return `/images/handbook/${slug}/${images.cover}`;
@@ -742,46 +740,6 @@ function closeLightbox() {
   const resultsEl = document.getElementById('search-results');
   if (!input || !resultsEl) return;
 
-  let fuse: any = null;
-  let searchLoaded = false;
-
-  // 非同步載入全文搜尋索引（避免 HTML bloat）
-  async function loadSearchIndex() {
-    if (searchLoaded) return;
-    try {
-      const res = await fetch('/search-index.json');
-      const searchIndex = await res.json();
-      searchLoaded = true;
-      
-      const Fuse = (await import('https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js')).default;
-      fuse = new Fuse(searchIndex, {
-        keys: [
-          { name: 'title', weight: 0.5 },
-          { name: 'description', weight: 0.3 },
-          { name: 'tags', weight: 0.15 },
-          { name: 'phaseLabel', weight: 0.05 },
-        ],
-        threshold: 0.35,
-        ignoreLocation: true,
-        includeScore: true,
-        includeMatches: true,
-      });
-    } catch (err) {
-      console.warn('⚠️ Search index failed to load:', err);
-    }
-  }
-
-  // 使用 window.searchData 做即時篩選（輕量 Metadata）
-  const quickSearch = (q: string) => {
-    const data = (window as any).searchData || [];
-    const lowerQ = q.toLowerCase();
-    return data.filter((item: any) =>
-      item.title.toLowerCase().includes(lowerQ) ||
-      item.description.toLowerCase().includes(lowerQ) ||
-      (item.tags || []).some((t: string) => t.toLowerCase().includes(lowerQ))
-    );
-  };
-
   let searchTimeout: any;
 
   // Highlight helper for UX
@@ -798,54 +756,45 @@ function closeLightbox() {
 
   input.addEventListener('input', () => {
     clearTimeout(searchTimeout);
+    const q = input.value.trim();
+    
+    if (!q) { 
+      resultsEl.style.display = 'none'; 
+      return; 
+    }
+
     searchTimeout = setTimeout(async () => {
-      const q = input.value.trim();
-      if (!q) { resultsEl.style.display = 'none'; return; }
+      try {
+        const res = await fetch(`/api/search.json?q=${encodeURIComponent(q)}`);
+        const results = await res.json();
 
-      let results: any[] = [];
-
-      if (fuse) {
-        // Fuse.js fuzzy search (全文索引載入後)
-        const fuseResults = fuse.search(q);
-        results = fuseResults.map((r: any) => ({
-          slug: r.item.slug,
-          title: r.item.title,
-          description: r.item.description,
-          icon: r.item.icon,
-          phase: r.item.phase,
-          score: r.score,
-        }));
-      } else {
-        // 即時快速搜尋（使用 window.searchData 輕量 Metadata）
-        results = quickSearch(q);
-        // 背景載入全文索引以增強搜尋
-        loadSearchIndex();
+        resultsEl.style.display = 'block';
+        if (results.length === 0) {
+          resultsEl.innerHTML = `
+            <div style="color:var(--color-muted);font-size:0.9rem;text-align:center;padding:1.5rem 0;background:rgba(212,168,67,0.02);border-radius:0.5rem;border:1px dashed rgba(212,168,67,0.15);">
+              <div style="font-size:1.5rem;margin-bottom:0.5rem;">😅</div>
+              未找到相關內容... <br/>
+              <span style="font-size:0.85rem;color:#6b7280;margin-top:0.8rem;display:inline-block;">
+                推薦搜尋：<span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='RADAR';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">RADAR</span>、
+                <span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='CNPJ';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">CNPJ</span>、
+                <span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='3PL';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">3PL</span>
+              </span>
+            </div>`;
+        } else {
+          resultsEl.innerHTML = `
+            <div style="color:var(--color-muted);font-size:0.8rem;margin-bottom:0.5rem;">找到 ${results.length} 個相關章節：</div>
+            ${results.map((r: any) => `
+              <a href="/handbook/${r.slug}" style="display:block;padding:0.75rem;border-radius:0.5rem;color:var(--color-text);font-size:0.9rem;margin-bottom:0.25rem;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.1);text-decoration:none;transition:all 0.2s;">
+                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.25rem;">${r.icon || '📄'} ${highlight(r.title, q)}</div>
+                <div style="font-size:0.8rem;color:var(--color-muted);line-height:1.4;">${highlight(r.description, q)}</div>
+              </a>
+            `).join('')}
+          `;
+        }
+      } catch (err) {
+        console.error('Search API error:', err);
       }
-
-      resultsEl.style.display = 'block';
-      if (results.length === 0) {
-        resultsEl.innerHTML = `
-          <div style="color:var(--color-muted);font-size:0.9rem;text-align:center;padding:1.5rem 0;background:rgba(212,168,67,0.02);border-radius:0.5rem;border:1px dashed rgba(212,168,67,0.15);">
-            <div style="font-size:1.5rem;margin-bottom:0.5rem;">😅</div>
-            未找到相關內容... <br/>
-            <span style="font-size:0.85rem;color:#6b7280;margin-top:0.8rem;display:inline-block;">
-              推薦搜尋：<span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='RADAR';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">RADAR</span>、
-              <span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='CNPJ';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">CNPJ</span>、
-              <span style="color:var(--color-gold);cursor:pointer;" onclick="document.getElementById('handbook-search').value='3PL';document.getElementById('handbook-search').dispatchEvent(new Event('input'))">3PL</span>
-            </span>
-          </div>`;
-      } else {
-        resultsEl.innerHTML = `
-          <div style="color:var(--color-muted);font-size:0.8rem;margin-bottom:0.5rem;">找到 ${results.length} 個相關章節：</div>
-          ${results.map((r: any) => `
-            <a href="/handbook/${r.slug}" style="display:block;padding:0.75rem;border-radius:0.5rem;color:var(--color-text);font-size:0.9rem;margin-bottom:0.25rem;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.1);text-decoration:none;transition:all 0.2s;">
-              <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.25rem;">${r.icon || '📄'} ${highlight(r.title, q)}</div>
-              <div style="font-size:0.8rem;color:var(--color-muted);line-height:1.4;">${highlight(r.description, q)}</div>
-            </a>
-          `).join('')}
-        `;
-      }
-    }, 250);
+    }, 300);
   });
 })();
 
@@ -1228,10 +1177,15 @@ const pathConfigs = {
   /* Hover effect on carousel cards */
   .carousel-slide-card {
     transition: transform 0.2s, box-shadow 0.2s;
+    background: rgba(15, 15, 24, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(212, 168, 67, 0.2);
   }
 
   .carousel-slide-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(212, 168, 67, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 168, 67, 0.15);
+    border-color: rgba(212, 168, 67, 0.5);
   }
 </style>
