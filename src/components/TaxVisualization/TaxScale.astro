@@ -293,8 +293,9 @@ const modes = defaultModes;
   }
 
   .crystal-header {
+    position: relative;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
@@ -306,9 +307,12 @@ const modes = defaultModes;
     font-weight: 700;
     color: var(--color-gold, #D4A843);
     margin: 0;
+    text-align: center;
   }
 
   .crystal-close {
+    position: absolute;
+    right: 0;
     background: none;
     border: none;
     font-size: 2rem;
@@ -324,6 +328,10 @@ const modes = defaultModes;
     color: var(--color-gold);
   }
 
+</style>
+
+<style is:global>
+  /* 供 JS 動態生成的內容使用，必須設定為 global */
   .formula-main {
     font-size: 1.3rem;
     font-weight: 800;
@@ -388,7 +396,10 @@ const modes = defaultModes;
     color: #00FF87;
   }
 
-  /* Responsive */
+</style>
+
+<style>
+  /* Responsive (Scoped for fixed UI layout) */
   @media (max-width: 900px) {
     .scale-weight {
       padding: 1rem 1.5rem;
@@ -434,7 +445,12 @@ const modes = defaultModes;
       max-height: 90vh;
       padding: 1rem;
     }
+  }
+</style>
 
+<style is:global>
+  /* Responsive for JS injected dynamic content */
+  @media (max-width: 600px) {
     .formula-main {
       font-size: 1.1rem;
     }
