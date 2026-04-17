@@ -96,7 +96,7 @@ const {
     </div>
     <div class="threshold-check">
       <label for="annual-revenue">年度營業額 (R$/年):</label>
-      <input type="text" id="annual-revenue" class="revenue-input" placeholder="例如: 5000000" />
+      <input type="text" id="annual-revenue" class="revenue-input" placeholder="例如: 5000000" value="5000000" />
       <div class="threshold-warning" id="threshold-warning"></div>
     </div>
   </div>
@@ -252,16 +252,25 @@ function calculateCBS_IBS(revenue) {
 function toggleReformSimulation() {
   const checkbox = document.getElementById('enable-2026-reform');
   const resultDiv = document.getElementById('cbs-ibs-result');
+  const revenueInput = document.getElementById('annual-revenue');
   if (checkbox && resultDiv) {
     if (checkbox.checked) {
       resultDiv.style.display = 'block';
-      const revenue = parseFloat(document.getElementById('annual-revenue')?.value.replace(/,/g, '')) || 0;
+      let revenue = 0;
+      if (revenueInput && revenueInput.value) {
+        revenue = parseFloat(revenueInput.value.replace(/,/g, '').replace(/R\$\s*/g, '')) || 0;
+      }
+      if (revenue === 0) {
+        resultDiv.innerHTML = '<p style="color:#E5FF00;font-size:0.85rem;">⚠️ 請先在上方輸入年度營業額</p>';
+        return;
+      }
       const result = calculateCBS_IBS(revenue);
       document.getElementById('cbs-value').textContent = 'R$ ' + result.cbs.toFixed(2);
       document.getElementById('ibs-value').textContent = 'R$ ' + result.ibs.toFixed(2);
       document.getElementById('cbs-ibs-total').textContent = 'R$ ' + result.total.toFixed(2);
     } else {
       resultDiv.style.display = 'none';
+      resultDiv.innerHTML = '';
     }
   }
 }
