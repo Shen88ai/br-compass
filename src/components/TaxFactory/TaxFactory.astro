@@ -90,6 +90,11 @@ const {
         <option value="real-nao-cumulativo">Lucro Real (非累積制-一般行業)</option>
       </select>
     </div>
+    <div class="threshold-check">
+      <label for="annual-revenue">年度營業額 (R$/年):</label>
+      <input type="text" id="annual-revenue" class="revenue-input" placeholder="例如: 5000000" />
+      <div class="threshold-warning" id="threshold-warning"></div>
+    </div>
   </div>
   
   <div class="factory-dashboard" id="factory-dashboard">
@@ -109,6 +114,16 @@ const {
 </div>
 
 <script define:vars={{ fullMode, subfMode }}>
+function checkThreshold(revenue) {
+  if (revenue > 4800000) {
+    return { regime: 'simples', warning: '⚠️ 超過 R$4.8M/年，Simples必須退出，強制使用 Lucro Presumido 或 Lucro Real' };
+  }
+  if (revenue > 78000000) {
+    return { regime: 'presumido', warning: '⚠️ 超過 R$78M/年，必須使用 Lucro Real' };
+  }
+  return { regime: '', warning: '' };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const factoryBtns = document.querySelectorAll('[data-action="switch-factory"]');
   const importStation = document.querySelector('[data-value="import"]');
@@ -136,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
         salesTax.textContent = data.salesTax;
         netStation.textContent = data.net;
         
-        // Animate update
         [importStation, salesStation, netStation].forEach(el => {
           el.closest('.factory-station')?.classList.add('animate-update');
           setTimeout(() => el.closest('.factory-station')?.classList.remove('animate-update'), 400);
@@ -144,6 +158,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  const revenueInput = document.getElementById('annual-revenue');
+  const thresholdWarning = document.getElementById('threshold-warning');
+  const taxRegimeSelect = document.getElementById('tax-regime');
+  
+  if (revenueInput && thresholdWarning && taxRegimeSelect) {
+    revenueInput.addEventListener('input', (e) => {
+      const revenue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+      const result = checkThreshold(revenue);
+      
+      if (result.warning) {
+        thresholdWarning.textContent = result.warning;
+        thresholdWarning.style.display = 'block';
+      } else {
+        thresholdWarning.textContent = '';
+        thresholdWarning.style.display = 'none';
+      }
+    });
+  }
 });
 </script>
 
@@ -342,6 +375,34 @@ document.addEventListener('DOMContentLoaded', () => {
 .tax-select:focus {
   outline: none;
   border-color: #D4A843;
+}
+
+.threshold-check {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.revenue-input {
+  background: #1a1a24;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.revenue-input:focus {
+  outline: none;
+  border-color: #D4A843;
+}
+
+.threshold-warning {
+  font-size: 0.75rem;
+  color: #E5FF00;
+  margin-top: 0.25rem;
+  min-height: 1rem;
 }
 
 /* Factory Dashboard */
