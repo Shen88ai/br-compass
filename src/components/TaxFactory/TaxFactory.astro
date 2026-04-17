@@ -1,0 +1,410 @@
+---
+interface Props {
+  fullMode?: {
+    import: string;
+    importTax: string;
+    sales: string;
+    salesTax: string;
+    net: string;
+  };
+  subfMode?: {
+    import: string;
+    importTax: string;
+    sales: string;
+    salesTax: string;
+    net: string;
+  };
+}
+
+const {
+  fullMode = {
+    import: '$1,000',
+    importTax: '-$420',
+    sales: '$2,400',
+    salesTax: '+$672',
+    net: '$252'
+  },
+  subfMode = {
+    import: '$500',
+    importTax: '-$210',
+    sales: '$2,137.50',
+    salesTax: '+$598.50',
+    net: '$389'
+  }
+} = Astro.props;
+---
+
+<div class="tax-factory" id="tax-factory">
+  <div class="factory-pipeline">
+    <div class="factory-station import-station">
+      <div class="station-icon">📦</div>
+      <div class="station-name">關口1 - 進口</div>
+      <div class="station-value" data-value="import">{fullMode.import}</div>
+      <div class="station-formula">申報金額</div>
+      <div class="station-tax">
+        <span class="tax-badge">-28%</span>
+        <div class="tax-value" data-tax="import">{fullMode.importTax}</div>
+      </div>
+    </div>
+    
+    <div class="conveyor-belt">
+      <div class="belt-segment"></div>
+      <div class="belt-arrow">▶</div>
+    </div>
+    
+    <div class="factory-station sales-station">
+      <div class="station-icon">🏭</div>
+      <div class="station-name">關口2 - 銷售</div>
+      <div class="station-value" data-value="sales">{fullMode.sales}</div>
+      <div class="station-formula">銷售發票</div>
+      <div class="station-tax">
+        <span class="tax-badge">+28%</span>
+        <div class="tax-value" data-tax="sales">{fullMode.salesTax}</div>
+      </div>
+    </div>
+    
+    <div class="conveyor-belt">
+      <div class="belt-segment"></div>
+      <div class="belt-arrow">▶</div>
+    </div>
+    
+    <div class="factory-station net-station">
+      <div class="station-icon">💰</div>
+      <div class="station-name">結算中心</div>
+      <div class="station-value net-value" data-value="net">{fullMode.net}</div>
+      <div class="station-formula">實繳稅額</div>
+      <div class="station-result">
+        <span class="result-badge">淨額</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="factory-controls">
+    <div class="mode-label">🔄 模式切換：</div>
+    <div class="mode-buttons">
+      <button class="factory-btn active" data-mode="full" data-action="switch-factory">
+        ☀️ 全報模式
+      </button>
+      <button class="factory-btn" data-mode="subf" data-action="switch-factory">
+        🌙 低報模式
+      </button>
+    </div>
+  </div>
+  
+  <div class="factory-dashboard" id="factory-dashboard">
+    <div class="dashboard-card full-mode">
+      <div class="card-header">全報模式</div>
+      <div class="card-value">{fullMode.net}</div>
+      <div class="card-label">實繳稅額</div>
+      <div class="card-status">✅ 合規</div>
+    </div>
+    <div class="dashboard-card subf-mode">
+      <div class="card-header">低報模式</div>
+      <div class="card-value">{subfMode.net}</div>
+      <div class="card-label">實繳稅額</div>
+      <div class="card-status">⚠️ 高稅</div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ fullMode, subfMode }}>
+document.addEventListener('DOMContentLoaded', () => {
+  const factoryBtns = document.querySelectorAll('[data-action="switch-factory"]');
+  const importStation = document.querySelector('[data-value="import"]');
+  const importTax = document.querySelector('[data-tax="import"]');
+  const salesStation = document.querySelector('[data-value="sales"]');
+  const salesTax = document.querySelector('[data-tax="sales"]');
+  const netStation = document.querySelector('[data-value="net"]');
+  
+  const modeData = {
+    full: fullMode,
+    subf: subfMode
+  };
+  
+  factoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.getAttribute('data-mode');
+      factoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const data = modeData[mode];
+      if (data && importStation && importTax && salesStation && salesTax && netStation) {
+        importStation.textContent = data.import;
+        importTax.textContent = data.importTax;
+        salesStation.textContent = data.sales;
+        salesTax.textContent = data.salesTax;
+        netStation.textContent = data.net;
+        
+        // Animate update
+        [importStation, salesStation, netStation].forEach(el => {
+          el.closest('.factory-station')?.classList.add('animate-update');
+          setTimeout(() => el.closest('.factory-station')?.classList.remove('animate-update'), 400);
+        });
+      }
+    });
+  });
+});
+</script>
+
+<style>
+.tax-factory {
+  background: linear-gradient(135deg, rgba(212,168,67,0.08) 0%, rgba(0,255,135,0.05) 100%);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.factory-pipeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.factory-station {
+  flex: 1;
+  background: #1a1a24;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.factory-station::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #D4A843;
+}
+
+.import-station::before { background: #00FF87; }
+.sales-station::before { background: #D4A843; }
+.net-station::before { background: #7DD3FC; }
+
+.factory-station:hover {
+  transform: translateY(-4px);
+  border-color: #D4A843;
+  box-shadow: 0 0 20px rgba(212,168,67,0.2);
+}
+
+.station-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.station-name {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.station-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f5f5f0;
+  margin-bottom: 0.25rem;
+}
+
+.net-value {
+  color: #00FF87;
+  font-size: 1.5rem;
+}
+
+.station-formula {
+  font-size: 0.7rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.station-tax {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.tax-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.import-station .tax-badge {
+  background: rgba(0,255,135,0.15);
+  color: #00FF87;
+}
+
+.sales-station .tax-badge {
+  background: rgba(212,168,67,0.15);
+  color: #D4A843;
+}
+
+.tax-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.import-station .tax-value { color: #00FF87; }
+.sales-station .tax-value { color: #E5FF00; }
+
+.station-result {
+  margin-top: 0.5rem;
+}
+
+.result-badge {
+  background: rgba(125,211,252,0.15);
+  color: #7DD3FC;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Conveyor Belt */
+.conveyor-belt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0.25rem 0;
+}
+
+.belt-segment {
+  width: 3px;
+  height: 30px;
+  background: repeating-linear-gradient(
+    180deg,
+    #D4A843 0px,
+    #D4A843 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  animation: conveyor-move-vertical 1s linear infinite;
+}
+
+.belt-arrow {
+  color: #D4A843;
+  animation: arrow-pulse 1s ease-in-out infinite;
+}
+
+@keyframes conveyor-move-vertical {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 12px; }
+}
+
+@keyframes arrow-pulse {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(3px); opacity: 0.6; }
+}
+
+/* Factory Controls */
+.factory-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mode-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.factory-btn {
+  background: #1a1a24;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.factory-btn:hover {
+  background: #252530;
+  border-color: #D4A843;
+}
+
+.factory-btn.active {
+  background: #D4A843;
+  color: #0a0a0f;
+  border-color: #D4A843;
+  font-weight: 600;
+}
+
+/* Factory Dashboard */
+.factory-dashboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.dashboard-card {
+  background: #1a1a24;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.dashboard-card .card-header {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-card .card-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #00FF87;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-card .card-label {
+  font-size: 0.7rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-card .card-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.dashboard-card:first-child .card-status { color: #00FF87; }
+.dashboard-card:last-child .card-status { color: #E5FF00; }
+
+/* Animation */
+.animate-update {
+  animation: value-pulse 0.4s ease;
+}
+
+@keyframes value-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .factory-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

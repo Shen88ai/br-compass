@@ -2,19 +2,19 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "br-compass",
   "compatibility_date": "2026-04-15",
-  "main": "dist/server/entry.mjs",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "binding": "ASSETS",
-    "directory": "dist/client"
+    "directory": "./dist",
+    "binding": "ASSETS"
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "br-compass-db",
-      "database_id": "REPLACE_WITH_YOUR_ID"
+      "database_id": "8b159120-b6b7-4d23-b96f-4803fe5bfce9"
     }
-  ]
+  ],
+  "observability": {
+    "enabled": true
+  }
 }

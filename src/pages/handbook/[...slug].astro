@@ -3,6 +3,11 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import { glossaryData, chapterTerms, categoryLabels } from '../../data/glossary';
+import TaxFunnel from '../../components/TaxVisualization/TaxFunnel.astro';
+import TaxRiver from '../../components/TaxVisualization/TaxRiver.astro';
+import TaxScale from '../../components/TaxVisualization/TaxScale.astro';
+
+export const prerender = true;
 
 export async function getStaticPaths() {
   const posts = await getCollection('handbook');
@@ -17,6 +22,11 @@ interface Props {
 }
 
 const { post } = Astro.props;
+
+if (post.data.redirect_to) {
+  return Astro.redirect(post.data.redirect_to, 301);
+}
+
 const { Content, headings } = await render(post);
 
 // Get cover image from frontmatter
@@ -53,6 +63,11 @@ const chapterGlossaryEntries = glossaryData.filter(g => chapterTermKeys.includes
 // Build glossary map for tooltip
 const glossaryMap: Record<string, typeof glossaryData[0]> = {};
 glossaryData.forEach(g => { glossaryMap[g.term] = g; });
+
+// Show TaxFunnel visualization for 04b pages
+const showTaxFunnel = post.id.includes('04b-tax-comparison-modes');
+const showTaxScale = post.id.includes('04b-tax-comparison-modes');
+const showTaxRiver = post.id.includes('04a-tax-comparison-intro');
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
@@ -181,6 +196,10 @@ glossaryData.forEach(g => { glossaryMap[g.term] = g; });
       <div class="prose-custom">
         <Content />
       </div>
+
+      {showTaxScale && <TaxScale />}
+      {showTaxFunnel && <TaxFunnel />}
+      {showTaxRiver && <TaxRiver />}
 
       <!-- ── Persona Journey MiniMap ─────────────────── -->
       <div class="journey-minimap persona-hidden" id="journey-minimap">

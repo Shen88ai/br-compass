@@ -1,0 +1,502 @@
+---
+interface FunnelStage {
+  label: string;
+  value: number;
+  color: string;
+  type: 'revenue' | 'cost' | 'tax' | 'profit';
+}
+
+interface TaxMode {
+  id: string;
+  label: string;
+  labelShort: string;
+  icon: string;
+  profit: number;
+  status: 'compliant' | 'warning' | 'risk';
+  stages: FunnelStage[];
+}
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const taxModes: TaxMode[] = [
+  {
+    id: 'lucro-real',
+    label: 'Lucro Real',
+    labelShort: '實際利潤制',
+    icon: '💼',
+    profit: 304,
+    status: 'compliant',
+    stages: [
+      { label: '毛利', value: 900, color: 'var(--color-neon-green)', type: 'revenue' },
+      { label: 'IRPJ', value: -60, color: 'var(--color-neon-yellow)', type: 'tax' },
+      { label: 'CSLL', value: -36, color: '#FF8C00', type: 'tax' },
+      { label: '運營成本', value: -500, color: 'var(--color-sky-blue)', type: 'cost' },
+    ]
+  },
+  {
+    id: 'lucro-presumido',
+    label: 'Lucro Presumido',
+    labelShort: '利潤推算制',
+    icon: '☀️',
+    profit: 345.28,
+    status: 'compliant',
+    stages: [
+      { label: '毛利', value: 900, color: 'var(--color-neon-green)', type: 'revenue' },
+      { label: 'IRPJ', value: -28.8, color: 'var(--color-neon-yellow)', type: 'tax' },
+      { label: 'CSLL', value: -25.92, color: '#FF8C00', type: 'tax' },
+      { label: '運營成本', value: -500, color: 'var(--color-sky-blue)', type: 'cost' },
+    ]
+  },
+  {
+    id: 'subf',
+    label: '低報模式',
+    labelShort: 'Sub F.',
+    icon: '🌙',
+    profit: 338.77,
+    status: 'warning',
+    stages: [
+      { label: '毛利', value: 1387.5, color: 'var(--color-neon-green)', type: 'revenue' },
+      { label: 'IRPJ', value: -25.65, color: 'var(--color-neon-yellow)', type: 'tax' },
+      { label: 'CSLL', value: -23.09, color: '#FF8C00', type: 'tax' },
+      { label: '低報差額', value: -500, color: '#9333EA', type: 'cost' },
+      { label: '運營成本', value: -500, color: 'var(--color-sky-blue)', type: 'cost' },
+    ]
+  }
+];
+---
+
+<div class:list={["tax-funnel-container", className]}>
+  <div class="funnel-header">
+    <h3 class="funnel-title">📊 稅務流水線漏斗圖</h3>
+    <div class="funnel-legend">
+      <div class="legend-item">
+        <span class="legend-dot" style="background: var(--color-neon-green)"></span>
+        <span>收入</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background: var(--color-neon-yellow)"></span>
+        <span>IRPJ</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background: #FF8C00"></span>
+        <span>CSLL</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background: var(--color-sky-blue)"></span>
+        <span>運營成本</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background: #9333EA"></span>
+        <span>低報差額</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="funnel-grid">
+    {taxModes.map((mode, modeIndex) => {
+      const totalDeductions = mode.stages
+        .filter(s => s.type !== 'revenue')
+        .reduce((sum, s) => sum + Math.abs(s.value), 0);
+      const maxWidth = 100;
+      
+      return (
+        <div class="funnel-column" data-mode={mode.id}>
+          <div class="funnel-header-row">
+            <span class="funnel-icon">{mode.icon}</span>
+            <span class="funnel-label">{mode.labelShort}</span>
+            <span class={`funnel-status ${mode.status}`}>
+              {mode.status === 'compliant' ? '✅' : '⚠️'}
+            </span>
+          </div>
+
+          <div class="funnel-funnel-shape">
+            {/* 收入層（最寬） */}
+            <div class="funnel-layer revenue-layer">
+              <div class="layer-content" style={`--layer-width: 100%;`}>
+                <span class="layer-item-label">毛利</span>
+                <span class="layer-item-value revenue-value">+R${mode.stages[0].value.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* 稅務及成本層（逐漸變窄） */}
+            {mode.stages.slice(1).map((stage, i) => {
+              const layerIndex = i + 1;
+              const totalLayers = mode.stages.length - 1;
+              const narrowingRatio = 1 - (layerIndex / (totalLayers + 1)) * 0.5;
+              const widthPercent = narrowingRatio * 100;
+              const displayValue = stage.value >= 0 
+                ? `+R$${Math.abs(stage.value).toFixed(2)}`
+                : `-R$${Math.abs(stage.value).toFixed(2)}`;
+              
+              return (
+                <div class={`funnel-layer ${stage.type}-layer`}>
+                  <div class="layer-content" style={`--layer-width: ${widthPercent}%; --layer-color: ${stage.color};`}>
+                    <span class="layer-item-label">{stage.label}</span>
+                    <span class="layer-item-value">{displayValue}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div class="funnel-result">
+            <div class="result-badge">
+              <span class="result-icon">💰</span>
+              <div class="result-info">
+                <span class="result-amount" style={`color: ${mode.status === 'compliant' ? 'var(--color-neon-green)' : 'var(--color-neon-yellow)'}`}>
+                  ${mode.profit.toFixed(2)}
+                </span>
+                <span class="result-label">淨利</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <div class="funnel-insight">
+    <div class="insight-badge">
+      💡 核心發現
+    </div>
+    <div class="insight-text">
+      Lucro Presumido 正清全報達到最高淨利 <strong style="color: var(--color-neon-green)">$345.28</strong>，
+      且 100% 合規。低報模式因需扣除未申報差額，淨利反而較低。
+    </div>
+  </div>
+</div>
+
+<style>
+.tax-funnel-container {
+  background: linear-gradient(135deg, rgba(13, 13, 20, 0.95) 0%, rgba(20, 20, 35, 0.95) 100%);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  font-family: var(--font-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+.funnel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(212, 168, 67, 0.1);
+}
+
+.funnel-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-gold, #D4A843);
+  margin: 0;
+  font-family: var(--font-heading), 'Space Grotesk', 'Inter', sans-serif;
+}
+
+.funnel-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #B8BCC8);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.funnel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .funnel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.funnel-column {
+  background: rgba(15, 15, 24, 0.9);
+  border: 1px solid rgba(212, 168, 67, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.funnel-column:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 168, 67, 0.4);
+  box-shadow: 0 8px 32px rgba(212, 168, 67, 0.15), 
+              0 0 60px rgba(0, 255, 135, 0.05);
+}
+
+.funnel-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(212, 168, 67, 0.1);
+}
+
+.funnel-icon {
+  font-size: 1.25rem;
+}
+
+.funnel-label {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text, #F5F5F0);
+}
+
+.funnel-status {
+  font-size: 1rem;
+}
+
+/* 漏斗形狀容器 */
+.funnel-funnel-shape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.funnel-layer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.layer-content {
+  width: var(--layer-width, 100%);
+  min-width: 50px;
+  max-width: 100%;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* 收入層 - 頂部最寬 */
+.revenue-layer .layer-content {
+  background: var(--color-neon-green);
+  clip-path: polygon(2% 0%, 98% 0%, 100% 100%, 0% 100%);
+  border-radius: 6px 6px 0 0;
+}
+
+/* 扣除層 - 上寬下窄梯形 */
+.tax-layer .layer-content,
+.cost-layer .layer-content {
+  clip-path: polygon(0% 0%, 100% 0%, 97% 100%, 3% 100%);
+}
+
+.tax-layer .layer-content {
+  background: var(--layer-color, var(--color-neon-yellow));
+}
+
+.cost-layer .layer-content {
+  background: var(--layer-color, var(--color-sky-blue));
+}
+
+/* 統一文字樣式 */
+.layer-item-label {
+  color: rgba(3, 3, 8, 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.layer-item-value {
+  color: var(--color-bg-900);
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+.revenue-value {
+  font-size: 1.1rem;
+}
+
+/* Hover 效果 */
+.funnel-column:hover .layer-content {
+  filter: brightness(1.1);
+  transform: scaleX(1.02);
+}
+
+/* 淨利結果 - 漏斗底部 */
+.funnel-result {
+  display: flex;
+  justify-content: center;
+  margin-top: -1px;
+}
+
+.result-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: rgba(0, 255, 135, 0.1);
+  border: 2px solid rgba(0, 255, 135, 0.4);
+  clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+}
+
+.result-icon {
+  font-size: 2rem;
+}
+
+.result-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.result-amount {
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  line-height: 1;
+}
+
+.result-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #B8BCC8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Insight 區塊 */
+.funnel-insight {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(212, 168, 67, 0.05);
+  border: 1px solid rgba(212, 168, 67, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.insight-badge {
+  flex-shrink: 0;
+  background: var(--color-gold, #D4A843);
+  color: var(--color-bg-900, #030308);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.insight-text {
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #B8BCC8);
+  line-height: 1.6;
+}
+
+/* 響應式 */
+@media (max-width: 600px) {
+  .funnel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .funnel-legend {
+    gap: 0.5rem;
+  }
+
+  .legend-item {
+    font-size: 0.7rem;
+  }
+
+  .layer-content {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .layer-value {
+    font-size: 0.85rem;
+  }
+
+  .layer-label {
+    font-size: 0.65rem;
+  }
+
+  .layer-deduction {
+    font-size: 0.7rem;
+  }
+
+  .result-amount {
+    font-size: 1.5rem;
+  }
+
+  .funnel-insight {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  (function initFunnelHover() {
+    const columns = document.querySelectorAll('.funnel-column');
+
+    columns.forEach((col) => {
+      const layers = col.querySelectorAll('.funnel-layer');
+      
+      col.addEventListener('mouseenter', () => {
+        gsap.to(col, {
+          y: -4,
+          duration: 0.3,
+          ease: 'back.out(1.7)'
+        });
+
+        layers.forEach((layer, i) => {
+          gsap.fromTo(layer, 
+            { opacity: 0.6 },
+            { 
+              opacity: 1, 
+              duration: 0.25,
+              delay: i * 0.04
+            }
+          );
+        });
+      });
+
+      col.addEventListener('mouseleave', () => {
+        gsap.to(col, {
+          y: 0,
+          duration: 0.3,
+          ease: 'power2.out'
+        });
+
+        layers.forEach((layer) => {
+          gsap.to(layer, {
+            opacity: 1,
+            duration: 0.2
+          });
+        });
+      });
+    });
+  })();
+</script>

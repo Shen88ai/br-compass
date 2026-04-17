@@ -14,6 +14,7 @@ const handbookCollection = defineCollection({
     coverImage: z.string().optional(),
     publishDate: z.coerce.date().optional(),
     featured: z.boolean().optional().default(false),
+    redirect_to: z.string().optional(),
     images: z.object({
       cover: z.string().optional(),
       diagram: z.string().optional(),

@@ -1,0 +1,740 @@
+---
+interface TaxMode {
+  id: string;
+  label: string;
+  icon: string;
+  profit: number;
+  status: 'compliant' | 'warning' | 'risk';
+  breakdown: {
+    label: string;
+    value: number;
+    color: string;
+  }[];
+}
+
+interface Props {
+  mode?: 'donut' | 'onion' | 'both';
+  showOnion?: boolean;
+  class?: string;
+}
+
+const { mode = 'both', showOnion = true, class: className } = Astro.props;
+
+const taxModes: TaxMode[] = [
+  {
+    id: 'lucro-real',
+    label: 'Lucro Real',
+    icon: '💼',
+    profit: 304,
+    status: 'compliant',
+    breakdown: [
+      { label: '毛利 (60%)', value: 900, color: '#00FF87' },
+      { label: 'IRPJ (15%)', value: -60, color: '#E5FF00' },
+      { label: 'CSLL (9%)', value: -36, color: '#FF6B6B' },
+      { label: '運營成本', value: -500, color: '#7DD3FC' },
+    ]
+  },
+  {
+    id: 'lucro-presumido',
+    label: 'Lucro Presumido',
+    icon: '☀️',
+    profit: 345.28,
+    status: 'compliant',
+    breakdown: [
+      { label: '毛利 (60%)', value: 900, color: '#00FF87' },
+      { label: 'IRPJ (8%×15%)', value: -28.8, color: '#E5FF00' },
+      { label: 'CSLL (12%×9%)', value: -25.92, color: '#FF6B6B' },
+      { label: '運營成本', value: -500, color: '#7DD3FC' },
+    ]
+  },
+  {
+    id: 'subf',
+    label: '低報模式',
+    icon: '🌙',
+    profit: 338.77,
+    status: 'warning',
+    breakdown: [
+      { label: '毛利 (185%)', value: 1387.5, color: '#00FF87' },
+      { label: 'IRPJ', value: -25.65, color: '#E5FF00' },
+      { label: 'CSLL', value: -23.09, color: '#FF6B6B' },
+      { label: '低報差額', value: -500, color: '#FF6B6B' },
+      { label: '運營成本', value: -500, color: '#7DD3FC' },
+    ]
+  }
+];
+
+const cbsIbsLayers = [
+  { label: '實繳稅額', value: 252, innerRadius: 0.1, outerRadius: 0.25, color: '#00FF87' },
+  { label: 'CBS/IBS 差額', value: 252, innerRadius: 0.3, outerRadius: 0.45, color: '#E5FF00' },
+  { label: '銷項稅額 (+28%)', value: 672, innerRadius: 0.5, outerRadius: 0.7, color: '#D4A843' },
+  { label: '進項抵扣 (-28%)', value: -420, innerRadius: 0.75, outerRadius: 0.95, color: '#7DD3FC' },
+];
+---
+
+<div class:list={["tax-viz-container", className]} data-mode={mode} data-show-onion={showOnion}>
+  <div class="viz-header">
+    <h3 class="viz-title">📊 稅務計算視覺化</h3>
+    <div class="viz-tabs">
+      <button class="viz-tab active" data-viz="donut">甜甜圈對比</button>
+      <button class="viz-tab" data-viz="onion">CBS/IBS 洋蔥圖</button>
+    </div>
+  </div>
+
+  <div class="viz-content">
+    <div class="viz-canvas-wrapper" id="viz-canvas-wrapper">
+      <canvas id="tax-donut-canvas"></canvas>
+      <div class="viz-legend" id="viz-legend"></div>
+    </div>
+
+    <div class="viz-info-panel" id="viz-info-panel">
+      <div class="info-header">
+        <span class="info-icon" id="info-icon">☀️</span>
+        <span class="info-label" id="info-label">選擇一個模式</span>
+      </div>
+      <div class="info-breakdown" id="info-breakdown">
+        <p class="info-hint">點擊甜甜圈查看詳細分解</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="viz-cbs-onion" id="viz-cbs-onion" style={showOnion ? '' : 'display:none'}>
+    <h4 class="onion-title">🧅 CBS/IBS 非累積稅制結構</h4>
+    <div class="onion-layers">
+      {cbsIbsLayers.map((layer, i) => (
+        <div class="onion-layer" data-index={i}>
+          <div class="layer-ring" style={`--ring-color: ${layer.color}; --ring-progress: ${Math.abs(layer.value) / 700};`}></div>
+          <div class="layer-info">
+            <span class="layer-label">{layer.label}</span>
+            <span class="layer-value" style={`color: ${layer.color}`}>
+              {layer.value > 0 ? '+' : ''}{layer.value >= 0 ? '$' : '-$'}{Math.abs(layer.value).toFixed(2)}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div class="onion-formula">
+      <span class="formula-badge">💡 CBS/IBS 公式</span>
+      <code>實繳 = 銷項稅額 - 進項抵扣</code>
+      <code>$252 = $672 - $420</code>
+    </div>
+  </div>
+</div>
+
+<script>
+  import * as THREE from 'three';
+  import { gsap } from 'gsap';
+
+  interface TaxMode {
+    id: string;
+    label: string;
+    icon: string;
+    profit: number;
+    status: string;
+    breakdown: { label: string; value: number; color: string }[];
+  }
+
+  interface CbsLayer {
+    label: string;
+    value: number;
+    color: string;
+  }
+
+  (function initTaxViz() {
+    const container = document.querySelector('.tax-viz-container');
+    if (!container) return;
+
+    const canvas = document.getElementById('tax-donut-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const showOnion = container.getAttribute('data-show-onion') !== 'false';
+    let currentView = 'donut';
+
+    const taxModes: TaxMode[] = [
+      {
+        id: 'lucro-real',
+        label: 'Lucro Real',
+        icon: '💼',
+        profit: 304,
+        status: 'compliant',
+        breakdown: [
+          { label: '毛利 (60%)', value: 900, color: '#00FF87' },
+          { label: 'IRPJ (15%)', value: -60, color: '#E5FF00' },
+          { label: 'CSLL (9%)', value: -36, color: '#FF6B6B' },
+          { label: '運營成本', value: -500, color: '#7DD3FC' },
+        ]
+      },
+      {
+        id: 'lucro-presumido',
+        label: 'Lucro Presumido',
+        icon: '☀️',
+        profit: 345.28,
+        status: 'compliant',
+        breakdown: [
+          { label: '毛利 (60%)', value: 900, color: '#00FF87' },
+          { label: 'IRPJ (8%×15%)', value: -28.8, color: '#E5FF00' },
+          { label: 'CSLL (12%×9%)', value: -25.92, color: '#FF6B6B' },
+          { label: '運營成本', value: -500, color: '#7DD3FC' },
+        ]
+      },
+      {
+        id: 'subf',
+        label: '低報模式',
+        icon: '🌙',
+        profit: 338.77,
+        status: 'warning',
+        breakdown: [
+          { label: '毛利 (185%)', value: 1387.5, color: '#00FF87' },
+          { label: 'IRPJ', value: -25.65, color: '#E5FF00' },
+          { label: 'CSLL', value: -23.09, color: '#FF6B6B' },
+          { label: '低報差額', value: -500, color: '#FF6B6B' },
+          { label: '運營成本', value: -500, color: '#7DD3FC' },
+        ]
+      }
+    ];
+
+    const cbsIbsLayers: CbsLayer[] = [
+      { label: '實繳稅額', value: 252, color: '#00FF87' },
+      { label: 'CBS/IBS 差額', value: 252, color: '#E5FF00' },
+      { label: '銷項稅額 (+28%)', value: 672, color: '#D4A843' },
+      { label: '進項抵扣 (-28%)', value: -420, color: '#7DD3FC' },
+    ];
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+    camera.position.set(0, 0, 5);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const donutMeshes: THREE.Mesh[] = [];
+    const donutGroup = new THREE.Group();
+    const onionGroup = new THREE.Group();
+    scene.add(donutGroup);
+    scene.add(onionGroup);
+
+    let selectedIndex = -1;
+    let hoveredIndex = -1;
+    let animationId: number;
+
+    function resize() {
+      const wrapper = document.getElementById('viz-canvas-wrapper');
+      if (!wrapper) return;
+      const w = wrapper.clientWidth;
+      const h = wrapper.clientHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    function createDonutChart() {
+      donutGroup.clear();
+      donutMeshes.length = 0;
+
+      const startX = -2.5;
+      const spacing = 2.5;
+
+      taxModes.forEach((mode, index) => {
+        const total = mode.breakdown.reduce((sum, b) => sum + Math.abs(b.value), 0);
+        const group = new THREE.Group();
+        group.position.x = startX + index * spacing;
+        group.position.y = 0.5;
+
+        let startAngle = 0;
+        mode.breakdown.forEach((item) => {
+          const ratio = Math.abs(item.value) / total;
+          const arcLength = ratio * Math.PI * 2;
+          
+          const shape = new THREE.Shape();
+          const innerRadius = 0.4;
+          const outerRadius = 0.7;
+          
+          shape.absarc(0, 0, outerRadius, startAngle, startAngle + arcLength, false);
+          shape.absarc(0, 0, innerRadius, startAngle + arcLength, startAngle, true);
+          shape.closePath();
+
+          const extrudeSettings = { depth: 0.3, bevelEnabled: false };
+          const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+          const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(item.color),
+            transparent: true,
+            opacity: 0.85
+          });
+          
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.position.z = -0.15 + index * 0.02;
+          mesh.userData = { modeIndex: index, itemIndex: mode.breakdown.indexOf(item) };
+          group.add(mesh);
+
+          startAngle += arcLength;
+        });
+
+        const torusGeo = new THREE.TorusGeometry(0.55, 0.05, 8, 32);
+        const torusMat = new THREE.MeshBasicMaterial({ 
+          color: 0xD4A843, 
+          transparent: true, 
+          opacity: 0.5 
+        });
+        const torus = new THREE.Mesh(torusGeo, torusMat);
+        torus.position.z = 0.15;
+        group.add(torus);
+
+        donutGroup.add(group);
+        donutMeshes.push(group);
+      });
+
+      donutGroup.position.y = 0;
+      onionGroup.visible = false;
+      donutGroup.visible = true;
+    }
+
+    function createOnionChart() {
+      onionGroup.clear();
+
+      const maxRadius = 2.2;
+      let currentRadius = 0.3;
+
+      cbsIbsLayers.forEach((layer, index) => {
+        const ringGeo = new THREE.RingGeometry(currentRadius, currentRadius + 0.4, 64);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(layer.color),
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.7
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.z = index * 0.1;
+        onionGroup.add(ring);
+
+        const labelGeo = new THREE.CircleGeometry(0.15, 32);
+        const labelMat = new THREE.MeshBasicMaterial({ 
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.9
+        });
+        const label = new THREE.Mesh(labelGeo, labelMat);
+        label.position.set(currentRadius + 0.2, 0.2, index * 0.1 + 0.01);
+        onionGroup.add(label);
+
+        currentRadius += 0.5;
+      });
+
+      onionGroup.visible = true;
+      donutGroup.visible = false;
+    }
+
+    function updateInfoPanel(index: number) {
+      const icon = document.getElementById('info-icon');
+      const label = document.getElementById('info-label');
+      const breakdown = document.getElementById('info-breakdown');
+
+      if (!icon || !label || !breakdown) return;
+
+      if (index < 0 || index >= taxModes.length) {
+        icon.textContent = '☀️';
+        label.textContent = '選擇一個模式';
+        breakdown.innerHTML = '<p class="info-hint">點擊甜甜圈查看詳細分解</p>';
+        return;
+      }
+
+      const mode = taxModes[index];
+      icon.textContent = mode.icon;
+      label.textContent = `${mode.label} (${mode.status === 'compliant' ? '✅ 合規' : '⚠️ ' + mode.profit})`;
+
+      const statusColor = mode.status === 'compliant' ? '#00FF87' : '#E5FF00';
+      let html = `
+        <div class="profit-display" style="color: ${statusColor}">
+          淨利: $${mode.profit.toFixed(2)}
+        </div>
+        <div class="breakdown-list">
+      `;
+      mode.breakdown.forEach(item => {
+        const sign = item.value >= 0 ? '+' : '';
+        html += `
+          <div class="breakdown-item">
+            <span class="breakdown-dot" style="background: ${item.color}"></span>
+            <span class="breakdown-label">${item.label}</span>
+            <span class="breakdown-value" style="color: ${item.color}">${sign}$${Math.abs(item.value).toFixed(2)}</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+      breakdown.innerHTML = html;
+    }
+
+    function highlightMode(index: number) {
+      donutMeshes.forEach((group, i) => {
+        gsap.to(group.scale, {
+          x: i === index ? 1.15 : 1,
+          y: i === index ? 1.15 : 1,
+          z: i === index ? 1.15 : 1,
+          duration: 0.3,
+          ease: 'back.out(1.7)'
+        });
+        
+        group.children.forEach((child) => {
+          if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshBasicMaterial) {
+            gsap.to(child.material, {
+              opacity: i === index ? 1 : 0.6,
+              duration: 0.3
+            });
+          }
+        });
+      });
+
+      updateInfoPanel(index);
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    canvas.addEventListener('mousemove', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(donutGroup.children, true);
+
+      if (intersects.length > 0) {
+        const modeIndex = intersects[0].object.parent?.userData?.modeIndex ?? 
+                         (intersects[0].object.parent?.parent?.userData?.modeIndex ?? -1);
+        
+        if (modeIndex >= 0 && modeIndex !== hoveredIndex) {
+          hoveredIndex = modeIndex;
+          highlightMode(modeIndex);
+          canvas.style.cursor = 'pointer';
+        }
+      } else if (hoveredIndex !== selectedIndex) {
+        hoveredIndex = selectedIndex;
+        highlightMode(selectedIndex);
+        canvas.style.cursor = 'default';
+      }
+    });
+
+    canvas.addEventListener('click', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(donutGroup.children, true);
+
+      if (intersects.length > 0) {
+        const modeIndex = intersects[0].object.parent?.userData?.modeIndex ?? 
+                         (intersects[0].object.parent?.parent?.userData?.modeIndex ?? -1);
+        if (modeIndex >= 0) {
+          selectedIndex = modeIndex;
+          highlightMode(modeIndex);
+        }
+      }
+    });
+
+    document.querySelectorAll('.viz-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.viz-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        const view = tab.getAttribute('data-viz');
+        currentView = view || 'donut';
+
+        if (currentView === 'onion') {
+          createOnionChart();
+          gsap.from(onionGroup.rotation, {
+            z: Math.PI * 2,
+            duration: 1,
+            ease: 'power2.out'
+          });
+        } else {
+          createDonutChart();
+          if (selectedIndex >= 0) {
+            highlightMode(selectedIndex);
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll('.onion-layer').forEach((layer, index) => {
+      layer.addEventListener('mouseenter', () => {
+        gsap.to(layer, { scale: 1.05, duration: 0.2 });
+      });
+      layer.addEventListener('mouseleave', () => {
+        gsap.to(layer, { scale: 1, duration: 0.2 });
+      });
+    });
+
+    function animate() {
+      animationId = requestAnimationFrame(animate);
+      
+      donutGroup.rotation.y += 0.003;
+      onionGroup.rotation.z += 0.005;
+
+      renderer.render(scene, camera);
+    }
+
+    function init() {
+      resize();
+      createDonutChart();
+      animate();
+
+      if (selectedIndex >= 0) {
+        highlightMode(selectedIndex);
+      }
+    }
+
+    window.addEventListener('resize', resize);
+    init();
+  })();
+</script>
+
+<style>
+.tax-viz-container {
+  background: linear-gradient(135deg, rgba(13, 13, 20, 0.95) 0%, rgba(20, 20, 35, 0.95) 100%);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  max-width: 900px;
+}
+
+.viz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.viz-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-gold, #D4A843);
+  margin: 0;
+}
+
+.viz-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.viz-tab {
+  background: transparent;
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--color-text-muted, #B8BCC8);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.viz-tab:hover {
+  border-color: var(--color-gold, #D4A843);
+  color: var(--color-gold, #D4A843);
+}
+
+.viz-tab.active {
+  background: var(--color-gold, #D4A843);
+  color: var(--color-bg-900, #030308);
+  font-weight: 600;
+}
+
+.viz-content {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .viz-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.viz-canvas-wrapper {
+  position: relative;
+  min-height: 350px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#tax-donut-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+}
+
+.viz-info-panel {
+  background: rgba(20, 20, 35, 0.8);
+  border: 1px solid rgba(212, 168, 67, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(212, 168, 67, 0.1);
+}
+
+.info-icon {
+  font-size: 1.5rem;
+}
+
+.info-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text, #F5F5F0);
+}
+
+.info-hint {
+  color: var(--color-text-muted, #B8BCC8);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.profit-display {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.breakdown-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.breakdown-label {
+  flex: 1;
+  color: var(--color-text-muted, #B8BCC8);
+}
+
+.breakdown-value {
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+}
+
+.viz-cbs-onion {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(212, 168, 67, 0.15);
+}
+
+.onion-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-neon-yellow, #E5FF00);
+  margin: 0 0 1rem;
+}
+
+.onion-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.onion-layer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.onion-layer:hover {
+  background: rgba(212, 168, 67, 0.1);
+  transform: translateX(4px);
+}
+
+.layer-ring {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--ring-color) calc(var(--ring-progress) * 100%),
+    transparent calc(var(--ring-progress) * 100%)
+  );
+  position: relative;
+}
+
+.layer-ring::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  background: var(--color-bg-800, #0F0F18);
+  border-radius: 50%;
+}
+
+.layer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.layer-label {
+  font-size: 0.9rem;
+  color: var(--color-text, #F5F5F0);
+}
+
+.layer-value {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+.onion-formula {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(0, 255, 135, 0.05);
+  border: 1px solid rgba(0, 255, 135, 0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.formula-badge {
+  font-size: 0.85rem;
+  color: var(--color-neon-green, #00FF87);
+  font-weight: 600;
+}
+
+.onion-formula code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #B8BCC8);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+</style>
