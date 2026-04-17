@@ -89,6 +89,10 @@ const {
         <option value="real-cumulativo">Lucro Real (累積制-特定行業)</option>
         <option value="real-nao-cumulativo">Lucro Real (非累積制-一般行業)</option>
       </select>
+      <div class="rate-display">
+        <span class="rate-badge">PIS: <span id="pis-rate">0%</span></span>
+        <span class="rate-badge">COFINS: <span id="cofins-rate">0%</span></span>
+      </div>
     </div>
     <div class="threshold-check">
       <label for="annual-revenue">年度營業額 (R$/年):</label>
@@ -114,6 +118,31 @@ const {
 </div>
 
 <script define:vars={{ fullMode, subfMode }}>
+const PIS_RATES = {
+  'simples': 0,
+  'presumido-cumulativo': 0.0065,
+  'presumido-nao-cumulativo': 0.0165,
+  'real-cumulativo': 0.0365,
+  'real-nao-cumulativo': 0.0165
+};
+
+const COFINS_RATES = {
+  'simples': 0,
+  'presumido-cumulativo': 0.03,
+  'presumido-nao-cumulativo': 0.076,
+  'real-cumulativo': 0.0365,
+  'real-nao-cumulativo': 0.076
+};
+
+function updateRateDisplay(regime) {
+  const pisRate = (PIS_RATES[regime] * 100).toFixed(2);
+  const cofinsRate = (COFINS_RATES[regime] * 100).toFixed(2);
+  const pisEl = document.getElementById('pis-rate');
+  const cofinsEl = document.getElementById('cofins-rate');
+  if (pisEl) pisEl.textContent = pisRate + '%';
+  if (cofinsEl) cofinsEl.textContent = cofinsRate + '%';
+}
+
 function checkThreshold(revenue) {
   if (revenue > 4800000) {
     return { regime: 'simples', warning: '⚠️ 超過 R$4.8M/年，Simples必須退出，強制使用 Lucro Presumido 或 Lucro Real' };
@@ -162,6 +191,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const revenueInput = document.getElementById('annual-revenue');
   const thresholdWarning = document.getElementById('threshold-warning');
   const taxRegimeSelect = document.getElementById('tax-regime');
+  
+  if (taxRegimeSelect) {
+    taxRegimeSelect.addEventListener('change', (e) => {
+      updateRateDisplay(e.target.value);
+    });
+    updateRateDisplay(taxRegimeSelect.value);
+  }
   
   if (revenueInput && thresholdWarning && taxRegimeSelect) {
     revenueInput.addEventListener('input', (e) => {
@@ -375,6 +411,20 @@ document.addEventListener('DOMContentLoaded', () => {
 .tax-select:focus {
   outline: none;
   border-color: #D4A843;
+}
+
+.rate-display {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.rate-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(212, 168, 67, 0.15);
+  color: #D4A843;
 }
 
 .threshold-check {
