@@ -9,6 +9,20 @@ const { class: className } = Astro.props;
 <div class:list={["tax-regime-comparator", className]}>
   <h3 class="comparator-title">🇧🇷 進口商品稅務決策流程</h3>
   
+  <div class="input-section">
+    <h4 class="section-title">💡 互動式模擬試算</h4>
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="annual-revenue">年度營業額 (R$/年):</label>
+        <input type="text" id="annual-revenue" class="money-input" placeholder="例如: 5000000" value="100000" />
+      </div>
+      <div class="input-group">
+        <label for="cif-value">進口貨值 CIF (R$):</label>
+        <input type="text" id="cif-value" class="money-input" placeholder="例如: 100000" value="50000" />
+      </div>
+    </div>
+  </div>
+
   <div class="step-container">
     <div class="step" data-step="1">
       <h4 class="step-title">Step 1 / 選擇稅務套裝 (Regime & PIS/COFINS)</h4>
@@ -64,62 +78,48 @@ const { class: className } = Astro.props;
         </label>
       </div>
     </div>
-  </div>
 
-  <div class="input-section">
-    <h4 class="section-title">💡 互動式模擬試算</h4>
-    <div class="input-grid">
-      <div class="input-group">
-        <label for="annual-revenue">年度營業額 (R$/年):</label>
-        <input type="text" id="annual-revenue" class="money-input" placeholder="例如: 5000000" value="100000" />
+    <div class="step" data-step="3">
+      <h4 class="step-title">Step 3 / 進口稅率設定 (Tributos na Importação)</h4>
+      <div class="import-tax-cards">
+        <label class="regime-option">
+          <input type="radio" name="ncm-rate-group" value="10" />
+          <div class="regime-card">
+            <span class="regime-name">II 10%</span>
+            <span class="regime-desc">一般電子產品</span>
+          </div>
+        </label>
+        <label class="regime-option">
+          <input type="radio" name="ncm-rate-group" value="15" />
+          <div class="regime-card">
+            <span class="regime-name">II 15%</span>
+            <span class="regime-desc">紡織品/家具</span>
+          </div>
+        </label>
+        <label class="regime-option">
+          <input type="radio" name="ncm-rate-group" value="20" checked />
+          <div class="regime-card">
+            <span class="regime-name">II 20%</span>
+            <span class="regime-desc">電器/機械</span>
+          </div>
+        </label>
+        <label class="regime-option">
+          <input type="radio" name="ncm-rate-group" value="35" />
+          <div class="regime-card">
+            <span class="regime-name">II 35%</span>
+            <span class="regime-desc">奢侈品/汽機車</span>
+          </div>
+        </label>
       </div>
-      <div class="input-group">
-        <label for="cif-value">進口貨值 CIF (R$):</label>
-        <input type="text" id="cif-value" class="money-input" placeholder="例如: 100000" value="50000" />
-      </div>
-    </div>
-  </div>
-
-  <div class="import-tax-section">
-    <h4 class="section-title">🛃 進口稅率設定 - Tributos na Importação</h4>
-    <div class="import-tax-cards">
-      <label class="regime-option">
-        <input type="radio" name="ncm-rate-group" value="10" />
-        <div class="regime-card">
-          <span class="regime-name">II 10%</span>
-          <span class="regime-desc">一般電子產品</span>
+      <div class="import-rate-inputs">
+        <div class="import-input-group">
+          <label>IPI 稅率 (%):</label>
+          <input type="number" id="ipi-rate" value="10" />
         </div>
-      </label>
-      <label class="regime-option">
-        <input type="radio" name="ncm-rate-group" value="15" />
-        <div class="regime-card">
-          <span class="regime-name">II 15%</span>
-          <span class="regime-desc">紡織品/家具</span>
+        <div class="import-input-group">
+          <label>ICMS 稅率 (%):</label>
+          <input type="number" id="icms-rate" value="18" />
         </div>
-      </label>
-      <label class="regime-option">
-        <input type="radio" name="ncm-rate-group" value="20" checked />
-        <div class="regime-card">
-          <span class="regime-name">II 20%</span>
-          <span class="regime-desc">電器/機械</span>
-        </div>
-      </label>
-      <label class="regime-option">
-        <input type="radio" name="ncm-rate-group" value="35" />
-        <div class="regime-card">
-          <span class="regime-name">II 35%</span>
-          <span class="regime-desc">奢侈品/汽機車</span>
-        </div>
-      </label>
-    </div>
-    <div class="import-rate-inputs">
-      <div class="import-input-group">
-        <label>IPI 稅率 (%):</label>
-        <input type="number" id="ipi-rate" value="10" />
-      </div>
-      <div class="import-input-group">
-        <label>ICMS 稅率 (%):</label>
-        <input type="number" id="icms-rate" value="18" />
       </div>
     </div>
   </div>
