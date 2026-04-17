@@ -81,44 +81,27 @@ const { class: className } = Astro.props;
 
     <div class="step" data-step="3">
       <h4 class="step-title">Step 3 / 進口稅率設定 (Tributos na Importação)</h4>
-      <div class="import-tax-cards">
-        <label class="regime-option">
-          <input type="radio" name="ncm-rate-group" value="10" />
-          <div class="regime-card">
-            <span class="regime-name">II 10%</span>
-            <span class="regime-desc">一般電子產品</span>
+      <div class="step-3-layout">
+        <div class="import-rate-dropdown">
+          <label for="ncm-rate">II 稅率 (%) - 依 NCM:</label>
+          <select id="ncm-rate" class="tax-select">
+            <option value="10">10% - 一般電子產品</option>
+            <option value="15">15% - 紡織品/家具</option>
+            <option value="20" selected>20% - 電器/機械</option>
+            <option value="35">35% - 奢侈品/汽機車</option>
+          </select>
+          <div class="other-rates">
+            <div class="input-group">
+              <label>IPI (%):</label>
+              <input type="number" id="ipi-rate" value="10" />
+            </div>
+            <div class="input-group">
+              <label>ICMS (%):</label>
+              <input type="number" id="icms-rate" value="18" />
+            </div>
           </div>
-        </label>
-        <label class="regime-option">
-          <input type="radio" name="ncm-rate-group" value="15" />
-          <div class="regime-card">
-            <span class="regime-name">II 15%</span>
-            <span class="regime-desc">紡織品/家具</span>
-          </div>
-        </label>
-        <label class="regime-option">
-          <input type="radio" name="ncm-rate-group" value="20" checked />
-          <div class="regime-card">
-            <span class="regime-name">II 20%</span>
-            <span class="regime-desc">電器/機械</span>
-          </div>
-        </label>
-        <label class="regime-option">
-          <input type="radio" name="ncm-rate-group" value="35" />
-          <div class="regime-card">
-            <span class="regime-name">II 35%</span>
-            <span class="regime-desc">奢侈品/汽機車</span>
-          </div>
-        </label>
-      </div>
-      <div class="import-rate-inputs">
-        <div class="import-input-group">
-          <label>IPI 稅率 (%):</label>
-          <input type="number" id="ipi-rate" value="10" />
         </div>
-        <div class="import-input-group">
-          <label>ICMS 稅率 (%):</label>
-          <input type="number" id="icms-rate" value="18" />
+        <div class="result-card-display" id="result-card-display">
         </div>
       </div>
     </div>
@@ -130,9 +113,6 @@ const { class: className } = Astro.props;
       <span>🎯 啟動 2026 稅改過渡期模擬 (Reforma Tributária)</span>
     </label>
     <p class="reform-note">PIS/COFINS 將自動全員抵扣 1% 並獨立為 CBS (0.9%) 及 IBS (0.1%)</p>
-  </div>
-
-  <div class="detailed-results" id="detailed-results">
   </div>
 
   <p class="disclaimer">⚠️ 免責聲明：此模擬試算只是為了學習，如有業務需求請諮詢專業稅務會計師</p>
@@ -294,10 +274,6 @@ const { class: className } = Astro.props;
   margin: 0.5rem 0 0 0;
 }
 
-.detailed-results {
-  margin-bottom: 1.5rem;
-}
-
 .tax-breakdown {
   background: rgba(26, 26, 36, 0.9);
   border: 1px solid rgba(212, 168, 67, 0.2);
@@ -342,10 +318,13 @@ const { class: className } = Astro.props;
 
 .breakdown-row .label {
   color: #888;
+  flex-shrink: 0;
 }
 
 .breakdown-row .value {
   color: #F5F5F0;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .breakdown-total {
@@ -356,6 +335,10 @@ const { class: className } = Astro.props;
   color: #D4A843;
   border-top: 1px solid #D4A843;
   margin-top: 0.5rem;
+}
+
+.breakdown-total .value {
+  text-align: right;
 }
 
 .disclaimer {
@@ -377,6 +360,106 @@ const { class: className } = Astro.props;
   .adicional-options {
     flex-direction: column;
     gap: 0.75rem;
+  }
+}
+
+.step-3-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.import-rate-dropdown {
+  background: rgba(26, 26, 36, 0.9);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.import-rate-dropdown label {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.tax-select {
+  width: 100%;
+  background: #1a1a24;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.tax-select:focus {
+  outline: none;
+  border-color: #D4A843;
+}
+
+.other-rates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.other-rates .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.other-rates .input-group label {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.other-rates .input-group input {
+  background: #0a0a0f;
+  border: 1px solid #333;
+  color: #f5f5f0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.result-card-display {
+  background: rgba(13, 13, 20, 0.95);
+  border: 1px solid rgba(0, 255, 135, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.result-card-display .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.result-card-display .breakdown-row .label {
+  flex-shrink: 0;
+}
+
+.result-card-display .breakdown-row .value {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.result-card-display .breakdown-total {
+  display: flex;
+  justify-content: space-between;
+}
+
+.result-card-display .breakdown-total .value {
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .step-3-layout {
+    grid-template-columns: 1fr;
   }
 }
 </style>
@@ -447,16 +530,16 @@ function updateCalculation() {
   const revenueInput = document.getElementById('annual-revenue') as HTMLInputElement;
   const cifInput = document.getElementById('cif-value') as HTMLInputElement;
   const reformCheckbox = document.getElementById('enable-reform') as HTMLInputElement;
-  const resultsDiv = document.getElementById('detailed-results');
+  const resultCardDisplay = document.getElementById('result-card-display');
   
-  if (!revenueInput || !cifInput || !resultsDiv) return;
+  if (!revenueInput || !cifInput) return;
   
   const revenue = parseMoney(revenueInput.value);
   const cif = parseMoney(cifInput.value);
   const useReform = reformCheckbox?.checked || false;
   
-  const ncmRateGroup = document.querySelector('input[name="ncm-rate-group"]:checked') as HTMLInputElement;
-  const ncmRate = ncmRateGroup ? parseFloat(ncmRateGroup.value) : 20;
+  const ncmSelect = document.getElementById('ncm-rate') as HTMLSelectElement;
+  const ncmRate = ncmSelect ? parseFloat(ncmSelect.value) : 20;
   const ipiRate = parseFloat((document.getElementById('ipi-rate') as HTMLInputElement)?.value) || 10;
   const icmsRate = parseFloat((document.getElementById('icms-rate') as HTMLInputElement)?.value) || 18;
   
@@ -466,9 +549,17 @@ function updateCalculation() {
   
   const importTax = calculateImportTax(cif, ncmRate, ipiRate, icmsRate);
   
-  const selectedRegime = (document.querySelector('input[name="tax-regime"]:checked') as HTMLInputElement)?.value || 'simples';
+  const selectedRegimeEl = document.querySelector('input[name="tax-regime"]:checked') as HTMLInputElement;
+  const selectedRegime = selectedRegimeEl?.value || null;
   
   let html = '';
+  
+  if (!selectedRegime) {
+    if (resultCardDisplay) {
+      resultCardDisplay.innerHTML = '<p style="color:#666;text-align:center;padding:2rem;">請先選擇稅務套裝</p>';
+    }
+    return;
+  }
   
   Object.entries(REGIME_DATA).forEach(([key, data]) => {
     if (key !== selectedRegime) return;
@@ -574,7 +665,13 @@ function updateCalculation() {
     `;
   });
   
-  resultsDiv.innerHTML = html;
+  if (resultCardDisplay) {
+    if (html) {
+      resultCardDisplay.innerHTML = html;
+    } else {
+      resultCardDisplay.innerHTML = '<p style="color:#666;text-align:center;padding:2rem;">請先選擇稅務套裝</p>';
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -584,8 +681,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const ipiInput = document.getElementById('ipi-rate');
   const icmsInput = document.getElementById('icms-rate');
   const adicionalInputs = document.querySelectorAll('input[name="adicional"]');
-  const ncmInputs = document.querySelectorAll('input[name="ncm-rate-group"]');
   const regimeInputs = document.querySelectorAll('input[name="tax-regime"]');
+  const ncmSelect = document.getElementById('ncm-rate');
   
   [revenueInput, cifInput, ipiInput, icmsInput].forEach(input => {
     input?.addEventListener('input', updateCalculation);
@@ -599,9 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
     input?.addEventListener('change', updateCalculation);
   });
   
-  ncmInputs.forEach(input => {
-    input?.addEventListener('change', updateCalculation);
-  });
+  ncmSelect?.addEventListener('change', updateCalculation);
   
   reformCheckbox?.addEventListener('change', updateCalculation);
   
