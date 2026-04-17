@@ -338,8 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   if (revenueInput && thresholdWarning && taxRegimeSelect) {
-    revenueInput.addEventListener('input', (e) => {
-      const revenue = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+    const checkAndUpdateThreshold = (e) => {
+      const revenue = parseFloat(e?.target?.value.replace(/,/g, '') || revenueInput.value.replace(/,/g, '')) || 0;
       const result = checkThreshold(revenue);
       
       if (result.warning) {
@@ -349,7 +349,10 @@ document.addEventListener('DOMContentLoaded', () => {
         thresholdWarning.textContent = '';
         thresholdWarning.style.display = 'none';
       }
-    });
+    };
+    
+    revenueInput.addEventListener('input', checkAndUpdateThreshold);
+    checkAndUpdateThreshold();
   }
   
   const cifInput = document.getElementById('cif-value');
