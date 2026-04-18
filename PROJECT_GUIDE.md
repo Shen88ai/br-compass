@@ -19,7 +19,16 @@ br-compass/
 │   │   ├── CompassView.astro      # 互动罗盘组件（首页入口）
 │   │   ├── DiagnosisForm.astro    # 军师诊断表单组件（3 问诊断）
 │   │   ├── JourneyMiniMap.astro   # 文章页顶部小地图组件
-│   │   └── JourneyNav.astro       # 文章页底部导航组件
+│   │   ├── JourneyNav.astro       # 文章页底部导航组件
+│   │   ├── TaxVisualization/       # 税务可视化组件
+│   │   │   ├── TaxFunnel.astro
+│   │   │   ├── TaxRiver.astro
+│   │   │   └── TaxScale.astro
+│   │   ├── TaxFactory/             # 税务工厂组件
+│   │   │   ├── TaxFactory.astro
+│   │   │   └── TaxRegimeComparator.astro
+│   │   └── EconomicTimeline/      # 经济波浪时间轴组件
+│   │       └── EconomicWaveTimeline.astro
 │   ├── layouts/
 │   │   └── Layout.astro           # 全局布局（含全域搜寻栏）
 │   ├── pages/
@@ -1299,4 +1308,69 @@ src/content/handbook/
 ├── E-insights/          # 市場洞察
 ├── F-media/             # 媒體中心
 └── index.md            # 總目錄
+
+---
+
+## 二十三、經濟波浪時間軸組件（EconomicWaveTimeline）
+
+### 23.1 組件位置
+
+```
+src/components/EconomicTimeline/
+└── EconomicWaveTimeline.astro    # 經濟波浪時間軸視覺化組件
+```
+
+### 23.2 使用方式
+
+1. **在頁面模板中引入**：`src/pages/handbook/[...slug].astro`
+
+```astro
+import EconomicWaveTimeline from '../../components/EconomicTimeline/EconomicWaveTimeline.astro';
+
+// 在 frontmatter 中設置條件
+const showEconomicWaveTimeline = post.id.includes('02-30年河東30年河西');
+
+// 在模板中使用
+{showEconomicWaveTimeline && <EconomicWaveTimeline />}
+```
+
+2. **在 MD 檔案中預留位置**：
+
+```markdown
+## 三、當前週期定位（2026）
+
+### 🌊 我們處於什麼位置？
+
+（此處將顯示經濟波浪時間軸組件）
+
+### 2026 年關鍵觀察指標
+```
+
+### 23.3 顯示內容
+
+| 時期 | 標記 | 年份範圍 |
+|------|------|----------|
+| 巴西奇蹟 | ☀️ | 1968-1973 |
+| 失落十年 | 🌧️ | 1981-1993 |
+| 超級週期 | 🌻 | 2003-2011 |
+| 崩潰 | ⛈️ | 2014-2019 |
+| 底部整固 | 🌱 | 2025-2026 📍 |
+| 新一輪增長？ | 🚀 | 2027+ |
+
+### 23.4 自定義屬性
+
+```astro
+<EconomicWaveTimeline currentYear={2026} />
+```
+
+| 屬性 | 類型 | 預設 | 說明 |
+|------|------|------|------|
+| currentYear | number | 2026 | 當前年份（現在位置） |
+
+### 23.5 重點樣式
+
+- 波浪路徑使用漸層颜色
+- 現在位置有脈動動畫 (pulse animation)
+- 未來使用虛線 + 問號表示不確定
+- 底部註腳：「只可意會，不可言傳」
 ```
