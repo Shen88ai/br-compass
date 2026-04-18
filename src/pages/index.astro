@@ -6,9 +6,19 @@ import PhaseInfoPanel from '../components/FateWheel/PhaseInfoPanel.astro';
 import { getCollection } from 'astro:content';
 
 const handbookEntries = await getCollection('handbook');
-const insightCount = handbookEntries.filter(e => e.data.phase === 'insights').length;
-const mediaCount = handbookEntries.filter(e => e.data.phase === 'media').length;
-const coreCount = handbookEntries.filter(e => e.data.phase !== 'insights' && e.data.phase !== 'media').length;
+const insightCount = handbookEntries.filter(e => e.data.phase === 'E').length;
+const mediaCount = handbookEntries.filter(e => e.data.phase === 'F').length;
+const coreCount = handbookEntries.filter(e => e.data.phase !== 'E' && e.data.phase !== 'F').length;
+
+// 動態計算每個 Phase 的文章數量
+const phaseCounts = {
+  A: handbookEntries.filter(e => e.data.phase === 'A').length,
+  B: handbookEntries.filter(e => e.data.phase === 'B').length,
+  C: handbookEntries.filter(e => e.data.phase === 'C').length,
+  D: handbookEntries.filter(e => e.data.phase === 'D').length,
+  E: insightCount,
+  F: mediaCount,
+};
 ---
 
 <Layout title="黃金雨林 | 跨境電商巴西出海一站式門戶" description="從稅務計算到公司設立，最完整的巴西落地解決方案">
@@ -183,7 +193,7 @@ const coreCount = handbookEntries.filter(e => e.data.phase !== 'insights' && e.d
               <div class="phase-label-platinum">階段一 · 第 1~2 個月</div>
               <h3 class="phase-card-title">戰略藍圖與落地籌備</h3>
               <p class="phase-card-desc">破譯巴西稅制、簽證策略、在地團隊組建與授權防護</p>
-              <div class="phase-card-link" style="color:var(--color-platinum);">8 篇指南 →</div>
+              <div class="phase-card-link" style="color:var(--color-platinum);">{phaseCounts.A} 篇指南 →</div>
             </div>
           </a>
 
@@ -193,7 +203,7 @@ const coreCount = handbookEntries.filter(e => e.data.phase !== 'insights' && e.d
               <div class="phase-label-blue">階段二 · 第 2~4 個月</div>
               <h3 class="phase-card-title">實體建立與資金血脈</h3>
               <p class="phase-card-desc">CNPJ 申請、Pre-acordo 策略、BACEN 資金申報、平台入駐</p>
-              <div class="phase-card-link" style="color:var(--color-gold-light);">3 篇指南 →</div>
+              <div class="phase-card-link" style="color:var(--color-gold-light);">{phaseCounts.B} 篇指南 →</div>
             </div>
           </a>
 
@@ -203,7 +213,7 @@ const coreCount = handbookEntries.filter(e => e.data.phase !== 'insights' && e.d
               <div class="phase-label-green">階段三 · 第 4~5 個月</div>
               <h3 class="phase-card-title">供應鏈與數位營運</h3>
               <p class="phase-card-desc">RADAR 申請、3PL 倉儲、ERP 整合、支付系統、售後服務</p>
-              <div class="phase-card-link" style="color:var(--color-neon-yellow);">6 篇指南 →</div>
+              <div class="phase-card-link" style="color:var(--color-neon-yellow);">{phaseCounts.C} 篇指南 →</div>
             </div>
           </a>
 
@@ -213,7 +223,7 @@ const coreCount = handbookEntries.filter(e => e.data.phase !== 'insights' && e.d
               <div class="phase-label-purple">階段四 · 第 6 個月+</div>
               <h3 class="phase-card-title">財務合規與利潤收割</h3>
               <p class="phase-card-desc">日常稅務合規、NF-e、SPED 申報、JCP 抵稅、利潤匯出</p>
-              <div class="phase-card-link" style="color:var(--color-neon-green);">3 篇指南 →</div>
+              <div class="phase-card-link" style="color:var(--color-neon-green);">{phaseCounts.D} 篇指南 →</div>
             </div>
           </a>
 

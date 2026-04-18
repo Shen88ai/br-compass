@@ -1,0 +1,225 @@
+---
+interface Props {
+  currentYear?: number;
+}
+
+const { currentYear = 2026 } = Astro.props;
+---
+
+<div class="economic-wave-timeline">
+  <div class="wave-timeline-container">
+    <svg viewBox="0 0 900 200" class="wave-timeline-svg">
+      <defs>
+        <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="var(--color-platinum)" />
+          <stop offset="25%" stop-color="var(--color-gold)" />
+          <stop offset="50%" stop-color="var(--color-neon-green)" />
+          <stop offset="75%" stop-color="var(--color-warning)" />
+          <stop offset="100%" stop-color="var(--color-neon-green)" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Main Wave Line -->
+      <path 
+        class="wave-path" 
+        d="M0,70 Q50,20 100,60 T200,40 T280,80 T350,30 T400,50 T500,20 T600,60 T700,40 T750,70 T900,50" 
+        fill="none" 
+        stroke="url(#waveGradient)" 
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+      
+      <!-- Period Dots -->
+      <g class="period-markers">
+        <circle cx="80" cy="55" r="10" class="period-dot boom" data-year="1968">
+          <title>1968-1973: 巴西奇蹟 ☀️</title>
+        </circle>
+        <circle cx="240" cy="70" r="10" class="period-dot bust" data-year="1981">
+          <title>1981-1993: 失落十年 🌧️</title>
+        </circle>
+        <circle cx="380" cy="45" r="10" class="period-dot super" data-year="2003">
+          <title>2003-2011: 超級週期 🌻</title>
+        </circle>
+        <circle cx="580" cy="55" r="10" class="period-dot crash" data-year="2014">
+          <title>2014-2019: 崩潰 ⛈️</title>
+        </circle>
+        <circle cx="720" cy="65" r="14" class="period-dot current" data-year="2026">
+          <title>2025-2026: 底部整固 🌱</title>
+        </circle>
+      </g>
+      
+      <!-- Labels -->
+      <g class="period-labels" font-size="11" text-anchor="middle" fill="var(--color-text)">
+        <text x="80" y="35">☀️</text>
+        <text x="80" y="48" font-size="9">巴西奇蹟</text>
+        
+        <text x="240" y="100">🌧️</text>
+        <text x="240" y="113" font-size="9">失落十年</text>
+        
+        <text x="380" y="25">🌻</text>
+        <text x="380" y="38" font-size="9">超級週期</text>
+        
+        <text x="580" y="35">⛈️</text>
+        <text x="580" y="48" font-size="9">崩潰</text>
+        
+        <text x="720" y="100" fill="var(--color-neon-green)" font-weight="bold">🌱</text>
+        <text x="720" y="113" fill="var(--color-neon-green)" font-size="10">底部整固</text>
+        
+        <text x="850" y="35">🚀</text>
+        <text x="850" y="48" font-size="9">新一輪增長？</text>
+      </g>
+      
+      <!-- Current Position Indicator -->
+      <g class="current-indicator" transform="translate(720, 85)">
+        <path d="M0,0 L0,15 M-5,10 L0,15 L5,10" fill="none" stroke="var(--color-neon-green)" stroke-width="2"/>
+        <circle cx="0" cy="0" r="22" fill="var(--color-neon-green)" opacity="0.2" class="pulse-ring"/>
+      </g>
+      
+      <!-- Future Indicator -->
+      <g class="future-indicator" transform="translate(850, 85)">
+        <circle cx="0" cy="0" r="16" fill="none" stroke="var(--color-gold)" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+        <text x="0" y="5" font-size="8" fill="var(--color-gold)" text-anchor="middle">?</text>
+      </g>
+    </svg>
+    
+    <!-- Year Axis -->
+    <div class="year-axis">
+      <span>1968</span>
+      <span>1980</span>
+      <span>1990</span>
+      <span>2000</span>
+      <span>2010</span>
+      <span>2020</span>
+      <span class="current-year">📍 2026 我們在這裡</span>
+      <span>2030+</span>
+    </div>
+  </div>
+  
+  <!-- Legend -->
+  <div class="wave-legend">
+    <div class="legend-item"><span class="emoji">☀️</span> 繁榮期</div>
+    <div class="legend-item"><span class="emoji">🌧️</span> 低潮期</div>
+    <div class="legend-item"><span class="emoji">🌻</span> 增長期</div>
+    <div class="legend-item"><span class="emoji">⛈️</span> 危機</div>
+    <div class="legend-item current"><span class="emoji">🌱</span> 整固期</div>
+  </div>
+  
+  <!-- Footer Note -->
+  <div class="wave-footer-note">
+    💫 只可意會，不可言傳
+  </div>
+</div>
+
+<style>
+.economic-wave-timeline {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(212,168,67,0.08) 0%, rgba(0,255,135,0.05) 100%);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.wave-timeline-container {
+  margin-bottom: 1.5rem;
+}
+
+.wave-timeline-svg {
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+}
+
+.period-dot {
+  fill: var(--color-bg-800);
+  stroke: var(--color-gold);
+  stroke-width: 2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.period-dot:hover {
+  stroke-width: 3;
+  transform-origin: center;
+  transform: scale(1.2);
+}
+
+.period-dot.boom { stroke: var(--color-gold); }
+.period-dot.bust { stroke: var(--color-muted); }
+.period-dot.super { stroke: var(--color-neon-green); }
+.period-dot.crash { stroke: var(--color-warning); }
+.period-dot.current { 
+  stroke: var(--color-neon-green); 
+  fill: var(--color-neon-green);
+}
+
+.wave-path {
+  filter: drop-shadow(0 0 6px rgba(212,168,67,0.3));
+}
+
+.year-axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.5rem 0;
+  font-size: 10px;
+  color: var(--color-muted);
+  border-top: 1px solid var(--color-border);
+}
+
+.year-axis span {
+  padding: 0 0.3rem;
+}
+
+.year-axis .current-year {
+  color: var(--color-neon-green);
+  font-weight: 600;
+  background: rgba(0,255,135,0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.wave-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 11px;
+  color: var(--color-text);
+}
+
+.legend-item .emoji {
+  font-size: 13px;
+}
+
+.legend-item.current {
+  color: var(--color-neon-green);
+  font-weight: 600;
+}
+
+.wave-footer-note {
+  text-align: center;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--color-border);
+  font-size: 12px;
+  color: var(--color-muted);
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.2; r: 22; }
+  50% { opacity: 0.4; r: 26; }
+}
+
+.pulse-ring {
+  animation: pulse 2s ease-in-out infinite;
+}
+</style>

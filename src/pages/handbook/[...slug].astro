@@ -8,6 +8,7 @@ import TaxRiver from '../../components/TaxVisualization/TaxRiver.astro';
 import TaxScale from '../../components/TaxVisualization/TaxScale.astro';
 import TaxFactory from '../../components/TaxFactory/TaxFactory.astro';
 import TaxRegimeComparator from '../../components/TaxFactory/TaxRegimeComparator.astro';
+import EconomicWaveTimeline from '../../components/EconomicTimeline/EconomicWaveTimeline.astro';
 
 export const prerender = true;
 
@@ -76,6 +77,7 @@ const showTaxFunnel = post.id.includes('04b-tax-comparison-modes');
 const showTaxScale = post.id.includes('04b-tax-comparison-modes');
 const showTaxRiver = post.id.includes('04a-tax-comparison-intro');
 const showTaxFactory = false;
+const showEconomicWaveTimeline = post.id.includes('02-30年河東30年河西');
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
@@ -210,6 +212,7 @@ const showTaxFactory = false;
       {showTaxRegimeComparator && <TaxRegimeComparator />}
       {showTaxFunnel && <TaxFunnel />}
       {showTaxRiver && <TaxRiver />}
+      {showEconomicWaveTimeline && <EconomicWaveTimeline />}
 
       <!-- ── Persona Journey MiniMap ─────────────────── -->
       <div class="journey-minimap persona-hidden" id="journey-minimap">

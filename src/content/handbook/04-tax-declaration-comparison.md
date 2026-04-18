@@ -70,73 +70,9 @@ images:
 
 ## 二、CBS/IBS 抵扣邏輯說明
 
-### 🏭 稅務流水線工廠
+import TaxFactory from '../../components/TaxFactory/TaxFactory.astro';
 
-<div class="tax-factory" id="tax-factory">
-  <div class="factory-pipeline">
-    <div class="factory-station import-station">
-      <div class="station-icon">📦</div>
-      <div class="station-name">關口1 - 進口</div>
-      <div class="station-value" data-value="import">$1,500</div>
-      <div class="station-formula">進項發票金額</div>
-      <div class="station-tax">
-        <span class="tax-badge">-28%</span>
-        <div class="tax-value" data-tax="import">-$420</div>
-      </div>
-    </div>
-    
-    <div class="conveyor-belt">
-      <div class="belt-segment"></div>
-      <div class="belt-arrow">▼</div>
-    </div>
-    
-    <div class="factory-station sales-station">
-      <div class="station-icon">🏭</div>
-      <div class="station-name">關口2 - 銷售</div>
-      <div class="station-value" data-value="sales">$2,400</div>
-      <div class="station-formula">銷售發票</div>
-      <div class="station-tax">
-        <span class="tax-badge">+28%</span>
-        <div class="tax-value" data-tax="sales">+$672</div>
-      </div>
-    </div>
-    
-    <div class="conveyor-belt">
-      <div class="belt-segment"></div>
-      <div class="belt-arrow">▼</div>
-    </div>
-    
-    <div class="factory-station net-station">
-      <div class="station-icon">💰</div>
-      <div class="station-name">結算中心</div>
-      <div class="station-value net-value" data-value="net">$252</div>
-      <div class="station-formula">實繳稅額</div>
-    </div>
-</div>
-  
-  <div class="factory-controls">
-    <div class="mode-label">🔄 模式切換：</div>
-    <div class="mode-buttons">
-      <button class="factory-btn active" data-mode="full">☀️ 全報模式</button>
-      <button class="factory-btn" data-mode="subf">🌙 低報模式</button>
-    </div>
-  </div>
-  
-  <div class="factory-dashboard">
-    <div class="dashboard-card">
-      <div class="card-header">全報模式</div>
-      <div class="card-value">$252</div>
-      <div class="card-label">實繳稅額</div>
-      <div class="card-status">✅ 合規</div>
-    </div>
-    <div class="dashboard-card">
-      <div class="card-header">低報模式</div>
-      <div class="card-value">$389</div>
-      <div class="card-label">實繳稅額</div>
-      <div class="card-status">⚠️ 高稅</div>
-    </div>
-  </div>
-</div>
+<TaxFactory />
 
 ## 二、三種模式 Accordion
 
