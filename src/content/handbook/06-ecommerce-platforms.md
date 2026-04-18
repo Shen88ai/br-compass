@@ -1,9 +1,9 @@
 ---
 title: "入駐主流電商與社交電商平台實戰"
 description: "Mercado Livre、Amazon、Shopee、TikTok Shop 2026 巴西新策略——平台註冊要訣、稅務處理差異、演算法邏輯與合規注意事項。"
-phase: "foundation"
+phase: "B"
 phaseLabel: "第二階段：實體建立"
-order: 6
+order: 03
 icon: "🛒"
 tags: ["Mercado Livre", "Amazon", "Shopee", "TikTok Shop", "社交電商", "平台註冊", "演算法"]
 

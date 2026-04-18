@@ -1,9 +1,9 @@
 ---
 title: "RADAR 申請與產品進口資質：打開貿易敲門磚"
 description: "外資剛成立的新公司如何申請 Siscomex RADAR 進出口權？需要哪些財力資質？以及如何確保選定的產品符合 INMETRO、ANATEL、ANVISA、MAPA 等強制認證要求。"
-phase: "operations"
+phase: "C"
 phaseLabel: "第三階段：供應鏈營運"
-order: 7
+order: 01
 icon: "📦"
 tags: ["RADAR", "Siscomex", "INMETRO", "ANATEL", "ANVISA", "MAPA", "進口", "清關"]
 

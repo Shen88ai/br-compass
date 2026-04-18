@@ -44,17 +44,21 @@ const prev = idx > 0 ? allPosts[idx - 1] : null;
 const next = idx < allPosts.length - 1 ? allPosts[idx + 1] : null;
 
 const phaseColors: Record<string, string> = {
-  preparation: 'var(--color-platinum)',
-  foundation:  'var(--color-gold)',
-  operations:  'var(--color-neon-yellow)',
-  harvest:     'var(--color-neon-green)',
+  A: 'var(--color-platinum)',
+  B: 'var(--color-gold)',
+  C: 'var(--color-neon-yellow)',
+  D: 'var(--color-neon-green)',
+  E: 'var(--color-sky-blue)',
+  F: 'var(--color-neon-yellow)',
 };
 const phaseColor = phaseColors[post.data.phase] || 'var(--color-gold)';
 const phaseRgb: Record<string, string> = {
-  preparation: '232,228,217',
-  foundation:  '212,168,67',
-  operations:  '229,255,0',
-  harvest:     '0,255,135',
+  A: '232,228,217',
+  B: '212,168,67',
+  C: '229,255,0',
+  D: '0,255,135',
+  E: '125,211,252',
+  F: '229,255,0',
 };
 const rgb = phaseRgb[post.data.phase] || '212,168,67';
 

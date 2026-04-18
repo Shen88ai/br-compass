@@ -1,9 +1,9 @@
 ---
 title: "串接當地 3PL 系統與倉儲選擇基準"
 description: "從進倉到尾程配送的 ICMS 稅務影響分析。如何選擇能提供最佳化稅務的倉庫？SC 州進口 ICMS 延緩抵稅優惠 (TTD) 實戰指南。"
-phase: "operations"
+phase: "C"
 phaseLabel: "第三階段：供應鏈營運"
-order: 8
+order: 02
 icon: "🏭"
 tags: ["3PL", "倉儲", "ICMS", "TTD", "Santa Catarina", "物流", "稅務優化"]
 

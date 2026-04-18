@@ -1,15 +1,14 @@
 ---
 title: "進口正清全報及低報比較（目錄）"
 description: "稅制轉型下的三種申報模式比較，幫助中小企業做出最適合的稅務決策。本頁已拆分為四個子頁面，請點擊下方連結瀏覽。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 4
+order: 01
 icon: "📊"
 tags: ["稅務", "進口", "正清全報", "低報", "利潤分析", "Lucro Real", "Lucro Presumido", "CBS", "IBS"]
 featured: true
 images:
   cover: 04-tax-declaration-comparison-cover.jpeg
-redirect_to: /handbook/04a-tax-comparison-intro
 ---
 
 ## 📋 本頁已拆分為四個子頁面

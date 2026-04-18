@@ -1,9 +1,9 @@
 ---
 title: "建立神經網絡：ERP 整合與在地支付系統"
 description: "如何整合 Pix、Boleto、Split Payment 分裂支付機制？選擇適合跨境電商的 ERP 系統，打造訂單到現金的自動化流程。"
-phase: "operations"
+phase: "C"
 phaseLabel: "第三階段：供應鏈營運"
-order: 9
+order: 03
 icon: "💳"
 tags: ["ERP", "Pix", "Boleto", "Split Payment", "支付", "Bling", "Tiny", "現金流"]
 

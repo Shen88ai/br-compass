@@ -18,7 +18,7 @@ const searchData = allPosts.map(p => ({
 
 const phases = [
   {
-    id: 'preparation',
+    id: 'A',
     number: '01',
     label: '戰略藍圖與落地籌備',
     labelPt: 'Preparação Estratégica',
@@ -27,10 +27,10 @@ const phases = [
     color: 'var(--color-platinum)',
     glow: 'rgba(232,228,217,0.3)',
     cause: '必須先看懂稅制地圖並獲得合法身份，才能真正落地開展業務。',
-    posts: sortedPosts.filter(p => p.data.phase === 'preparation'),
+    posts: sortedPosts.filter(p => p.data.phase === 'A'),
   },
   {
-    id: 'foundation',
+    id: 'B',
     number: '02',
     label: '實體建立與資金血脈',
     labelPt: 'Fundação & Capital',
@@ -39,10 +39,10 @@ const phases = [
     color: 'var(--color-gold)',
     glow: 'rgba(212,168,67,0.3)',
     cause: '有了戰略後，建立法律實體並打通合法匯款管道，才有資格入駐電商平台。',
-    posts: sortedPosts.filter(p => p.data.phase === 'foundation'),
+    posts: sortedPosts.filter(p => p.data.phase === 'B'),
   },
   {
-    id: 'operations',
+    id: 'C',
     number: '03',
     label: '供應鏈與數位營運',
     labelPt: 'Operações & Supply Chain',
@@ -51,10 +51,10 @@ const phases = [
     color: 'var(--color-neon-yellow)',
     glow: 'rgba(229,255,0,0.3)',
     cause: '店鋪與資金準備妥當，打通貨物進口及物流管道，由 IT 系統接管日常交易。',
-    posts: sortedPosts.filter(p => p.data.phase === 'operations'),
+    posts: sortedPosts.filter(p => p.data.phase === 'C'),
   },
   {
-    id: 'harvest',
+    id: 'D',
     number: '04',
     label: '財務合規與利潤收割',
     labelPt: 'Compliance & Colheita',
@@ -63,10 +63,10 @@ const phases = [
     color: 'var(--color-neon-green)',
     glow: 'rgba(0,255,135,0.3)',
     cause: '穩定銷售後應付稅務稽核，年底執行盈餘最大化並合法匯回母國。',
-    posts: sortedPosts.filter(p => p.data.phase === 'harvest'),
+    posts: sortedPosts.filter(p => p.data.phase === 'D'),
   },
   {
-    id: 'insights',
+    id: 'E',
     number: '05',
     label: '市場洞察',
     labelPt: 'Insights & Análise',
@@ -75,10 +75,10 @@ const phases = [
     color: 'var(--color-sky-blue)',
     glow: 'rgba(125,211,252,0.3)',
     cause: '掌握巴西市場的最新趨勢、政策變化與宏觀經濟動態，做出明智決策。',
-    posts: sortedPosts.filter(p => p.data.phase === 'insights'),
+    posts: sortedPosts.filter(p => p.data.phase === 'E'),
   },
   {
-    id: 'media',
+    id: 'F',
     number: '06',
     label: '媒體中心',
     labelPt: 'Mídia & Vídeos',
@@ -87,7 +87,7 @@ const phases = [
     color: 'var(--color-neon-yellow)',
     glow: 'rgba(229,255,0,0.3)',
     cause: '通過 YouTube、小紅書、抖音等視頻平台，用視覺化方式理解巴西市場與稅制。',
-    posts: sortedPosts.filter(p => p.data.phase === 'media'),
+    posts: sortedPosts.filter(p => p.data.phase === 'F'),
   },
 ];
 
@@ -669,7 +669,7 @@ if (document.readyState === 'loading') {
 }
 
 const phaseDetails: Record<string, { title: string; items: string[] }> = {
-  preparation: {
+  A: {
     title: '🗺️ 第一階段：戰略藍圖與落地籌備',
     items: [
       '1.0 巴西稅改全景地圖 — 2026-2033 過渡期攻略',
@@ -678,7 +678,7 @@ const phaseDetails: Record<string, { title: string; items: string[] }> = {
       '1.3 尋找在地領路人 — Pleno Poder 的牽制藝術',
     ]
   },
-  foundation: {
+  B: {
     title: '🏛️ 第二階段：實體建立與資金血脈',
     items: [
       '2.1 外資企業閃電成立 — CNPJ & Pre-acordo 倉庫策略',
@@ -686,7 +686,7 @@ const phaseDetails: Record<string, { title: string; items: string[] }> = {
       '2.3 入駐電商平台 — Meli / Amazon / TikTok Shop 2026',
     ]
   },
-  operations: {
+  C: {
     title: '⚙️ 第三階段：供應鏈與數位營運',
     items: [
       '3.1 RADAR 申請與產品進口資質 (INMETRO / ANATEL / ANVISA / MAPA)',
@@ -697,12 +697,27 @@ const phaseDetails: Record<string, { title: string; items: string[] }> = {
       '3.4 本地化售後服務 — CDC 消費者保護法',
     ]
   },
-  harvest: {
+  D: {
     title: '💰 第四階段：財務合規與利潤收割',
     items: [
       '4.1 日常稅務合規 — NF-e、SPED、Malha Fiscal',
       '4.2 合規抵稅策略 — JCP 自有資本利息與 Royalties',
       '4.3 利潤匯出母國 — Remessa de Lucros 完整操作',
+    ]
+  },
+  E: {
+    title: '📊 市場洞察',
+    items: [
+      '01 巴西市場剖析 — 2026 宏觀經濟與產業趨勢',
+      '02 30年河東30年河西 — 巴西經濟大起大落',
+      '03 2027巴西稅改 — 雙重IVA制度詳解',
+    ]
+  },
+  F: {
+    title: '🎬 媒體中心',
+    items: [
+      '01 2027巴西稅改解說 — 雙重IVA制度',
+      '02 小紅書系列EP01',
     ]
   }
 };

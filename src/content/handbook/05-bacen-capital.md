@@ -1,9 +1,9 @@
 ---
 title: "中央銀行申報與合規資本注入：SCE-IED (RDE-IED) 不可逾越的紅線"
 description: "為何匯款前必須先在 BACEN 的 SCE-IED (RDE-IED) 系統完成外資登記？2024 年 10 月 30 天規則取消後的定期申報新制。如何確保匯款水單與申報內容完全一致？精算註冊資本額與前半年的營運費用模型。"
-phase: "foundation"
+phase: "B"
 phaseLabel: "第二階段：實體建立"
-order: 5
+order: 02
 icon: "🏦"
 tags: ["BACEN", "SCE-IED", "RDE-IED", "資本注入", "外資登記", "匯款", "CNPJ", "合規", "gov.br", "定期申報"]
 featured: true

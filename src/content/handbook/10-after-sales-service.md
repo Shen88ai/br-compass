@@ -1,9 +1,9 @@
 ---
 title: "本地化銷售與售後服務：巴西消費者法 (CDC) 實戰"
 description: "巴西消費者保護法 (CDC) 對電商賣家的強制要求、退換貨流程、逆向物流最佳實踐，以及如何避免消費者訴訟與 PROCON 罰款。"
-phase: "operations"
+phase: "C"
 phaseLabel: "第三階段：供應鏈營運"
-order: 10
+order: 04
 icon: "🔄"
 tags: ["CDC", "消費者法", "退換貨", "逆向物流", "PROCON", "售後服務", "本地化"]
 

@@ -1,9 +1,9 @@
 ---
 title: 入境前合規準備清單：從 CPF 到文件認證的完整指南
 description: 在踏上巴西土地之前，你必須完成哪些合規準備？CPF 線上申請、海牙認證、宣誓翻譯、gov.br 激活——一份按時間線排序的 5W2H 行動清單。
-phase: preparation
-phaseLabel: 第一階段：戰略藍圖
-order: 1
+phase: "A"
+phaseLabel: "第一階段：戰略藍圖"
+order: "00"
 icon: 📋
 tags:
   - CPF

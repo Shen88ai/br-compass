@@ -1,9 +1,9 @@
 ---
 title: "Q&A 學習區塊：常見問題解答"
 description: "循序漸進學習指南，回答關於稅務模式的常見問題。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 4.3
+order: 01.3
 icon: "📚"
 tags: ["稅務", "Q&A", "學習", "FAQ"]
 featured: false

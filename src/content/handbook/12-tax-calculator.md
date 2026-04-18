@@ -1,9 +1,9 @@
 ---
 title: "進口稅務計算器：全額申報 vs 低報風險"
 description: "互動式稅務模擬：了解巴西進口稅務結構，比較全額申報與低報的稅務差異與風險。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 13
+order: 04
 icon: "🧮"
 tags: ["稅務", "計算器", "進口", "全額申報", "低報", "風險評估"]
 featured: true

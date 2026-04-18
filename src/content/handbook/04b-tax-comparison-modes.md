@@ -1,9 +1,9 @@
 ---
 title: "三種模式詳細計算表：Lucro Real vs Lucro Presumido vs 低報"
 description: "三種稅務模式的詳細計算表及對比分析，幫助企業做出最佳決策。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 4.2
+order: 01.2
 icon: "📊"
 tags: ["稅務", "計算表", "Lucro Real", "Lucro Presumido", "低報"]
 featured: false

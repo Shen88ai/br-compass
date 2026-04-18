@@ -1,9 +1,9 @@
 ---
 title: "尋找在地領路人：牽制與授權的博弈"
 description: "如何篩選可靠的巴西會計師與律師？如何安全地核發 Pleno Poder 全權授權書？附帶合約清單與風險管理框架，確保外資母廠不被反客為主。"
-phase: "preparation"
+phase: "A"
 phaseLabel: "第一階段：戰略藍圖"
-order: 3
+order: 03
 icon: "🤝"
 tags: ["會計師", "律師", "Pleno Poder", "授權書", "Administrador", "風險管理", "合規"]
 

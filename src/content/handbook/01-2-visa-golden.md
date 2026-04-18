@@ -1,9 +1,9 @@
 ---
 title: "黃金簽證：房產投資居留指南"
 description: "透過在巴西購買房產取得臨時居留權——區域門檻、資金來源要求、14天居住規則、4年轉永居完整路徑。"
-phase: "preparation"
+phase: "A"
 phaseLabel: "第一階段：戰略藍圖"
-order: 3
+order: 02.1
 icon: "🏠"
 tags: ["黃金簽證", "房產投資", "Visto Gold", "CRNM", "永居", "Matrícula"]
 featured: true

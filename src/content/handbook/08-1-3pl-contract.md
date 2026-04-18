@@ -1,9 +1,9 @@
 ---
 title: "3PL 合約談判：稅務條款與賠償責任的全方位檢查清單"
 description: "深度解析與巴西 3PL 物流商簽約時必須注意的法律細節，包括 Split Payment 系統對接、ANVISA/MAPA 資質責任、延遲發貨罰款條款等關鍵談判點。"
-phase: "operations"
+phase: "C"
 phaseLabel: "第三階段：供應鏈營運"
-order: 81
+order: 02.1
 icon: "📋"
 tags: ["3PL", "合約", "法律", "ANVISA", "MAPA", "AFE", "LDR", "物流", "賠償"]
 

@@ -1,9 +1,9 @@
 ---
 title: "合法當地居留：簽證戰略與決策地圖"
 description: "5 種簽證路徑完整對比——法定董事 RN 11、投資簽證 RN 36、黃金簽證、數位遊民 VITEM XIV、高管簽證。互動決策地圖幫你找到最適合的路徑。"
-phase: "preparation"
+phase: "A"
 phaseLabel: "第一階段：戰略藍圖"
-order: 5
+order: 02
 icon: "🛂"
 tags: ["簽證", "RN 11", "RN 36", "黃金簽證", "數位遊民", "VITEM", "稅務居民", "永居", "CPF", "SCE-IED"]
 featured: true

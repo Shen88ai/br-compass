@@ -1,11 +1,11 @@
 ---
-title: "外資企業閃電成立：CNPJ、Pre-acordo 與 Pleno Poder 的授權博弈"
-description: "逐步拆解外資公司如何在巴西從零到一：Pre-acordo 借用倉庫地址策略、CNPJ 申請流程、Pleno Poder 全權授權書的法律風險管控，以及資本金額的精算邏輯。"
-phase: "foundation"
-phaseLabel: "第二階段：實體建立"
-order: 4
+title: "外资企业闪电成立：CNPJ、Pre-acordo 与 Pleno Poder 的授权博弈"
+description: "逐步拆解外资公司如何在巴西从零到一：Pre-acordo 借用仓库地址策略、CNPJ 申请流程、Pleno Poder 全权授权书的风险管控，以及资本金额的精算逻辑。"
+phase: "B"
+phaseLabel: "第二阶段：实体建立"
+order: 01
 icon: "🏛️"
-tags: ["CNPJ", "公司設立", "Pleno Poder", "SCE-IED", "RDE-IED", "外資", "Pre-acordo", "BACEN"]
+tags: ["CNPJ", "公司设立", "Pleno Poder", "SCE-IED", "RDE-IED", "外资", "Pre-acordo", "BACEN"]
 
 images:
   cover: 04-company-setup-cover.png

@@ -1,9 +1,9 @@
 ---
 title: "Split Payment 現金流生存指南：稅款即時扣繳的 survival playbook"
 description: "深度解析 2026 年起的 Split Payment 分裂支付機制，理解「稅款瞬間被抽走」對現金流的衝擊，並提供週轉金規劃與 ERP 對接的實務建議。"
-phase: "operations"
+phase: "C"
 phaseLabel: "第三階段：供應鏈營運"
-order: 91
+order: 03.1
 icon: "💸"
 tags: ["Split Payment", "現金流", "CBS", "IBS", "週轉金", "財務管理", "Split Payment"]
 

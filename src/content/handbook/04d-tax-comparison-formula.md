@@ -1,9 +1,9 @@
 ---
 title: "淨利還原公式與稅務規劃檢查清單"
 description: "完整公式推導與行動檢查清單，幫助企業落實稅務規劃。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 4.4
+order: 01.4
 icon: "✅"
 tags: ["稅務", "公式", "檢查清單", "行動"]
 featured: false

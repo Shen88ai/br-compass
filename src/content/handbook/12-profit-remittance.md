@@ -1,9 +1,9 @@
 ---
 title: "獲利落袋為安：合規抵稅與利潤匯出 (Remessa de Lucros)"
 description: "如何合法、低稅地將巴西子公司的盈餘匯回母公司？深度探討 JCP（自有資本利息）、特許權使用費、管理費等利潤轉移工具的合規操作與稅務優化。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 12
+order: 03
 icon: "💰"
 tags: ["Remessa de Lucros", "JCP", "利潤匯出", "特許權使用費", "抵稅", "IRRF", "跨國稅務"]
 featured: true

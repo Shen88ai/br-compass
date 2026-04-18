@@ -1,9 +1,9 @@
 ---
 title: "高管簽證 VITEM V：跨國公司外派人員的巴西通行證"
 description: "VITEM V 高管/技術工作簽證完整指南——2026 年最低工資 R$1,621 的連鎖反應、學歷認證陷阱、Local-plus 安排風險、3~6 週最快審批路徑。"
-phase: "preparation"
+phase: "A"
 phaseLabel: "第一階段：戰略藍圖"
-order: 6
+order: 02.3
 icon: "👔"
 tags: ["VITEM V", "高管簽證", "技術服務簽證", "最低工資", "學歷認證", "CLT", "INSS", "FGTS", "Pró-labore"]
 featured: true

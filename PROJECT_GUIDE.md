@@ -45,20 +45,22 @@ br-compass/
 
 ### 章节命名规则
 - 文件名格式：`{phase}-{order}-{slug}.md`
-- Phase 01 = preparation（战略蓝图）
-- Phase 02 = foundation（实体建立）
-- Phase 03 = operations（运营执行）
-- Phase 04 = harvest（财务合规）
-- 示例：`01-0-pre-entry-checklist.md`、`05-bacen-capital.md`、`12-profit-remittance.md`
+- Phase A = 第一阶段：战略蓝图（战略/签证/团理队）
+- Phase B = 第二阶段：实体建立（公司设立/银行/平台）
+- Phase C = 第三阶段：供应链营运（物流/ERP/支付）
+- Phase D = 第四阶段：财务合规（税务/合规/利润）
+- Phase E = 市场洞察（市场分析/趋势）
+- Phase F = 媒体中心（影片/图文/素材）
+- 示例：`01-tax-system.md`、`04-company-setup.md`、`04a-tax-comparison-intro.md`
 
 ### Frontmatter 格式
 ```yaml
 ---
 title: "章节标题"
 description: "章节描述（用于 SEO 和卡片预览）"
-phase: "preparation"          # preparation | foundation | operations | harvest
+phase: "A"                    # A | B | C | D | E | F（大写字母）
 phaseLabel: "第一階段：戰略藍圖"
-order: 1                       # 数字，决定章节顺序
+order: 01                      # 两位数字，决定章节顺序
 icon: "📋"                     # emoji 图标
 tags: ["标签1", "标签2"]
 featured: true                 # 可选，标记为重点章节
@@ -1136,3 +1138,165 @@ npm run build
 
 - **中期**：串接 Cloudinary 優化圖片載入
 - **長期**：CMS 管理（非必要）
+
+---
+
+## 二十二、Phase 編號重构（2026-04-18）
+
+### 22.1 問題描述
+
+**現象**：點擊 `04-tax-declaration-comparison` 時頁面直接跳轉到 `04a-tax-comparison-intro`，原始頁面內容被隱藏。
+
+**根本原因**：
+1. `04-tax-declaration-comparison.md` 的 frontmatter 包含 `redirect_to: /handbook/04a-tax-comparison-intro`
+2. `04-company-setup` (order: 4) 與 `04-tax-declaration-comparison` (order: 4) **編號相同**，導致衝突
+3. Phase 使用字串（如 `preparation`、`foundation`），與章節編號混用造成混淆
+
+**踩坑記錄**：
+- 開發者誤以為 `04a`、`04b`、`04c`、`04d` 是 `04-company-setup` 的子頁面
+- 實際上 `04-company-setup` 屬於 Phase 2 (foundation)，`04a-04d` 屬於 Phase 4 (harvest)
+- 使用數字字串作 Phase 導致排序混亂
+
+### 22.2 解決方案
+
+#### 22.2.1 Phase 編號改用大寫字母
+
+| Letter | phaseLabel | 舊 Phase 值 | 用途 |
+|--------|-----------|-------------|------|
+| A | 第一階段：戰略藍圖 | preparation | 簽證、稅務、團隊 |
+| B | 第二階段：實體建立 | foundation | 公司設立、银行、平台 |
+| C | 第三階段：供應鏈營運 | operations | 物流、ERP、支付 |
+| D | 第四階段：財務合規 | harvest | 稅務、合規、利潤 |
+| E | 市場洞察 | insights | 市场分析、趋势 |
+| F | 媒體中心 | media | 影片、图文、素材 |
+
+#### 22.2.2 Order 編號新規範
+
+格式：`{章節編號}.{子頁面編號}`（兩位數字）
+
+| 檔案 | 新 Phase | 新 Order | 說明 |
+|------|---------|----------|------|
+| 01-0-pre-entry-checklist | A | 00 | 入境前準備 |
+| 01-tax-system | A | 01 | 稅制說明 |
+| 02-visa-strategy | A | 02 | 簽證戰略 |
+| 01-2-visa-golden | A | 02.1 | 黃金簽證（子頁面） |
+| 01-3-visa-digital-nomad | A | 02.2 | 數位遊民（子頁面） |
+| 01-4-visa-executive | A | 02.3 | 高管簽證（子頁面） |
+| 03-local-team | A | 03 | 在地團隊 |
+| **04-company-setup** | **B** | **01** | 公司設立 ← 修復✅ |
+| 05-bacen-capital | B | 02 | 中央銀行申報 |
+| 06-ecommerce-platforms | B | 03 | 電商平台 |
+| 07-radar-import | C | 01 | RADAR 申請 |
+| 08-3pl-warehouse | C | 02 | 3PL 倉儲 |
+| 08-1-3pl-contract | C | 02.1 | 3PL 合約（子頁面） |
+| 09-erp-payment | C | 03 | ERP 整合 |
+| 09-1-split-payment | C | 03.1 | Split Payment（子頁面） |
+| 10-after-sales-service | C | 04 | 售後服務 |
+| **04-tax-declaration-comparison** | **D** | **01** | 稅務比較 ← 修復✅ |
+| 04a-tax-comparison-intro | D | 01.1 | 稅務結論 |
+| 04b-tax-comparison-modes | D | 01.2 | 三種模式 |
+| 04c-tax-comparison-qa | D | 01.3 | Q&A |
+| 04d-tax-comparison-formula | D | 01.4 | 淨利公式 |
+| 11-tax-compliance | D | 02 | 稅務合規 |
+| 12-profit-remittance | D | 03 | 利潤匯回 |
+| 12-tax-calculator | D | 04 | 稅務計算器 |
+| 01-巴西市場剖析 | E | 01 | 市場洞察 |
+| 03-2027巴西稅改 | E | 03 | 稅改洞察 |
+| 01-2027-巴西稅改雙重IVA | F | 01 | 媒體素材 |
+| 02-小紅書系列EP01 | F | 02 | 媒體素材 |
+
+### 22.3 Frontmatter 修正範例
+
+#### 錯誤示範（舊）
+```yaml
+---
+title: "進口正清全報及低報比較"
+phase: "harvest"
+phaseLabel: "第四階段：財務合規"
+order: 4
+redirect_to: /handbook/04a-tax-comparison-intro
+---
+```
+
+#### 正確示範（新）
+```yaml
+---
+title: "進口正清全報及低報比較（目錄）"
+description: "稅制轉型下的三種申報模式比較..."
+phase: "D"
+phaseLabel: "第四階段：財務合規"
+order: "01"
+icon: "📊"
+tags: ["稅務", "進口", "正清全報"]
+featured: true
+images:
+  cover: 04-tax-declaration-comparison-cover.jpeg
+---
+```
+
+### 22.4 Astro Schema 更新
+
+**修改檔案**：`src/content.config.ts`
+
+```typescript
+// 舊
+phase: z.enum(['preparation', 'foundation', 'operations', 'harvest', 'insights', 'media']),
+order: z.number(),
+
+// 新
+phase: z.enum(['A', 'B', 'C', 'D', 'E', 'F']),
+order: z.union([z.string(), z.number()]),
+```
+
+### 22.4 新增文章時的判斷流程
+
+1. **判斷 Phase（選擇字母）**：
+   - 戰略/簽證/團隊 → A
+   - 公司設立/銀行/平台 → B
+   - 物流/ERP/支付 → C
+   - 稅務/合規/利潤 → D
+   - 市場分析/趨勢 → E
+   - 影片图文/素材 → F
+
+2. **選擇 Order（字串，兩位數字）**：
+   - 格式：`"01"` 或 `"01.1"`
+   - 主頁面：01, 02, 03...
+   - 子頁面：01.1, 01.2, 01.3...
+
+3. **Astro Schema 相容性**：
+   - 目前支援 `z.union([z.string(), z.number()])` 過渡
+   - 未來應统一使用字串格式 `"01"`
+
+4. **驗證不衝突**：
+   - 確認同 Phase 下沒有相同編號
+
+### 22.5 Astro 前端頁面同步更新
+
+**修改檔案**：
+
+| 檔案 | 修改內容 |
+|------|---------|
+| `src/pages/handbook/index.astro` | `phases` id: `'A'`, `'B'`, `'C'`, `'D'`, `'E'`, `'F'` |
+| `src/pages/handbook/[...slug].astro` | `phaseColors`/`phaseRgb` key: `'A'~'F'` |
+| `src/pages/index.astro` | Anchor href: `'#phase-A'`, `'#phase-B'` 等 |
+
+### 22.6 未來重構建議（長期）
+
+將檔案移動到以 Phase 分成的資料夾：
+
+```
+src/content/handbook/
+├── A-preparation/          # 第一階段
+│   ├── 01-tax-system.md
+│   ├── 02-visa-strategy.md
+│   └── index.md
+├── B-foundation/         # 第二階段
+│   ├── 01-company-setup.md
+│   ├── 02-bacen-capital.md
+│   └── index.md
+├── C-operations/         # 第三階段
+├── D-harvest/            # 第四階段
+├── E-insights/          # 市場洞察
+├── F-media/             # 媒體中心
+└── index.md            # 總目錄
+```

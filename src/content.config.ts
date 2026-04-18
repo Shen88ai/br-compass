@@ -6,9 +6,9 @@ const handbookCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    phase: z.enum(['preparation', 'foundation', 'operations', 'harvest', 'insights', 'media']),
+    phase: z.enum(['A', 'B', 'C', 'D', 'E', 'F']),
     phaseLabel: z.string(),
-    order: z.number(),
+    order: z.union([z.string(), z.number()]),
     icon: z.string().default('📄'),
     tags: z.array(z.string()).optional().default([]),
     coverImage: z.string().optional(),

@@ -1,9 +1,9 @@
 ---
 title: "數位遊民簽證：遠程工作者的巴西通行證"
 description: "VITEM XIV 數位遊民簽證完整指南——收入門檻、183天稅務居民規則、境內轉換流程、轉投資簽證路徑。"
-phase: "preparation"
+phase: "A"
 phaseLabel: "第一階段：戰略藍圖"
-order: 4
+order: 02.2
 icon: "💻"
 tags: ["數位遊民", "VITEM XIV", "稅務居民", "183天", "遠程工作", "MigranteWeb"]
 featured: true

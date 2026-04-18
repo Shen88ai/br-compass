@@ -1,9 +1,9 @@
 ---
 title: "破譯巴西複雜稅制：從稅務瘋人院到 IVA Dual"
 description: "深度解析巴西從 5 稅並存的舊制，到 2026-2033 IVA Dual 雙軌過渡期的完整稅務架構，並點出企業選擇 Lucro Real vs. Lucro Presumido 的關鍵時機與長遠影響。"
-phase: "preparation"
+phase: "A"
 phaseLabel: "第一階段：戰略藍圖"
-order: 1
+order: 01
 icon: "⚖️"
 tags: ["稅制", "IVA Dual", "Lucro Real", "IRPJ", "CSLL", "CBS", "IBS"]
 featured: true

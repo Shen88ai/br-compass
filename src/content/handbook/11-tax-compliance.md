@@ -1,9 +1,9 @@
 ---
 title: "日常稅務合規：SPED 系統、NF-e、報表與 Malha Fiscal 應對"
 description: "從 SPED 數位監管架構到日常 NF-e 開立、月度報表申報、以及稅務審查應對——跨境電商在巴西的完整合規操作手冊。"
-phase: "harvest"
+phase: "D"
 phaseLabel: "第四階段：財務合規"
-order: 11
+order: 02
 icon: "📋"
 tags: ["SPED", "NF-e", "Malha Fiscal", "稅務合規", "Compliance", "電子發票", "稅務審查", "EFD", "ECD", "ECF"]
 featured: true
