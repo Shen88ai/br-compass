@@ -3808,12 +3808,17 @@ code, .mono {
   margin-bottom: var(--space-4);
 }
 .advisor-card {
+  /* position: fixed would cause overlap with floating-contact */
+  /* Keep as static/relative unless explicitly triggered */
+  position: relative;
   background: linear-gradient(135deg, var(--color-bg-800), #12121f);
   border: 1px solid rgba(var(--color-gold-rgb), 0.2);
   border-radius: var(--radius-card);
   padding: var(--space-4);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
   text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
 }
 .advisor-dialogue {
   display: flex;

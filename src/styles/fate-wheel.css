@@ -24,11 +24,11 @@
 /* ── Diagnosis Overlay Panel ──────────────────────────────── */
 .diagnosis-overlay {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 100px;
+  right: 24px;
   z-index: 20;
   max-width: 380px;
-  background: rgba(15, 15, 24, 0.85);
+  background: rgba(15, 15, 24, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(var(--color-gold-rgb), 0.2);
