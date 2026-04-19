@@ -5398,3 +5398,133 @@ details details > summary:hover {
     padding: var(--space-1) var(--space-2);
   }
 }
+
+/* ── Exit Intent Popup ─────────────────────────────── */
+.exit-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.popup-content {
+  background: linear-gradient(135deg, #1a1a2e, #0f0f18);
+  border: 1px solid var(--color-gold);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 0 60px rgba(212, 168, 67, 0.3);
+}
+
+.popup-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.popup-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.popup-title {
+  font-size: 1.5rem;
+  color: var(--color-gold);
+  margin-bottom: 0.5rem;
+}
+
+.popup-desc {
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+}
+
+.popup-cta {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.popup-skip {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ── Reading Progress Milestone CTA ─────────────── */
+.milestone-popup {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--color-bg-800), #12121f);
+  border: 1px solid var(--color-neon-yellow);
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideUp 0.5s ease;
+  box-shadow: 0 4px 20px rgba(229, 255, 0, 0.2);
+}
+
+.milestone-icon {
+  font-size: 1.25rem;
+}
+
+.milestone-text {
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.milestone-cta {
+  background: var(--color-neon-yellow);
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.milestone-cta:hover {
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* ── WhatesApp/TG Floating Button ────────────────── */
+.floating-contact {
+  text-decoration: none;
+}
+
+.floating-label {
+  font-size: 0.85rem;
+}

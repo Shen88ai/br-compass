@@ -21,7 +21,28 @@ const phaseCounts = {
 };
 ---
 
-<Layout title="黃金雨林 | 跨境電商巴西出海一站式門戶" description="從稅務計算到公司設立，最完整的巴西落地解決方案">
+<Layout title="黃金雨林 | 跨境電商巴西出海一站式門戶" description="從稅務計算到公司設立，最完整的巴西落地解決方案" canonicalUrl="/">
+
+<!-- JSON-LD Structured Data for WebSite -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "黃金雨林 Golden Rainforest",
+  "url": "https://braziltax.netlify.app",
+  "description": "巴西跨境電商一站式門戶，從稅務計算到公司設立的完整解決方案",
+  "publisher": {
+    "@type": "Organization",
+    "name": "黃金雨林 Golden Rainforest"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://braziltax.netlify.app/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+})} />
   <!-- 3D Fate Wheel Scene (fixed, always centered) -->
   <FateWheelScene />
 

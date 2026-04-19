@@ -5,9 +5,20 @@ import '@fontsource-variable/inter';
 export interface Props {
   title?: string;
   description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
 }
 
-const { title = '巴西出海實戰手冊', description = '跨境電商出海、落地巴西的完整實戰指南' } = Astro.props;
+const { 
+  title = '巴西出海實戰手冊', 
+  description = '跨境電商出海、落地巴西的完整實戰指南',
+  canonicalUrl,
+  ogImage = '/images/og-default.png'
+} = Astro.props;
+
+const siteUrl = 'https://braziltax.netlify.app';
+const fullCanonicalUrl = canonicalUrl ? `${siteUrl}${canonicalUrl}` : siteUrl;
+const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
 ---
 
 <!doctype html>
@@ -17,8 +28,31 @@ const { title = '巴西出海實戰手冊', description = '跨境電商出海、
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO: Canonical URL -->
+    <link rel="canonical" href={fullCanonicalUrl} />
+    
+    <!-- SEO: Primary Meta -->
     <title>{title} | 專業會計服務</title>
     <meta name="description" content={description} />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | 專業會計服務`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={fullCanonicalUrl} />
+    <meta property="og:image" content={fullOgImage} />
+    <meta property="og:site_name" content="黃金雨林 Golden Rainforest" />
+    <meta property="og:locale" content="zh_TW" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@braziltax" />
+    <meta name="twitter:title" content={`${title} | 專業會計服務`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={fullOgImage} />
+    
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -77,6 +111,37 @@ const { title = '巴西出海實戰手冊', description = '跨境電商出海、
       <div class="footer-brand">專業會計服務</div>
       <p class="footer-copy">© 2026 BrazilTax. 為跨境電商提供最完善的巴西落地解決方案。</p>
     </footer>
+
+    <!-- ── Exit Intent Popup ───────────────────────────────── -->
+    <div class="exit-popup" id="exit-popup" style="display:none;">
+      <div class="popup-content">
+        <button class="popup-close" id="popup-close">&times;</button>
+        <div class="popup-icon">💬</div>
+        <h3 class="popup-title">別急著走！</h3>
+        <p class="popup-desc">有問題需要解答嗎？我們的巴西稅務專家可以幫你。</p>
+        <a href="https://braziltax.netlify.app/#contact" class="popup-cta btn-gold-primary">
+          免費咨詢
+        </a>
+        <button class="popup-skip" id="popup-skip">先不用，謝謝</button>
+      </div>
+    </div>
+
+    <!-- ── Reading Progress Milestone CTA ───────────────────── -->
+    <div class="milestone-popup" id="milestone-popup" style="display:none;">
+      <div class="milestone-content">
+        <span class="milestone-icon">📖</span>
+        <span class="milestone-text">還有更多精彩內容！</span>
+        <a href="https://braziltax.netlify.app/#contact" class="milestone-cta">咨詢獲取完整方案</a>
+      </div>
+    </div>
+
+    <!-- ── WhatsApp/TG Floating Button ───────────────────── -->
+    <a href="https://t.me/braziltax" class="floating-contact" id="floating-contact" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.182c1.165 0 2.143.378 2.935 1.134l-.002.002c.778.777 1.425 1.622 1.906 2.546.481.924.727 1.963.727 3.118s-.246 2.194-.727 3.118c-.481.924-1.128 1.77-1.906 2.546l-.002-.002c-.792.756-1.77 1.134-2.935 1.134a4.55 4.55 0 01-3.182-1.317c-.924-.924-1.317-2.053-1.317-3.438s.393-2.514 1.317-3.438c.924-.924 2.053-1.317 3.438-1.317h.15zm2.975 5.143c-.378-.378-.918-.605-1.622-.605-.703 0-1.317.227-1.841.681-.378.327-.697.838-.918 1.532-.15.462-.27.882-.378 1.261-.107.378-.35.836-.803 1.261l-.378.378c-.227.227-.474.303-.682.227-.208-.075-.436-.378-.603-.878-.15-.462-.327-.925-.481-1.388-.156-.378-.434-.832-.878-1.072-.444-.24-1.082-.24-1.476-.378-.15-.075-.303-.227-.378-.378-.075-.15-.15-.303-.15-.462s.075-.378.227-.546l.377-.378c.15-.15.303-.227.462-.227h.378l.462-.075c.378-.15.682-.15 1.06.075.378.227.682.681.925 1.164.243.482.378 1.013.378 1.592s-.135 1.11-.378 1.592c-.243.482-.547.936-.925 1.164-.378.227-.682.227-1.06.075l-.462-.075-.378-.075c-.15 0-.312.077-.462.227l-.377.378c-.152.15-.227.397-.227.546 0 .16.075.313.15.463.075.15.227.303.378.378.393.139.832.139 1.476.379.444.24.723.694.878 1.072.155.378.332.925.482 1.388a4.55 4.55 0 010 2.755c-.15.462-.378.925-.482 1.388-.155.378-.434.832-.878 1.072-.644.24-1.082.24-1.476.378-.15.075-.227.227-.378.378l-.378.378c-.152.152-.303.227-.462.227-.159 0-.312-.075-.462-.227l-.378-.378c-.15-.15-.303-.227-.461-.227h-.38l-.462.075c-.378.15-.682.15-1.06-.075a2.818 2.818 0 01-.925-1.164c-.243-.482-.378-1.013-.378-1.592s.135-1.11.378-1.592c.243-.482.547-.936.925-1.164.378-.227.682-.227 1.06-.075l.462.075.378.075c.15 0 .312-.077.462-.227l.377-.378c.15-.15.227-.312.227-.546z"/>
+      </svg>
+      <span class="floating-label">客服</span>
+    </a>
   </body>
 </html>
 
@@ -512,5 +577,75 @@ if (document.readyState === 'loading') {
   }
 
   animate();
+})();
+
+// ── Exit Intent Popup ─────────────────────────────────
+(function initExitPopup() {
+  const popup = document.getElementById('exit-popup');
+  const closeBtn = document.getElementById('popup-close');
+  const skipBtn = document.getElementById('popup-skip');
+  if (!popup) return;
+  
+  let shown = false;
+  let lastY = 0;
+  
+  document.addEventListener('mouseleave', (e) => {
+    if (e.clientY <= 0 && !shown) {
+      shown = true;
+      popup.style.display = 'flex';
+    }
+  });
+  
+  function closePopup() {
+    popup.style.display = 'none';
+  }
+  
+  closeBtn?.addEventListener('click', closePopup);
+  skipBtn?.addEventListener('click', closePopup);
+  
+  setTimeout(() => {
+    if (popup) popup.style.display = 'none';
+  }, 10000);
+})();
+
+// ── Reading Progress Milestone CTA ───────────────────────
+(function initMilestonePopup() {
+  const popup = document.getElementById('milestone-popup');
+  if (!popup) return;
+  
+  let triggered = false;
+  
+  window.addEventListener('scroll', () => {
+    if (triggered) return;
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    
+    if (progress >= 30 && progress < 70) {
+      triggered = true;
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 5000);
+    }
+  }, { passive: true });
+})();
+
+// ── Floating Contact Button Animation ──────────────────
+(function initFloatingButton() {
+  const btn = document.getElementById('floating-contact');
+  if (!btn) return;
+  
+  btn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--color-gold),#b8860b);color:var(--color-bg-900);padding:12px 20px;border-radius:50px;font-weight:600;box-shadow:0 4px 20px rgba(212,168,67,0.4);transition:all 0.3s;';
+  
+  btn.addEventListener('mouseenter', () => {
+    btn.style.transform = 'scale(1.1)';
+    btn.style.boxShadow = '0 6px 30px rgba(212,168,67,0.6)';
+  });
+  
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'scale(1)';
+    btn.style.boxShadow = '0 4px 20px rgba(212,168,67,0.4)';
+  });
 })();
 </script>

@@ -1,0 +1,11 @@
+# Robots.txt for BR Compass
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://braziltax.netlify.app/sitemap.xml
+
+# Disallow admin areas
+Disallow: /api/
+Disallow: /_astro/
+Disallow: /*.json$

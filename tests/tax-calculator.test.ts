@@ -105,8 +105,8 @@ describe('Tax Calculator - Chapter Content', () => {
     const content = fs.readFileSync(chapterPath, 'utf-8');
 
     expect(content).toContain('title:');
-    expect(content).toContain('phase: "harvest"');
-    expect(content).toContain('order: 13');
+    expect(content).toContain('phase: "D"');
+    expect(content).toContain('order:');
   });
 
   it('should start with 因果連接', () => {

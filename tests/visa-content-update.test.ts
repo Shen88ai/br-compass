@@ -17,14 +17,14 @@ describe('新增章節：01-0-pre-entry-checklist.md 入境前合規準備清單
       expect(existsSync(mdPath)).toBe(true);
     });
 
-    it('phase 應為 preparation', () => {
+    it('phase 應為 A（第一階段：戰略藍圖）', () => {
       const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/phase:\s*["']?preparation["']?/);
+      expect(md).toMatch(/phase:\s*["']?A["']?/);
     });
 
     it('order 應小於 01-tax-system.md 的 order（即最前面）', () => {
       const md = readFileSync(mdPath, 'utf-8');
-      const orderMatch = md.match(/order:\s*(\d+)/);
+      const orderMatch = md.match(/order:\s*["']?(\d+)["']?/);
       expect(orderMatch).toBeTruthy();
       expect(parseInt(orderMatch![1])).toBeLessThan(11);
     });
@@ -115,9 +115,9 @@ describe('新增章節：01-4-visa-executive.md 高管簽證 VITEM V', () => {
       expect(existsSync(mdPath)).toBe(true);
     });
 
-    it('phase 應為 preparation', () => {
+    it('phase 應為 A（第一階段：戰略藍圖）', () => {
       const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/phase:\s*["']?preparation["']?/);
+      expect(md).toMatch(/phase:\s*["']?A["']?/);
     });
 
     it('應包含 VITEM V 相關 tags', () => {

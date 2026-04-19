@@ -80,7 +80,34 @@ const showTaxFactory = false;
 const showEconomicWaveTimeline = post.id.includes('02-30年河東30年河西');
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
+<Layout title={post.data.title} description={post.data.description} canonicalUrl={`/handbook/${post.id}`}>
+
+<!-- JSON-LD Structured Data for Article -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "author": {
+    "@type": "Organization",
+    "name": "黃金雨林 Golden Rainforest",
+    "url": "https://braziltax.netlify.app"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "黃金雨林 Golden Rainforest",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://braziltax.netlify.app/images/logo.png"
+    }
+  },
+  "datePublished": "2026-01-01",
+  "dateModified": "2026-04-19",
+  "image": coverImagePath ? `https://braziltax.netlify.app${coverImagePath}` : "https://braziltax.netlify.app/images/og-default.png",
+  "url": `https://braziltax.netlify.app/handbook/${post.id}`,
+  "articleSection": post.data.phaseLabel,
+  "keywords": post.data.tags?.join(', ') || ''
+})} />
   <!-- Reading Progress Bar -->
   <div class="reading-progress">
     <div class="reading-progress-bar" id="progress-bar"></div>

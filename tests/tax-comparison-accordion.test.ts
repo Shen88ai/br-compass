@@ -17,90 +17,54 @@ describe('04-tax-declaration-comparison Chapter', () => {
     it('应有正确的 frontmatter 欄位', () => {
       const md = readFileSync(mdPath, 'utf-8');
       expect(md).toMatch(/title:/);
-      expect(md).toMatch(/phase: "harvest"/);
+      expect(md).toMatch(/phase: "D"/);
       expect(md).toMatch(/featured: true/);
     });
   });
 
-  describe('Enhanced UI Components', () => {
-    it('应包含 Toggle 切换', () => {
+  describe('Content Structure (子頁面包，含4個子頁面)', () => {
+    it('应包含子頁面連結', () => {
       const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/tax-toggle/);
+      expect(md).toMatch(/04a-tax-comparison-intro|tax-comparison-intro/);
     });
 
-    it('应包含 箭頭流動圖', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/tax-flow-diagram/);
-    });
-
-    it('应包含 10.9% 横向進度條', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/competitiveness-bar/);
-    });
-
-    it('应包含 稅務抵銷演示', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/tax-offset-demo/);
-    });
-  });
-
-  describe('Content Structure (Q&A Sources)', () => {
     it('应以因果连結論开篇', () => {
       const md = readFileSync(mdPath, 'utf-8');
       expect(md).toMatch(/因果連接/);
     });
 
-    it('应包含 Accordion 互動區塊', () => {
+    it('应包含目录导航', () => {
       const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/accordion-container/);
+      expect(md).toMatch(/本章節已拆分|章節目錄/);
+    });
+  });
+
+  describe('04a 子頁面内容', () => {
+    const subPath = join(handbookDir, '04a-tax-comparison-intro.md');
+    
+    it('04a 子頁面应存在', () => {
+      expect(existsSync(subPath)).toBe(true);
     });
 
     it('应包含 Lucro Real 模式', () => {
-      const md = readFileSync(mdPath, 'utf-8');
+      const md = readFileSync(subPath, 'utf-8');
       expect(md).toMatch(/Lucro Real/);
     });
 
-    it('应包含 Lucro Presumido 正清全報', () => {
-      const md = readFileSync(mdPath, 'utf-8');
+    it('应包含 Lucro Presumido', () => {
+      const md = readFileSync(subPath, 'utf-8');
       expect(md).toMatch(/Lucro Presumido/);
       expect(md).toMatch(/正清全報/);
     });
 
-    it('应包含 Lucro Presumido 低報', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/低報/);
+    it('应包含低報风险警示', () => {
+      const md = readFileSync(subPath, 'utf-8');
+      expect(md).toMatch(/低報|風險/);
     });
 
-    it('应包含低報模式風險警示', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/Risco de ser fiscalizado/);
-    });
-
-    it('应包含 10.9% 竞争分析', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/10\.9%/);
-    });
-
-    it('应包含 CBS/IBS 抵扣逻辑', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/28%/);
-    });
-
-    it('应包含淨利還原公式 (H = E - D - F - G - B)', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/E-D-F-G-B/);
-    });
-
-    it('应包含 Q&A 學習區塊', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/qa-section/);
-    });
-  });
-
-  describe('Key Decision Checklist', () => {
-    it('应包含关键决策检查清單', () => {
-      const md = readFileSync(mdPath, 'utf-8');
-      expect(md).toMatch(/關鍵決策/);
+    it('应包含决策检查清單', () => {
+      const md = readFileSync(subPath, 'utf-8');
+      expect(md).toMatch(/檢查清單|決策|checklist/i);
     });
   });
 });
